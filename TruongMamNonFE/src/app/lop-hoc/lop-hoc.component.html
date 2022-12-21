@@ -1,0 +1,230 @@
+<p-toast></p-toast>
+<p-progressBar
+  *ngIf="loading"
+  mode="indeterminate"
+  [style]="{ height: '6px' }"
+></p-progressBar>
+<p style="font-size: 200%" *ngIf="loading">Đang tải dữ liệu...</p>
+<div class="card" *ngIf="!loading">
+  <p-toolbar styleClass="mb-1 gap-2">
+    <ng-template pTemplate="left">
+      <button
+        pButton
+        pRipple
+        label="Thêm"
+        icon="pi pi-plus"
+        class="p-button-success mr-2"
+        pTooltip="Thêm"
+        tooltipPosition="bottom"
+        (click)="openNew()"
+        [disabled]="!selectedNienHoc"
+      ></button>
+      <button
+        pButton
+        pRipple
+        label="Tải lại"
+        icon="pi pi-refresh"
+        class="p-button-info mr-2"
+        pTooltip="Tải lại"
+        tooltipPosition="bottom"
+        [disabled]="!selectedNienHoc"
+        (click)="getLopHocs()"
+      ></button>
+    </ng-template>
+
+    <ng-template pTemplate="right">
+      <p-fileUpload
+        mode="basic"
+        accept="image/*"
+        [maxFileSize]="1000000"
+        label="Nhập file"
+        chooseLabel="Nhập file"
+        pTooltip="Nhập file"
+        tooltipPosition="bottom"
+        class="p-mr-2 p-d-inline-block mr-2"
+      ></p-fileUpload>
+      <button
+        type="button"
+        pButton
+        pRipple
+        icon="pi pi-file-excel"
+        (click)="exportExcel()"
+        class="p-button-success mr-2"
+        label="Excel"
+        pTooltip="Xuất Excel"
+        tooltipPosition="bottom"
+      ></button>
+      <button
+        type="button"
+        pButton
+        pRipple
+        icon="pi pi-file-pdf"
+        (click)="exportPdf()"
+        class="p-button-warning"
+        label="PDF"
+        pTooltip="Xuất PDF"
+        tooltipPosition="bottom"
+      ></button>
+    </ng-template>
+  </p-toolbar>
+
+  <p-table
+    #dt
+    [value]="displayLopHocs"
+    [rows]="10"
+    [paginator]="true"
+    [globalFilterFields]="['tenLop']"
+    [tableStyle]="{ 'min-width': '50rem' }"
+    [rowHover]="true"
+    dataKey="maLopHoc"
+    currentPageReportTemplate="Hiển thị {first} đến {last} trong {totalRecords} mục"
+    [showCurrentPageReport]="true"
+    [rowsPerPageOptions]="[10, 25, 50]"
+    styleClass="p-datatable-sm p-datatable-striped p-datatable-gridlines"
+  >
+    <ng-template pTemplate="caption">
+      <div class="flex align-items-center justify-content-between">
+        <h3 class="m-0">Danh sách lớp học</h3>
+        <span class="ml-auto"> </span>
+        <span class="p-input-icon-left ml-2">
+          <i class="pi pi-search"></i>
+          <input
+            pInputText
+            type="text"
+            (input)="dt.filterGlobal($any($event.target).value, 'contains')"
+            placeholder="Tìm kiếm..."
+          />
+        </span>
+      </div>
+    </ng-template>
+    <ng-template pTemplate="header">
+      <tr>
+        <th pSortableColumn="tenLop" style="min-width: 15rem">
+          Tên lớp <p-sortIcon field="tenLop"></p-sortIcon>
+        </th>
+        <th pSortableColumn="khoiLop" style="min-width: 10rem">
+          Khối lớp <p-sortIcon field="khoiLop"></p-sortIcon>
+        </th>
+        <th pSortableColumn="hocPhi" style="min-width: 5rem">
+          Học phí <p-sortIcon field="hocPhi"></p-sortIcon>
+        </th>
+        <th pSortableColumn="nienHoc" style="min-width: 5rem">
+          Niên học <p-sortIcon field="nienHoc"></p-sortIcon>
+        </th>
+        <th style="min-width: 5rem"></th>
+      </tr>
+    </ng-template>
+    <ng-template pTemplate="body" let-lopHoc>
+      <tr>
+        <td>{{ lopHoc.tenLop }}</td>
+        <td>{{ lopHoc.khoiLop?.tenKhoiLop }}</td>
+        <td>{{ lopHoc.hocPhi | currency : "VND" : "symbol" : "0.0-0" }}</td>
+        <td>{{ lopHoc.nienHoc?.tenNienHoc }}</td>
+        <td>
+          <button
+            pButton
+            pRipple
+            icon="pi pi-pencil"
+            class="p-button-rounded p-button-success mr-2"
+            title="Sửa"
+            (click)="editLopHoc(lopHoc)"
+          ></button>
+          <button
+            pButton
+            pRipple
+            icon="pi pi-trash"
+            class="p-button-rounded p-button-warning"
+            title="Xóa"
+            (click)="deleteLopHoc(lopHoc)"
+          ></button>
+        </td>
+      </tr>
+    </ng-template>
+    <ng-template pTemplate="summary">
+      <div class="flex align-items-center justify-content-between">
+        Tổng cộng có {{ lopHocs ? lopHocs.length : 0 }} mục.
+      </div>
+    </ng-template>
+  </p-table>
+</div>
+
+<p-dialog
+  [(visible)]="lopHocDialog"
+  [style]="{ width: '750px' }"
+  header="Chi tiết lớp học"
+  [modal]="true"
+  styleClass="p-fluid"
+>
+  <ng-template pTemplate="content">
+    <div class="field">
+      <label for="tenLopHoc">Tên lớp học</label>
+      <input
+        type="text"
+        pInputText
+        id="tenLopHoc"
+        [(ngModel)]="lopHoc.tenLop"
+        required
+        autofocus
+      />
+      <small class="p-error" *ngIf="submitted && !lopHoc.tenLop"
+        >Tên lớp học không được để trống</small
+      >
+    </div>
+    <div class="field">
+      <label for="khoiLop">Khối lớp</label>
+      <p-dropdown
+        [options]="khoiLops"
+        [(ngModel)]="selectedKhoiLop"
+        optionLabel="tenKhoiLop"
+        [filter]="true"
+        filterBy="tenKhoiLop"
+        [showClear]="false"
+        dataKey="maKhoiLop"
+        placeholder="Chọn khối lớp"
+        (onChange)="onKhoiLopChange($event.value)"
+        appendTo="body"
+      >
+        <ng-template pTemplate="selectedItem">
+          <div class="khoiLop-item khoiLop-item-value" *ngIf="selectedKhoiLop">
+            <div>{{ selectedKhoiLop.tenKhoiLop }}</div>
+          </div>
+        </ng-template>
+        <ng-template let-khoiLop pTemplate="item">
+          <div class="nienHoc-item">
+            <div>{{ khoiLop?.tenKhoiLop }}</div>
+          </div>
+        </ng-template>
+      </p-dropdown>
+    </div>
+    <div class="field">
+      <label for="hocPhi">Học phí</label>
+      <p-inputNumber
+        inputId="hocPhi"
+        [(ngModel)]="lopHoc.hocPhi"
+        locale="de-DE"
+      >
+      </p-inputNumber>
+    </div>
+  </ng-template>
+
+  <ng-template pTemplate="footer">
+    <button
+      pButton
+      pRipple
+      label="Hủy"
+      icon="pi pi-times"
+      class="p-button-text"
+      (click)="hideDialog()"
+    ></button>
+    <button
+      pButton
+      pRipple
+      label="Lưu"
+      icon="pi pi-check"
+      class="p-button-text"
+      (click)="saveLopHoc()"
+    ></button>
+  </ng-template>
+</p-dialog>
+
+<p-confirmDialog [style]="{ width: '450px' }"></p-confirmDialog>

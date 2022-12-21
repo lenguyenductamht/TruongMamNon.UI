@@ -1,0 +1,201 @@
+<p-toast></p-toast>
+<p-progressBar
+  *ngIf="loading"
+  mode="indeterminate"
+  [style]="{ height: '6px' }"
+></p-progressBar>
+<p style="font-size: 200%" *ngIf="loading">Đang tải dữ liệu...</p>
+<div class="card" *ngIf="!loading">
+  <p-toolbar styleClass="mb-1 gap-2">
+    <ng-template pTemplate="left">
+      <button
+        pButton
+        pRipple
+        label="Thêm"
+        icon="pi pi-plus"
+        class="p-button-success mr-2"
+        pTooltip="Thêm"
+        tooltipPosition="bottom"
+        (click)="openNew()"
+      ></button>
+      <button
+        pButton
+        pRipple
+        label="Tải lại"
+        icon="pi pi-refresh"
+        class="p-button-primary mr-2"
+        pTooltip="Tải lại"
+        tooltipPosition="bottom"
+        (click)="getVaccines()"
+      ></button>
+    </ng-template>
+
+    <ng-template pTemplate="right">
+      <p-fileUpload
+        mode="basic"
+        accept="image/*"
+        [maxFileSize]="1000000"
+        chooseLabel="Nhập file"
+        pTooltip="Nhập file"
+        tooltipPosition="bottom"
+        class="p-mr-2 p-d-inline-block mr-2"
+      ></p-fileUpload>
+
+      <button
+        type="button"
+        pButton
+        pRipple
+        icon="pi pi-file-excel"
+        (click)="exportExcel()"
+        class="p-button-success mr-2"
+        label="Xuất Excel"
+        pTooltip="Xuất Excel"
+        tooltipPosition="bottom"
+      ></button>
+
+      <button
+        type="button"
+        pButton
+        pRipple
+        icon="pi pi-file-pdf"
+        (click)="exportPdf()"
+        class="p-button-warning"
+        label="Xuất PDF"
+        pTooltip="Xuất PDF"
+        tooltipPosition="bottom"
+      ></button>
+    </ng-template>
+  </p-toolbar>
+
+  <p-table
+    #dt
+    [value]="vaccines"
+    [rows]="10"
+    [paginator]="true"
+    [globalFilterFields]="['tenVaccine']"
+    [tableStyle]="{ 'min-width': '75rem' }"
+    [rowHover]="true"
+    dataKey="maVaccine"
+    currentPageReportTemplate="Hiển thị {first} đến {last} trong {totalRecords} mục"
+    [showCurrentPageReport]="true"
+    [rowsPerPageOptions]="[10, 25, 50]"
+    styleClass="p-datatable-sm p-datatable-striped p-datatable-gridlines"
+  >
+    <ng-template pTemplate="caption">
+      <div class="flex align-items-center justify-content-between">
+        <h3 class="m-0">Danh mục Vaccine</h3>
+        <span class="p-input-icon-left">
+          <i class="pi pi-search"></i>
+          <input
+            pInputText
+            type="text"
+            (input)="dt.filterGlobal($any($event.target).value, 'contains')"
+            placeholder="Tìm kiếm..."
+          />
+        </span>
+      </div>
+    </ng-template>
+    <ng-template pTemplate="header">
+      <tr>
+        <th pSortableColumn="tenVaccine" style="min-width: 15rem">
+          Tên vaccine <p-sortIcon field="tenVaccine"></p-sortIcon>
+        </th>
+        <th pSortableColumn="ghiChu" style="min-width: 10rem">
+          Ghi Chú <p-sortIcon field="ghiChu"></p-sortIcon>
+        </th>
+        <th style="width: 8rem"></th>
+      </tr>
+    </ng-template>
+    <ng-template pTemplate="body" let-vaccine>
+      <tr>
+        <td>{{ vaccine.tenVaccine }}</td>
+        <td>{{ vaccine.ghiChu }}</td>
+        <td>
+          <button
+            pButton
+            pRipple
+            icon="pi pi-pencil"
+            class="p-button-rounded p-button-success mr-2"
+            pTooltip="Sửa"
+            tooltipPosition="top"
+            (click)="editVaccine(vaccine)"
+          ></button>
+          <button
+            pButton
+            pRipple
+            icon="pi pi-trash"
+            class="p-button-rounded p-button-warning"
+            pTooltip="Xóa"
+            tooltipPosition="top"
+            (click)="deleteVaccine(vaccine)"
+          ></button>
+        </td>
+      </tr>
+    </ng-template>
+    <ng-template pTemplate="summary">
+      <div class="flex align-items-center justify-content-between">
+        Tổng cộng có {{ vaccines ? vaccines.length : 0 }} mục.
+      </div>
+    </ng-template>
+  </p-table>
+</div>
+
+<p-dialog
+  [(visible)]="vaccineDialog"
+  [style]="{ width: '550px' }"
+  header="Chi tiết vaccine"
+  [modal]="true"
+  styleClass="p-fluid"
+>
+  <ng-template pTemplate="content">
+    <div class="field">
+      <label for="tenVaccine" class="required-field">Tên vaccine</label>
+      <input
+        type="text"
+        pInputText
+        id="tenVaccine"
+        [(ngModel)]="vaccine.tenVaccine"
+        required
+        autofocus
+      />
+      <small class="p-error" *ngIf="submitted && !vaccine.tenVaccine"
+        >Tên vaccine không được để trống</small
+      >
+    </div>
+    <div class="field">
+      <label for="ghiChu">Ghi Chú</label>
+      <textarea
+        id="ghiChu"
+        pInputTextarea
+        [(ngModel)]="vaccine.ghiChu"
+        rows="3"
+        cols="20"
+      ></textarea>
+    </div>
+  </ng-template>
+
+  <ng-template pTemplate="footer">
+    <button
+      pButton
+      pRipple
+      label="Hủy"
+      icon="pi pi-times"
+      class="p-button-text"
+      (click)="hideDialog()"
+      pTooltip="Hủy"
+      tooltipPosition="top"
+    ></button>
+    <button
+      pButton
+      pRipple
+      label="Lưu"
+      icon="pi pi-check"
+      class="p-button-text"
+      (click)="saveVaccine()"
+      pTooltip="Lưu"
+      tooltipPosition="top"
+    ></button>
+  </ng-template>
+</p-dialog>
+
+<p-confirmDialog [style]="{ width: '450px' }"></p-confirmDialog>

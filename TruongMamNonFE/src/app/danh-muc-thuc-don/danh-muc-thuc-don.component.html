@@ -1,0 +1,268 @@
+<p-toast></p-toast>
+<p-progressBar
+  *ngIf="loading"
+  mode="indeterminate"
+  [style]="{ height: '6px' }"
+></p-progressBar>
+<p style="font-size: 200%" *ngIf="loading">Đang tải dữ liệu...</p>
+<div class="card" *ngIf="!loading">
+  <p-toolbar styleClass="mb-1 gap-2">
+    <ng-template pTemplate="left">
+      <button
+        pButton
+        pRipple
+        label="Thêm"
+        icon="pi pi-plus"
+        class="p-button-success mr-2"
+        pTooltip="Thêm"
+        tooltipPosition="bottom"
+        (click)="openNew()"
+      ></button>
+      <button
+        pButton
+        pRipple
+        label="Tải lại"
+        icon="pi pi-refresh"
+        class="p-button-primary mr-2"
+        pTooltip="Tải lại"
+        tooltipPosition="bottom"
+        (click)="getDanhMucThucDons()"
+      ></button>
+    </ng-template>
+
+    <ng-template pTemplate="right">
+      <p-fileUpload
+        mode="basic"
+        accept="image/*"
+        [maxFileSize]="1000000"
+        chooseLabel="Nhập file"
+        pTooltip="Nhập file"
+        tooltipPosition="bottom"
+        class="p-mr-2 p-d-inline-block mr-2"
+      ></p-fileUpload>
+
+      <button
+        type="button"
+        pButton
+        pRipple
+        icon="pi pi-file-excel"
+        (click)="exportExcel()"
+        class="p-button-success mr-2"
+        label="Xuất Excel"
+        pTooltip="Xuất Excel"
+        tooltipPosition="bottom"
+      ></button>
+
+      <button
+        type="button"
+        pButton
+        pRipple
+        icon="pi pi-file-pdf"
+        (click)="exportPdf()"
+        class="p-button-warning"
+        label="Xuất PDF"
+        pTooltip="Xuất PDF"
+        tooltipPosition="bottom"
+      ></button>
+    </ng-template>
+  </p-toolbar>
+
+  <p-table
+    #dt
+    [value]="danhMucThucDons"
+    [rows]="10"
+    [paginator]="true"
+    [globalFilterFields]="[
+      'tenDanhMuc',
+      'ghiChu',
+      'maDanhMuc',
+      'thoiGian',
+      'nangLuong',
+      'chatDam',
+      'chatBeo',
+      'chatBot'
+    ]"
+    [tableStyle]="{ 'min-width': '75rem' }"
+    [rowHover]="true"
+    dataKey="maDanhMuc"
+    currentPageReportTemplate="Hiển thị {first} đến {last} trong {totalRecords} mục"
+    [showCurrentPageReport]="true"
+    [rowsPerPageOptions]="[10, 25, 50]"
+    styleClass="p-datatable-sm p-datatable-striped p-datatable-gridlines"
+  >
+    <ng-template pTemplate="caption">
+      <div class="flex align-items-center justify-content-between">
+        <h3 class="m-0">Danh mục thực đơn</h3>
+        <span class="p-input-icon-left">
+          <i class="pi pi-search"></i>
+          <input
+            pInputText
+            type="text"
+            (input)="dt.filterGlobal($any($event.target).value, 'contains')"
+            placeholder="Tìm kiếm..."
+          />
+        </span>
+      </div>
+    </ng-template>
+    <ng-template pTemplate="header">
+      <tr>
+        <th pSortableColumn="tenDanhMuc" style="min-width: 15rem">
+          Tên thực đơn <p-sortIcon field="tenDanhMuc"></p-sortIcon>
+        </th>
+        <th pSortableColumn="ghiChu" style="min-width: 10rem">
+          Ghi Chú <p-sortIcon field="ghiChu"></p-sortIcon>
+        </th>
+        <th pSortableColumn="thoiGian" style="min-width: 10rem">
+          Thời gian <p-sortIcon field="thoiGian"></p-sortIcon>
+        </th>
+        <th pSortableColumn="nangLuong">
+          Năng lượng <p-sortIcon field="nangLuong"></p-sortIcon>
+        </th>
+        <th pSortableColumn="chatDam">
+          Chất đạm <p-sortIcon field="chatDam"></p-sortIcon>
+        </th>
+        <th pSortableColumn="chatBeo">
+          Chất béo <p-sortIcon field="chatBeo"></p-sortIcon>
+        </th>
+        <th pSortableColumn="chatBot">
+          Chất bột <p-sortIcon field="chatBot"></p-sortIcon>
+        </th>
+        <th style="min-width: 5rem"></th>
+      </tr>
+    </ng-template>
+    <ng-template pTemplate="body" let-danhMucThucDon>
+      <tr>
+        <td>{{ danhMucThucDon.tenDanhMuc }}</td>
+        <td>{{ danhMucThucDon.ghiChu }}</td>
+        <td>{{ danhMucThucDon.thoiGian }}</td>
+        <td>{{ danhMucThucDon.nangLuong }}</td>
+        <td>{{ danhMucThucDon.chatDam }}</td>
+        <td>{{ danhMucThucDon.chatBeo }}</td>
+        <td>{{ danhMucThucDon.chatBot }}</td>
+        <td>
+          <button
+            pButton
+            pRipple
+            icon="pi pi-pencil"
+            class="p-button-rounded p-button-success mr-2"
+            pTooltip="Sửa"
+            tooltipPosition="bottom"
+            (click)="editDanhMucThucDon(danhMucThucDon)"
+          ></button>
+          <button
+            pButton
+            pRipple
+            icon="pi pi-trash"
+            class="p-button-rounded p-button-warning"
+            pTooltip="Xóa"
+            tooltipPosition="bottom"
+            (click)="deleteDanhMucThucDon(danhMucThucDon)"
+          ></button>
+        </td>
+      </tr>
+    </ng-template>
+    <ng-template pTemplate="summary">
+      <div class="flex align-items-center justify-content-between">
+        Tổng cộng có {{ danhMucThucDons ? danhMucThucDons.length : 0 }} mục.
+      </div>
+    </ng-template>
+  </p-table>
+</div>
+
+<p-dialog
+  [(visible)]="danhMucThucDonDialog"
+  [style]="{ width: '550px' }"
+  header="Chi tiết danh mục thực đơn"
+  [modal]="true"
+  styleClass="p-fluid"
+>
+  <ng-template pTemplate="content">
+    <div class="field">
+      <label for="tenDanhMuc">Tên danh mục</label>
+      <input
+        type="text"
+        pInputText
+        id="tenDanhMuc"
+        [(ngModel)]="danhMucThucDon.tenDanhMuc"
+        required
+        autofocus
+      />
+      <small class="p-error" *ngIf="submitted && !danhMucThucDon.tenDanhMuc"
+        >Tên danh mục không được để trống</small
+      >
+    </div>
+    <div class="field">
+      <label for="ghiChu">Ghi Chú</label>
+      <textarea
+        id="ghiChu"
+        pInputTextarea
+        [(ngModel)]="danhMucThucDon.ghiChu"
+        rows="3"
+        cols="20"
+      ></textarea>
+    </div>
+
+    <div class="field">
+      <label for="thoiGian">Thời gian</label>
+      <input
+        type="text"
+        pInputText
+        id="thoiGian"
+        [(ngModel)]="danhMucThucDon.thoiGian"
+        required
+      />
+    </div>
+    <div class="field">
+      <label for="nangLuong">Năng lượng</label>
+      <p-inputNumber
+        id="nangLuong"
+        [(ngModel)]="danhMucThucDon.nangLuong"
+      ></p-inputNumber>
+    </div>
+
+    <div class="field">
+      <label for="chatDam">Chất đạm</label>
+      <p-inputNumber
+        id="chatDam"
+        [(ngModel)]="danhMucThucDon.chatDam"
+      ></p-inputNumber>
+    </div>
+
+    <div class="field">
+      <label for="chatBeo">Chất béo</label>
+      <p-inputNumber
+        id="chatBeo"
+        [(ngModel)]="danhMucThucDon.chatBeo"
+      ></p-inputNumber>
+    </div>
+
+    <div class="field">
+      <label for="chatBot">Chất bột</label>
+      <p-inputNumber
+        id="chatBot"
+        [(ngModel)]="danhMucThucDon.chatBot"
+      ></p-inputNumber>
+    </div>
+  </ng-template>
+
+  <ng-template pTemplate="footer">
+    <button
+      pButton
+      pRipple
+      label="Hủy"
+      icon="pi pi-times"
+      class="p-button-text"
+      (click)="hideDialog()"
+    ></button>
+    <button
+      pButton
+      pRipple
+      label="Lưu"
+      icon="pi pi-check"
+      class="p-button-text"
+      (click)="saveDanhMucThucDon()"
+    ></button>
+  </ng-template>
+</p-dialog>
+
+<p-confirmDialog [style]="{ width: '450px' }"></p-confirmDialog>

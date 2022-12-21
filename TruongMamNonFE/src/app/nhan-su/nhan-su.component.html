@@ -1,0 +1,610 @@
+<p-toast></p-toast>
+<p-progressBar
+  *ngIf="loading"
+  mode="indeterminate"
+  [style]="{ height: '6px' }"
+></p-progressBar>
+<p style="font-size: 200%" *ngIf="loading">Đang tải dữ liệu...</p>
+<div class="card" *ngIf="!loading">
+  <p-toolbar styleClass="mb-1 gap-2">
+    <ng-template pTemplate="left">
+      <button
+        pButton
+        pRipple
+        label="Thêm"
+        icon="pi pi-plus"
+        class="p-button-success mr-2"
+        pTooltip="Thêm"
+        tooltipPosition="bottom"
+        (click)="openNew()"
+      ></button>
+      <button
+        pButton
+        pRipple
+        label="Tải lại"
+        icon="pi pi-refresh"
+        class="p-button-info mr-2"
+        pTooltip="Tải lại"
+        tooltipPosition="bottom"
+        (click)="getNhanSus()"
+      ></button>
+    </ng-template>
+
+    <ng-template pTemplate="right">
+      <p-fileUpload
+        mode="basic"
+        accept="image/*"
+        [maxFileSize]="1000000"
+        label="Nhập file"
+        chooseLabel="Nhập file"
+        pTooltip="Nhập file"
+        tooltipPosition="bottom"
+        class="p-mr-2 p-d-inline-block mr-2"
+      ></p-fileUpload>
+      <button
+        type="button"
+        pButton
+        pRipple
+        icon="pi pi-file-excel"
+        (click)="exportExcel()"
+        class="p-button-success mr-2"
+        label="Xuất Excel"
+        pTooltip="Xuất file xlsx"
+        tooltipPosition="bottom"
+      ></button>
+      <button
+        type="button"
+        pButton
+        pRipple
+        icon="pi pi-file-pdf"
+        (click)="exportPdf()"
+        class="p-button-warning"
+        label="Xuất PDF"
+        pTooltip="Xuất file PDF"
+        tooltipPosition="bottom"
+      ></button>
+    </ng-template>
+  </p-toolbar>
+
+  <p-table
+    #dt
+    [value]="nhanSus"
+    [rows]="10"
+    [paginator]="true"
+    [globalFilterFields]="['maNhanSu', 'ho', 'ten']"
+    [tableStyle]="{ 'min-width': '75rem' }"
+    [rowHover]="true"
+    dataKey="maNhanSu"
+    currentPageReportTemplate="Hiển thị {first} đến {last} trong {totalRecords} mục"
+    [showCurrentPageReport]="true"
+    [rowsPerPageOptions]="[10, 25, 50]"
+    styleClass="p-datatable-sm p-datatable-striped p-datatable-gridlines"
+  >
+    <ng-template pTemplate="caption">
+      <div class="flex align-items-center justify-content-between">
+        <h3 class="m-0">Danh sách lớp học</h3>
+        <span class="ml-auto"> </span>
+        <span class="p-input-icon-left ml-2">
+          <i class="pi pi-search"></i>
+          <input
+            pInputText
+            type="text"
+            (input)="dt.filterGlobal($any($event.target).value, 'contains')"
+            placeholder="Tìm kiếm..."
+          />
+        </span>
+      </div>
+    </ng-template>
+    <ng-template pTemplate="header">
+      <tr>
+        <th pSortableColumn="maNhanSu" style="min-width: 5rem">
+          Mã học sinh <p-sortIcon field="maNhanSu"></p-sortIcon>
+        </th>
+        <th pSortableColumn="ho" style="min-width: 5rem">
+          Họ <p-sortIcon field="ho"></p-sortIcon>
+        </th>
+        <th pSortableColumn="ten" style="min-width: 5rem">
+          Tên <p-sortIcon field="ten"></p-sortIcon>
+        </th>
+        <th pSortableColumn="gioiTinh" style="min-width: 5rem">
+          Giới tính<p-sortIcon field="gioiTinh"></p-sortIcon>
+        </th>
+        <th pSortableColumn="ngaySinh" style="min-width: 5rem">
+          Ngày sinh<p-sortIcon field="ngaySinh"></p-sortIcon>
+        </th>
+        <th pSortableColumn="trangThaiLamViec" style="min-width: 5rem">
+          Trạng thái cán bộ<p-sortIcon field="trangThaiLamViec"></p-sortIcon>
+        </th>
+        <th pSortableColumn="loaiNhanSu" style="min-width: 5rem">
+          Vị trí việc làm<p-sortIcon field="loaiNhanSu"></p-sortIcon>
+        </th>
+        <th pSortableColumn="chucVu" style="min-width: 5rem">
+          Chức vụ<p-sortIcon field="chucVu"></p-sortIcon>
+        </th>
+        <th pSortableColumn="phongBan" style="min-width: 5rem">
+          Phòng ban<p-sortIcon field="phongBan"></p-sortIcon>
+        </th>
+        <th style="width: 8rem"></th>
+      </tr>
+    </ng-template>
+    <ng-template pTemplate="body" let-nhanSu>
+      <tr>
+        <td>{{ nhanSu.maNhanSu }}</td>
+        <td>{{ nhanSu.ho }}</td>
+        <td>{{ nhanSu.ten }}</td>
+        <td>{{ nhanSu.gioiTinh }}</td>
+        <td>{{ nhanSu.ngaySinh | date : "dd/MM/yyyy" }}</td>
+        <td>{{ nhanSu.trangThaiLamViec }}</td>
+        <td>{{ nhanSu.loaiNhanSu?.tenLoaiNhanSu }}</td>
+        <td>{{ nhanSu.chucVu ? nhanSu.chucVu.tenChucVu : "" }}</td>
+        <td>{{ nhanSu.phongBan?.tenPhongBan }}</td>
+        <td>
+          <button
+            pButton
+            pRipple
+            icon="pi pi-pencil"
+            class="p-button-rounded p-button-success mr-2"
+            pTooltip="Sửa"
+            tooltipPosition="top"
+            (click)="editNhanSu(nhanSu)"
+          ></button>
+          <button
+            pButton
+            pRipple
+            icon="pi pi-trash"
+            class="p-button-rounded p-button-warning"
+            pTooltip="Xóa"
+            tooltipPosition="top"
+            (click)="deleteNhanSu(nhanSu)"
+          ></button>
+        </td>
+      </tr>
+    </ng-template>
+    <ng-template pTemplate="summary">
+      <div class="flex align-items-center justify-content-between">
+        Tổng cộng có {{ nhanSus ? nhanSus.length : 0 }} mục.
+      </div>
+    </ng-template>
+  </p-table>
+</div>
+
+<p-dialog
+  [(visible)]="nhanSuDialog"
+  [style]="{ width: '80%' }"
+  header="Thông tin nhân sự"
+  [modal]="true"
+  styleClass="p-fluid"
+>
+  <ng-template pTemplate="content"> </ng-template>
+  <div class="p-fluid grid mt-4">
+    <div class="field col-12 md:col-3">
+      <span class="p-float-label">
+        <input
+          type="text"
+          pInputText
+          id="maNhanSu"
+          [(ngModel)]="nhanSu.maNhanSu"
+          disabled
+        />
+        <label for="maHocSinh">Mã nhân sự</label>
+      </span>
+    </div>
+
+    <div class="field col-12 md:col-2">
+      <span class="p-float-label">
+        <input
+          type="text"
+          pInputText
+          id="ho"
+          [(ngModel)]="nhanSu.ho"
+          required
+          autofocus
+        />
+        <small class="p-error" *ngIf="submitted && !nhanSu.ho"
+          >Họ không được để trống</small
+        >
+        <label for="ho" class="required-field">Họ</label>
+      </span>
+    </div>
+
+    <div class="field col-12 md:col-1">
+      <span class="p-float-label">
+        <input
+          type="text"
+          pInputText
+          id="ten"
+          [(ngModel)]="nhanSu.ten"
+          required
+        />
+        <small class="p-error" *ngIf="submitted && !nhanSu.ten"
+          >Tên không được để trống</small
+        >
+        <label for="ten" class="required-field">Tên</label>
+      </span>
+    </div>
+
+    <div class="field col-12 md:col-3">
+      <span class="p-float-label">
+        <p-dropdown
+          [(ngModel)]="selectedGioiTinh"
+          inputId="gioiTinh"
+          [options]="gioiTinhs"
+          placeholder="Chọn giới tính"
+          appendTo="body"
+        >
+          <ng-template pTemplate="selectedItem">
+            <div
+              class="gioiTinh-item gioiTinh-item-value"
+              *ngIf="selectedGioiTinh"
+            >
+              <div>{{ selectedGioiTinh.name }}</div>
+            </div>
+          </ng-template>
+          <ng-template let-gioiTinh pTemplate="item">
+            <div class="gioiTinh-item">
+              <div>{{ gioiTinh?.name }}</div>
+            </div>
+          </ng-template>
+        </p-dropdown>
+        <label for="gioiTinh" class="required-field">Giới tính</label>
+      </span>
+    </div>
+
+    <div class="field col-12 md:col-3">
+      <span class="p-float-label">
+        <p-calendar
+          [(ngModel)]="nhanSu.ngaySinh"
+          [showIcon]="true"
+          dateFormat="dd/mm/yy"
+          appendTo="body"
+          [defaultDate]="nhanSu.ngaySinh"
+        ></p-calendar>
+        <label class="required-field" for="ngaySinh">Ngày sinh</label>
+      </span>
+    </div>
+
+    <div class="field col-12 md:col-3">
+      <span class="p-float-label">
+        <input
+          type="text"
+          pInputText
+          id="noiSinh"
+          [(ngModel)]="nhanSu.noiSinh"
+          required
+        />
+        <label for="noiSinh" class="required-field">Nơi sinh</label>
+      </span>
+    </div>
+
+    <div class="field col-12 md:col-3">
+      <span class="p-float-label">
+        <input type="text" pInputText id="cmnd" [(ngModel)]="nhanSu.cmnd" />
+        <label for="cmnd" class="required-field">CMND</label>
+      </span>
+    </div>
+
+    <div class="field col-12 md:col-3">
+      <span class="p-float-label">
+        <p-calendar
+          [(ngModel)]="nhanSu.ngayCap"
+          [showIcon]="true"
+          dateFormat="dd/mm/yy"
+          appendTo="body"
+          [defaultDate]="nhanSu.ngayCap"
+        ></p-calendar>
+        <label for="ngayCap">Ngày cấp</label>
+      </span>
+    </div>
+
+    <div class="field col-12 md:col-3">
+      <span class="p-float-label">
+        <p-dropdown
+          [autoDisplayFirst]="false"
+          [options]="danTocs"
+          [(ngModel)]="selectedDanToc"
+          optionLabel="TenDanToc"
+          [autoDisplayFirst]="true"
+          appendTo="body"
+          [filter]="true"
+          filterBy="TenDanToc"
+          dataKey="MaDanToc"
+          (onChange)="onDanTocChange($event.value)"
+        ></p-dropdown>
+        <label for="danToc" class="required-field">Dân tộc</label>
+      </span>
+    </div>
+
+    <div class="field col-12 md:col-3">
+      <span class="p-float-label">
+        <p-dropdown
+          [autoDisplayFirst]="false"
+          [options]="tonGiaos"
+          [(ngModel)]="selectedTonGiao"
+          optionLabel="TenTonGiao"
+          [autoDisplayFirst]="true"
+          appendTo="body"
+          [filter]="true"
+          filterBy="TenTonGiao"
+          dataKey="MaTonGiao"
+          (onChange)="onTonGiaoChange($event.value)"
+        ></p-dropdown>
+        <label for="tonGiao" class="required-field">Tôn giáo</label>
+      </span>
+    </div>
+
+    <div class="field col-12 md:col-3">
+      <span class="p-float-label">
+        <p-dropdown
+          [autoDisplayFirst]="false"
+          [options]="quocTichs"
+          [(ngModel)]="selectedQuocTich"
+          optionLabel="TenQuocGia"
+          [autoDisplayFirst]="true"
+          appendTo="body"
+          [filter]="true"
+          filterBy="TenQuocGia"
+          dataKey="MaQuocGia"
+          (onChange)="onQuocTichChange($event.value)"
+        ></p-dropdown>
+        <label for="quocTich" class="required-field">Quốc tịch</label>
+      </span>
+    </div>
+
+    <div class="field col-12 md:col-3">
+      <span class="p-float-label">
+        <p-calendar
+          [(ngModel)]="nhanSu.ngayVaoTruong"
+          [showIcon]="true"
+          dateFormat="dd/mm/yy"
+          appendTo="body"
+          [defaultDate]="nhanSu.ngayVaoTruong"
+        ></p-calendar>
+        <label for="ngayVaoTruong">Ngày vào trường</label>
+      </span>
+    </div>
+
+    <div class="field col-12 md:col-3">
+      <span class="p-float-label">
+        <p-dropdown
+          [options]="phongBans"
+          [(ngModel)]="selectedPhongBan"
+          optionLabel="tenPhongBan"
+          [filter]="true"
+          filterBy="tenPhongBan"
+          dataKey="maPhongBan"
+          placeholder="Chọn phòng ban"
+          (onChange)="onPhongBanChange($event.value)"
+          appendTo="body"
+          [showClear]="false"
+        >
+          <ng-template pTemplate="selectedItem">
+            <div
+              class="phongBan-item phongBan-item-value"
+              *ngIf="selectedPhongBan"
+            >
+              <div>{{ selectedPhongBan.tenPhongBan }}</div>
+            </div>
+          </ng-template>
+          <ng-template let-phongBan pTemplate="item">
+            <div class="phongBan-item">
+              <div>{{ phongBan?.tenPhongBan }}</div>
+            </div>
+          </ng-template>
+        </p-dropdown>
+        <label for="phongBan" class="required-field">Phòng ban</label>
+      </span>
+    </div>
+
+    <div class="field col-12 md:col-3">
+      <span class="p-float-label">
+        <p-dropdown
+          [autoDisplayFirst]="false"
+          [options]="trangThaiLamViecs"
+          [(ngModel)]="selectedTrangThaiLamViec"
+          optionLabel="name"
+          [autoDisplayFirst]="true"
+          (onChange)="onTrangThaiHocChange($event.value)"
+        >
+          <ng-template pTemplate="selectedItem">
+            <div
+              class="trangThaiLamViec-item trangThaiLamViec-item-value"
+              *ngIf="selectedTrangThaiLamViec"
+            >
+              <div>{{ selectedTrangThaiLamViec.name }}</div>
+            </div>
+          </ng-template>
+          <ng-template let-trangThaiLamViec pTemplate="item">
+            <div class="trangThaiLamViec-item">
+              <div>{{ trangThaiLamViec?.name }}</div>
+            </div>
+          </ng-template></p-dropdown
+        >
+        <label for="trangThaiLamViec" class="required-field"
+          >Trạng thái làm việc</label
+        >
+      </span>
+    </div>
+
+    <div class="field col-12 md:col-3">
+      <span class="p-float-label">
+        <input
+          type="text"
+          pInputText
+          id="lyDoThoiViec"
+          [(ngModel)]="nhanSu.lyDoThoiViec"
+        />
+        <label for="lyDoThoiViec">Lý do thôi việc</label>
+      </span>
+    </div>
+
+    <div class="field col-12 md:col-3">
+      <span class="p-float-label">
+        <p-calendar
+          [(ngModel)]="nhanSu.ngayCapNhat"
+          [showIcon]="true"
+          dateFormat="dd/mm/yy"
+          appendTo="body"
+        ></p-calendar>
+        <label for="ngayCapNhat">Ngày cập nhật</label>
+      </span>
+    </div>
+
+    <div class="field col-12 md:col-3">
+      <span class="p-float-label">
+        <p-dropdown
+          [options]="loaiNhanSus"
+          [(ngModel)]="selectedLoaiNhanSu"
+          optionLabel="tenLoaiNhanSu"
+          [filter]="true"
+          filterBy="tenLoaiNhanSu"
+          dataKey="maLoaiNhanSu"
+          placeholder="Chọn khối lớp"
+          (onChange)="onLoaiNhanSuChange($event.value)"
+          appendTo="body"
+          [showClear]="false"
+        >
+          <ng-template pTemplate="selectedItem">
+            <div
+              class="loaiNhanSu-item loaiNhanSu-item-value"
+              *ngIf="selectedLoaiNhanSu"
+            >
+              <div>{{ selectedLoaiNhanSu.tenLoaiNhanSu }}</div>
+            </div>
+          </ng-template>
+          <ng-template let-loaiNhanSu pTemplate="item">
+            <div class="loaiNhanSu-item">
+              <div>{{ loaiNhanSu?.tenLoaiNhanSu }}</div>
+            </div>
+          </ng-template>
+        </p-dropdown>
+        <label for="loaiNhanSu" class="required-field">Loại nhân sự</label>
+      </span>
+    </div>
+
+    <div class="field col-12 md:col-3">
+      <span class="p-float-label">
+        <p-dropdown
+          [options]="chucVus"
+          [(ngModel)]="selectedChucVu"
+          optionLabel="tenChucVu"
+          [filter]="true"
+          filterBy="tenChucVu"
+          dataKey="maChucVu"
+          placeholder="Chọn chức vụ"
+          (onChange)="onChucVuChange($event.value)"
+          appendTo="body"
+          [showClear]="false"
+        >
+          <ng-template pTemplate="selectedItem">
+            <div class="chucVu-item chucVu-item-value" *ngIf="selectedChucVu">
+              <div>{{ selectedChucVu.tenChucVu }}</div>
+            </div>
+          </ng-template>
+          <ng-template let-chucVu pTemplate="item">
+            <div class="chucVu-item">
+              <div>{{ chucVu?.tenChucVu }}</div>
+            </div>
+          </ng-template>
+        </p-dropdown>
+        <label for="chucVu">Chức vụ</label>
+      </span>
+    </div>
+
+    <div class="field col-12 md:col-3">
+      <span class="p-float-label">
+        <p-dropdown
+          [options]="khoiLops"
+          [(ngModel)]="selectedKhoiLop"
+          optionLabel="tenKhoiLop"
+          [filter]="true"
+          filterBy="tenKhoiLop"
+          dataKey="maKhoiLop"
+          placeholder="Chọn khối lớp"
+          (onChange)="onKhoiLopChange($event.value)"
+          appendTo="body"
+          [showClear]="false"
+        >
+          <ng-template pTemplate="selectedItem">
+            <div
+              class="khoiLop-item khoiLop-item-value"
+              *ngIf="selectedKhoiLop"
+            >
+              <div>{{ selectedKhoiLop.tenKhoiLop }}</div>
+            </div>
+          </ng-template>
+          <ng-template let-khoiLop pTemplate="item">
+            <div class="khoiLop-item">
+              <div>{{ khoiLop?.tenKhoiLop }}</div>
+            </div>
+          </ng-template>
+        </p-dropdown>
+        <label for="khoiLop">Khối lớp</label>
+      </span>
+    </div>
+
+    <div class="field col-12 md:col-3">
+      <span class="p-float-label">
+        <input
+          type="text"
+          pInputText
+          id="soDienThoai"
+          [(ngModel)]="nhanSu.soDienThoai"
+        />
+        <label for="soDienThoai">Số điện thoại</label>
+      </span>
+    </div>
+
+    <div class="field col-12 md:col-3">
+      <span class="p-float-label">
+        <input type="text" pInputText id="email" [(ngModel)]="nhanSu.email" />
+        <label for="email">Email</label>
+      </span>
+    </div>
+
+    <div class="field col-12 md:col-3">
+      <span class="p-float-label">
+        <textarea
+          id="hoKhau"
+          rows="2"
+          cols="30"
+          pInputTextarea
+          [(ngModel)]="nhanSu.hoKhau"
+        ></textarea>
+        <label for="hoKhau" class="required-field">Hộ khẩu</label>
+      </span>
+    </div>
+
+    <div class="field col-12 md:col-3">
+      <span class="p-float-label">
+        <textarea
+          id="diaChi"
+          rows="2"
+          cols="30"
+          pInputTextarea
+          [(ngModel)]="nhanSu.diaChi"
+        ></textarea>
+        <label for="diaChi" class="required-field">Chỗ ở hiện nay</label>
+      </span>
+    </div>
+  </div>
+  <ng-template pTemplate="footer">
+    <button
+      pButton
+      pRipple
+      label="Hủy"
+      icon="pi pi-times"
+      class="p-button-text"
+      (click)="hideDialog()"
+    ></button>
+    <button
+      pButton
+      pRipple
+      label="Lưu"
+      icon="pi pi-check"
+      class="p-button-text"
+      (click)="saveNhanSu()"
+    ></button>
+  </ng-template>
+</p-dialog>
+
+<p-confirmDialog [style]="{ width: '450px' }"></p-confirmDialog>
