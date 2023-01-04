@@ -1,5 +1,4 @@
-export interface NienHoc {
-  maNienHoc: number;
+export interface AUNienHocRequest {
   tenNienHoc: string;
   batDauHK1: Date;
   ketThucHK1: Date;

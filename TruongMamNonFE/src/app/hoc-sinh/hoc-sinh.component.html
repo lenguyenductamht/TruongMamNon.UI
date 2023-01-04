@@ -130,12 +130,12 @@
         <td>{{ hocSinh.ho }}</td>
         <td>{{ hocSinh.ten }}</td>
         <td>
-          {{ hocSinh.gioiTinh }}
+          {{ hocSinh.gioiTinh?.tenGioiTinh }}
         </td>
         <td>{{ hocSinh.ngaySinh | date : "dd/MM/yyyy" }}</td>
-        <td>{{ hocSinh.trangThaiHoc }}</td>
+        <td>{{ hocSinh.trangThaiHoc?.tenTrangThai }}</td>
         <td>{{ hocSinh.ngayNhapHoc | date : "dd/MM/yyyy" }}</td>
-        <td>{{ hocSinh.lopHoc ? hocSinh.lopHoc.tenLop : "" }}</td>
+        <td>{{ hocSinh.lopHoc ? hocSinh.lopHoc?.tenLop : "" }}</td>
         <td>
           <button
             pButton
@@ -215,7 +215,7 @@
             required
           />
           <small class="p-error" *ngIf="submitted && !hocSinh.ten"
-            >Tên không được để trống</small
+            >Nhập tên</small
           >
           <label for="ten" class="required-field">Tên</label>
         </span>
@@ -224,25 +224,30 @@
       <div class="field col-12 md:col-3">
         <span class="p-float-label">
           <p-dropdown
-            [(ngModel)]="selectedGioiTinh"
-            inputId="gioiTinh"
             [options]="gioiTinhs"
+            [(ngModel)]="selectedGioiTinh"
+            optionLabel="tenGioiTinh"
+            dataKey="maGioiTinh"
             placeholder="Chọn giới tính"
+            appendTo="body"
           >
             <ng-template pTemplate="selectedItem">
               <div
                 class="gioiTinh-item gioiTinh-item-value"
                 *ngIf="selectedGioiTinh"
               >
-                <div>{{ selectedGioiTinh.name }}</div>
+                <div>{{ selectedGioiTinh.tenGioiTinh }}</div>
               </div>
             </ng-template>
             <ng-template let-gioiTinh pTemplate="item">
               <div class="gioiTinh-item">
-                <div>{{ gioiTinh?.name }}</div>
+                <div>{{ gioiTinh?.tenGioiTinh }}</div>
               </div>
             </ng-template>
           </p-dropdown>
+          <small class="p-error" *ngIf="submitted && !hocSinh.maGioiTinh"
+            >Vui lòng chọn giới tính</small
+          >
           <label for="gioiTinh" class="required-field">Giới tính</label>
         </span>
       </div>
@@ -253,8 +258,6 @@
             [options]="khoiLops"
             [(ngModel)]="selectedKhoiLop"
             optionLabel="tenKhoiLop"
-            [filter]="true"
-            filterBy="tenKhoiLop"
             dataKey="maKhoiLop"
             placeholder="Chọn khối lớp"
             (onChange)="onKhoiLopChange($event.value)"
@@ -275,6 +278,9 @@
               </div>
             </ng-template>
           </p-dropdown>
+          <small class="p-error" *ngIf="submitted && !hocSinh.maKhoiLop"
+            >Vui lòng chọn khối lớp</small
+          >
           <label for="khoiLop" class="required-field">Khối lớp</label>
         </span>
       </div>
@@ -316,6 +322,7 @@
             [showIcon]="true"
             dateFormat="dd/mm/yy"
             appendTo="body"
+            [disabled]="true"
           ></p-calendar>
           <label for="ngayNhapHoc">Ngày nhập học</label>
         </span>
@@ -327,8 +334,9 @@
             [autoDisplayFirst]="false"
             [options]="trangThaiHocs"
             [(ngModel)]="selectedTrangThaiHoc"
-            optionLabel="name"
+            optionLabel="tenTrangThai"
             [autoDisplayFirst]="true"
+            dataKey="maTrangThai"
             (onChange)="onTrangThaiHocChange($event.value)"
           >
             <ng-template pTemplate="selectedItem">
@@ -336,12 +344,12 @@
                 class="trangThaiHoc-item trangThaiHoc-item-value"
                 *ngIf="selectedTrangThaiHoc"
               >
-                <div>{{ selectedTrangThaiHoc.name }}</div>
+                <div>{{ selectedTrangThaiHoc.tenTrangThai }}</div>
               </div>
             </ng-template>
             <ng-template let-trangThaiHoc pTemplate="item">
               <div class="trangThaiHoc-item">
-                <div>{{ trangThaiHoc?.name }}</div>
+                <div>{{ trangThaiHoc?.tenTrangThai }}</div>
               </div>
             </ng-template></p-dropdown
           >
@@ -372,6 +380,9 @@
             appendTo="body"
             name="ngaySinh"
           ></p-calendar>
+          <small class="p-error" *ngIf="submitted && !hocSinh.ngaySinh"
+            >Vui lòng chọn ngày sinh</small
+          >
           <label class="required-field" for="ngaySinh">Ngày sinh</label>
         </span>
       </div>
@@ -385,7 +396,7 @@
             [(ngModel)]="hocSinh.noiSinh"
             required
           />
-          <label for="noiSinh" class="required-field">Nơi sinh</label>
+          <label for="noiSinh">Nơi sinh</label>
         </span>
       </div>
 
@@ -395,14 +406,21 @@
             [autoDisplayFirst]="false"
             [options]="danTocs"
             [(ngModel)]="selectedDanToc"
-            optionLabel="TenDanToc"
-            [autoDisplayFirst]="true"
-            appendTo="body"
-            [filter]="true"
-            filterBy="TenDanToc"
-            dataKey="MaDanToc"
+            optionLabel="tenDanToc"
+            dataKey="maDanToc"
             (onChange)="onDanTocChange($event.value)"
-          ></p-dropdown>
+          >
+            <ng-template pTemplate="selectedItem">
+              <div class="danToc-item danToc-item-value" *ngIf="selectedDanToc">
+                <div>{{ selectedDanToc.tenDanToc }}</div>
+              </div>
+            </ng-template>
+            <ng-template let-danToc pTemplate="item">
+              <div class="danToc-item">
+                <div>{{ danToc?.tenDanToc }}</div>
+              </div>
+            </ng-template></p-dropdown
+          >
           <label for="danToc" class="required-field">Dân tộc</label>
         </span>
       </div>
@@ -413,14 +431,24 @@
             [autoDisplayFirst]="false"
             [options]="tonGiaos"
             [(ngModel)]="selectedTonGiao"
-            optionLabel="TenTonGiao"
-            [autoDisplayFirst]="true"
-            appendTo="body"
-            [filter]="true"
-            filterBy="TenTonGiao"
-            dataKey="MaTonGiao"
+            optionLabel="tenTonGiao"
+            dataKey="maTonGiao"
             (onChange)="onTonGiaoChange($event.value)"
-          ></p-dropdown>
+          >
+            <ng-template pTemplate="selectedItem">
+              <div
+                class="tonGiao-item tonGiao-item-value"
+                *ngIf="selectedTonGiao"
+              >
+                <div>{{ selectedTonGiao.tenTonGiao }}</div>
+              </div>
+            </ng-template>
+            <ng-template let-tonGiao pTemplate="item">
+              <div class="tonGiao-item">
+                <div>{{ tonGiao?.tenTonGiao }}</div>
+              </div>
+            </ng-template></p-dropdown
+          >
           <label for="tonGiao" class="required-field">Tôn giáo</label>
         </span>
       </div>
@@ -431,14 +459,24 @@
             [autoDisplayFirst]="false"
             [options]="quocTichs"
             [(ngModel)]="selectedQuocTich"
-            optionLabel="TenQuocGia"
-            [autoDisplayFirst]="true"
-            appendTo="body"
-            [filter]="true"
-            filterBy="TenQuocGia"
-            dataKey="MaQuocGia"
+            optionLabel="tenQuocGia"
+            dataKey="maQuocGia"
             (onChange)="onQuocTichChange($event.value)"
-          ></p-dropdown>
+          >
+            <ng-template pTemplate="selectedItem">
+              <div
+                class="quocTich-item quocTich-item-value"
+                *ngIf="selectedQuocTich"
+              >
+                <div>{{ selectedQuocTich.tenQuocGia }}</div>
+              </div>
+            </ng-template>
+            <ng-template let-quocTich pTemplate="item">
+              <div class="quocTich-item">
+                <div>{{ quocTich?.tenQuocGia }}</div>
+              </div>
+            </ng-template></p-dropdown
+          >
           <label for="quocTich" class="required-field">Quốc tịch</label>
         </span>
       </div>
@@ -465,7 +503,7 @@
             pInputTextarea
             [(ngModel)]="hocSinh.hoKhau"
           ></textarea>
-          <label for="hoKhau" class="required-field">Hộ khẩu</label>
+          <label for="hoKhau">Hộ khẩu</label>
         </span>
       </div>
 
@@ -478,7 +516,7 @@
             pInputTextarea
             [(ngModel)]="hocSinh.diaChi"
           ></textarea>
-          <label for="diaChi" class="required-field">Chỗ ở hiện nay</label>
+          <label for="diaChi">Chỗ ở hiện nay</label>
         </span>
       </div>
 
@@ -489,6 +527,7 @@
             [showIcon]="true"
             dateFormat="dd/mm/yy"
             appendTo="body"
+            [disabled]="true"
           ></p-calendar>
           <label for="ngayCapNhat">Ngày cập nhật</label>
         </span>
@@ -514,13 +553,25 @@
 
       <div class="field col-12 md:col-3">
         <span class="p-float-label">
-          <p-calendar
+          <!-- <p-inputNumber
             [(ngModel)]="hocSinh.namSinhPhuHuynh"
-            [showIcon]="true"
-            dateFormat="dd/mm/yy"
-            appendTo="body"
-          ></p-calendar>
-          <label for="namSinhPhuHuynh">Ngày sinh phụ huynh</label>
+            mode="decimal"
+            inputId="namSinhPhuHuynh"
+            [useGrouping]="false"
+          >
+          </p-inputNumber> -->
+          <input
+            type="number"
+            pInputText
+            id="namSinhPhuHuynh"
+            [(ngModel)]="hocSinh.namSinhPhuHuynh"
+          />
+          <!-- <small
+            class="p-error"
+            *ngIf="submitted && hocSinh.namSinhPhuHuynh.length > 4"
+            >Năm sinh không hợp lệ</small
+          > -->
+          <label for="namSinhPhuHuynh">Năm sinh phụ huynh</label>
         </span>
       </div>
 

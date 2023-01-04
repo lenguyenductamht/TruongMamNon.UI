@@ -6,7 +6,7 @@
 ></p-progressBar>
 <p style="font-size: 200%" *ngIf="loading">Đang tải dữ liệu...</p>
 <div class="card" *ngIf="!loading">
-  <p-toolbar styleClass="mb-4 gap-2">
+  <p-toolbar styleClass="mb-1 gap-2">
     <ng-template pTemplate="left">
       <button
         pButton
@@ -14,6 +14,8 @@
         label="Thêm"
         icon="pi pi-plus"
         class="p-button-success mr-2"
+        pTooltip="Thêm"
+        tooltipPosition="bottom"
         (click)="openNew()"
       ></button>
       <button
@@ -21,26 +23,35 @@
         pRipple
         label="Tải lại"
         icon="pi pi-refresh"
-        class="p-button-primary mr-2"
+        class="p-button-info mr-2"
+        pTooltip="Tải lại"
+        tooltipPosition="bottom"
         (click)="getNienHocs()"
       ></button>
     </ng-template>
 
     <ng-template pTemplate="right">
-      <p-fileUpload
-        mode="basic"
-        accept="image/*"
-        [maxFileSize]="1000000"
-        label="Nhập file"
-        chooseLabel="Nhập file"
-        class="p-mr-2 p-d-inline-block"
-      ></p-fileUpload>
       <button
+        type="button"
         pButton
         pRipple
-        label="Xuất file"
-        icon="pi pi-file-export"
-        class="p-button-help ml-2"
+        icon="pi pi-file-excel"
+        (click)="exportExcel()"
+        class="p-button-success mr-2"
+        label="Xuất Excel"
+        pTooltip="Xuất file xlsx"
+        tooltipPosition="bottom"
+      ></button>
+      <button
+        type="button"
+        pButton
+        pRipple
+        icon="pi pi-file-pdf"
+        (click)="exportPdf()"
+        class="p-button-warning"
+        label="Xuất PDF"
+        pTooltip="Xuất file PDF"
+        tooltipPosition="bottom"
       ></button>
     </ng-template>
   </p-toolbar>
@@ -50,14 +61,7 @@
     [value]="nienHocs"
     [rows]="10"
     [paginator]="true"
-    [globalFilterFields]="[
-      'maNienHoc',
-      'tenNienHoc',
-      'batDauHK1',
-      'ketThucHK1',
-      'batDauHK2',
-      'ketThucHK2'
-    ]"
+    [globalFilterFields]="['maNienHoc', 'tenNienHoc']"
     [tableStyle]="{ 'min-width': '75rem' }"
     [rowHover]="true"
     dataKey="maNienHoc"
@@ -114,6 +118,8 @@
             icon="pi pi-pencil"
             class="p-button-rounded p-button-success mr-2"
             (click)="editNienHoc(nienHoc)"
+            pTooltip="Sửa"
+            tooltipPosition="top"
           ></button>
           <button
             pButton
@@ -121,6 +127,8 @@
             icon="pi pi-trash"
             class="p-button-rounded p-button-warning"
             (click)="deleteNienHoc(nienHoc)"
+            pTooltip="Xóa"
+            tooltipPosition="top"
           ></button>
         </td>
       </tr>
@@ -136,7 +144,7 @@
 <p-dialog
   [(visible)]="nienHocDialog"
   [style]="{ width: '750px' }"
-  header="Chi tiết niên học"
+  header="{{ dialogHeader }}"
   [modal]="true"
   styleClass="p-fluid"
 >
@@ -158,41 +166,53 @@
     <div class="field">
       <label for="batDauHK1">Bắt đầu học kỳ 1</label>
       <p-calendar
-        [(ngModel)]="nienHoc.batDauHK1"
+        [(ngModel)]="_batDauHK1"
         [showIcon]="true"
         dateFormat="dd/mm/yy"
         appendTo="body"
       ></p-calendar>
+      <small class="p-error" *ngIf="submitted && !_batDauHK1"
+        >Bắt đầu học kỳ 1 không được để trống</small
+      >
     </div>
 
     <div class="field">
       <label for="ketThucHK1">Kết thúc học kỳ 1</label>
       <p-calendar
-        [(ngModel)]="nienHoc.ketThucHK1"
+        [(ngModel)]="_ketThucHK1"
         [showIcon]="true"
         dateFormat="dd/mm/yy"
         appendTo="body"
       ></p-calendar>
+      <small class="p-error" *ngIf="submitted && !_ketThucHK1"
+        >Kết thúc học kỳ 1 không được để trống</small
+      >
     </div>
 
     <div class="field">
       <label for="batDauHK2">Bắt đầu học kỳ 2</label>
       <p-calendar
-        [(ngModel)]="nienHoc.batDauHK2"
+        [(ngModel)]="_batDauHK2"
         [showIcon]="true"
         dateFormat="dd/mm/yy"
         appendTo="body"
       ></p-calendar>
+      <small class="p-error" *ngIf="submitted && !_batDauHK2"
+        >Bắt đầu học kỳ 2 không được để trống</small
+      >
     </div>
 
     <div class="field">
       <label for="ketThucHK2">Kết thúc học kỳ 2</label>
       <p-calendar
-        [(ngModel)]="nienHoc.ketThucHK2"
+        [(ngModel)]="_ketThucHK2"
         [showIcon]="true"
         dateFormat="dd/mm/yy"
         appendTo="body"
       ></p-calendar>
+      <small class="p-error" *ngIf="submitted && !_ketThucHK2"
+        >Kết thúc học kỳ 2 không được để trống</small
+      >
     </div>
   </ng-template>
 
