@@ -24,50 +24,49 @@ export class VaccineComponent implements OnInit {
 
   public vaccines: Vaccine[] = [];
 
-  
-  public vaccine:Vaccine=Object.assign({},this.dataService.newVaccine);
-  public submitted: boolean = false; 
-  public cols: any[]|undefined;
+  public vaccine: Vaccine = Object.assign({}, this.dataService.newVaccine);
+  public submitted: boolean = false;
+  public cols: any[] | undefined;
 
-  public exportColumns: any[]|undefined;
+  public exportColumns: any[] | undefined;
   public ngOnInit(): void {
     this.getVaccines();
   }
 
-  public exportExcel(){
-    const exportData:any[]=[];
-    this.vaccines.forEach((table)=>{
+  public exportExcel() {
+    const exportData: any[] = [];
+    this.vaccines.forEach((table) => {
       exportData.push({
         TenVaccine: table.tenVaccine,
-        GhiChu:table.ghiChu,
+        GhiChu: table.ghiChu,
       });
     });
     this.exportService.exportExcel(exportData, 'Vaccine');
   }
 
-  public exportPdf(){
-    const exportData:any[]=[];
-    this.vaccines.forEach((table)=>{
+  public exportPdf() {
+    const exportData: any[] = [];
+    this.vaccines.forEach((table) => {
       exportData.push({
         tenVaccine: table.tenVaccine,
-        ghiChu:table.ghiChu,
+        ghiChu: table.ghiChu,
       });
     });
     this.exportService.exportPdf(
       {
-        tenVaccine: "Tên vaccine", 
-        ghiChu: "Ghi Chú", 
+        tenVaccine: 'Tên vaccine',
+        ghiChu: 'Ghi Chú',
       },
-      exportData, 
+      exportData,
       'Vaccine'
     );
   }
 
-  public getVaccines():void{
-    this.loading=true;
+  public getVaccines(): void {
+    this.loading = true;
     this.dataService.getVaccines().subscribe((data) => {
       this.vaccines = data;
-      this.loading=false;
+      this.loading = false;
     });
   }
 
@@ -90,7 +89,7 @@ export class VaccineComponent implements OnInit {
       header: 'Xác nhận',
       icon: 'pi pi-exclamation-triangle',
       accept: () => {
-        this.dataService.deleteVaccine(vaccine.maVaccine).subscribe((data)=>{
+        this.dataService.deleteVaccine(vaccine.maVaccine).subscribe((data) => {
           this.getVaccines();
           this.messageService.add({
             severity: 'success',
@@ -98,7 +97,7 @@ export class VaccineComponent implements OnInit {
             detail: 'Xóa thành công',
             life: 3000,
           });
-        });        
+        });
       },
     });
   }
@@ -135,7 +134,7 @@ export class VaccineComponent implements OnInit {
     this.submitted = true;
     console.log('saveVaccine: ', this.vaccine);
     if (this.vaccine.maVaccine === 0) {
-      this.dataService.postVaccine(this.vaccine).subscribe(
+      this.dataService.addVaccine(this.vaccine).subscribe(
         (data) => {
           console.log('return data = ', data);
           this.getVaccines();
@@ -148,18 +147,19 @@ export class VaccineComponent implements OnInit {
       );
     } else {
       console.log('ma', this.vaccine.maVaccine);
-      this.dataService.putVaccine(this.vaccine.maVaccine, this.vaccine).subscribe(
-        (data) => {
-          console.log('return data = ', data);
-          this.getVaccines()
-          this.hideDialog(false, true);
-        },
-        (error) => {
-          console.log('error');
-          this.hideDialog(false, false);
-        }
-      );
+      this.dataService
+        .updateVaccine(this.vaccine.maVaccine, this.vaccine)
+        .subscribe(
+          (data) => {
+            console.log('return data = ', data);
+            this.getVaccines();
+            this.hideDialog(false, true);
+          },
+          (error) => {
+            console.log('error');
+            this.hideDialog(false, false);
+          }
+        );
     }
   }
 }
-

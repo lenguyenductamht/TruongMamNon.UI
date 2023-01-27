@@ -24,64 +24,66 @@ export class DanhMucThucDonComponent implements OnInit {
 
   public danhMucThucDons: DanhMucThucDon[] = [];
 
-  
-  public danhMucThucDon:DanhMucThucDon=Object.assign({},this.dataService.newDanhMucThucDon);
-  public submitted: boolean = false; 
-  public cols: any[]|undefined;
+  public danhMucThucDon: DanhMucThucDon = Object.assign(
+    {},
+    this.dataService.newDanhMucThucDon
+  );
+  public submitted: boolean = false;
+  public cols: any[] | undefined;
 
-  public exportColumns: any[]|undefined;
+  public exportColumns: any[] | undefined;
   public ngOnInit(): void {
     this.getDanhMucThucDons();
   }
 
-  public exportExcel(){
-    const exportData:any[]=[];
-    this.danhMucThucDons.forEach((table)=>{
+  public exportExcel() {
+    const exportData: any[] = [];
+    this.danhMucThucDons.forEach((table) => {
       exportData.push({
         tenDanhMuc: table.tenDanhMuc,
-        ghiChu:table.ghiChu,
-        thoiGian:table.thoiGian,
-        nangLuong:table.nangLuong,
-        chatDam:table.chatDam,
-        chatBeo:table.chatBeo,
-        chatBot:table.chatBot
+        ghiChu: table.ghiChu,
+        thoiGian: table.thoiGian,
+        nangLuong: table.nangLuong,
+        chatDam: table.chatDam,
+        chatBeo: table.chatBeo,
+        chatBot: table.chatBot,
       });
     });
     this.exportService.exportExcel(exportData, 'DanhMucThucDon');
   }
 
-  public exportPdf(){
-    const exportData:any[]=[];
-    this.danhMucThucDons.forEach((table)=>{
+  public exportPdf() {
+    const exportData: any[] = [];
+    this.danhMucThucDons.forEach((table) => {
       exportData.push({
         tenDanhMuc: table.tenDanhMuc,
-        ghiChu:table.ghiChu,
-        thoiGian:table.thoiGian,
-        nangLuong:table.nangLuong,
-        chatDam:table.chatDam,
-        chatBeo:table.chatBeo,
-        chatBot:table.chatBot
+        ghiChu: table.ghiChu,
+        thoiGian: table.thoiGian,
+        nangLuong: table.nangLuong,
+        chatDam: table.chatDam,
+        chatBeo: table.chatBeo,
+        chatBot: table.chatBot,
       });
     });
     this.exportService.exportPdf(
       {
-        tenDanhMuc: "Tên danh mục", 
-        ghiChu: "Ghi Chú", 
-        thoiGian: "Thời gian",
-        nangLuong: "Năng lượng",
-        chatDam:"Chất đạm", 
-        chatBeo:"Chất béo", 
-        chatBot: "Chất bột"
+        tenDanhMuc: 'Tên danh mục',
+        ghiChu: 'Ghi Chú',
+        thoiGian: 'Thời gian',
+        nangLuong: 'Năng lượng',
+        chatDam: 'Chất đạm',
+        chatBeo: 'Chất béo',
+        chatBot: 'Chất bột',
       },
-      exportData, 
+      exportData,
       'DanhMucThucDon'
     );
   }
 
-  public getDanhMucThucDons():void{
+  public getDanhMucThucDons(): void {
     this.dataService.getDanhMucThucDons().subscribe((data) => {
       this.danhMucThucDons = data;
-      this.loading=false;
+      this.loading = false;
     });
   }
 
@@ -104,15 +106,17 @@ export class DanhMucThucDonComponent implements OnInit {
       header: 'Xác nhận',
       icon: 'pi pi-exclamation-triangle',
       accept: () => {
-        this.dataService.deleteDanhMucThucDon(danhMucThucDon.maDanhMuc).subscribe((data)=>{
-          this.getDanhMucThucDons();
-          this.messageService.add({
-            severity: 'success',
-            summary: 'Thành công',
-            detail: 'Xóa thành công',
-            life: 3000,
+        this.dataService
+          .deleteDanhMucThucDon(danhMucThucDon.maDanhMuc)
+          .subscribe((data) => {
+            this.getDanhMucThucDons();
+            this.messageService.add({
+              severity: 'success',
+              summary: 'Thành công',
+              detail: 'Xóa thành công',
+              life: 3000,
+            });
           });
-        });        
       },
     });
   }
@@ -162,16 +166,18 @@ export class DanhMucThucDonComponent implements OnInit {
       );
     } else {
       console.log('ma', this.danhMucThucDon.maDanhMuc);
-      this.dataService.putDanhMucThucDon(this.danhMucThucDon.maDanhMuc, this.danhMucThucDon).subscribe(
-        (data) => {
-          console.log('return data = ', data);
-          this.hideDialog(false, true);
-        },
-        (error) => {
-          console.log('error');
-          this.hideDialog(false, false);
-        }
-      );
+      this.dataService
+        .putDanhMucThucDon(this.danhMucThucDon.maDanhMuc, this.danhMucThucDon)
+        .subscribe(
+          (data) => {
+            console.log('return data = ', data);
+            this.hideDialog(false, true);
+          },
+          (error) => {
+            console.log('error');
+            this.hideDialog(false, false);
+          }
+        );
     }
   }
 }

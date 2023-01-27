@@ -12,7 +12,6 @@ import { ExportService } from '../services/export.service';
   templateUrl: './lop-hoc.component.html',
   providers: [MessageService, ConfirmationService],
   styleUrls: ['./lop-hoc.component.scss'],
-
 })
 export class LopHocComponent implements OnInit {
   constructor(
@@ -26,91 +25,89 @@ export class LopHocComponent implements OnInit {
   public lopHocDialog = false;
 
   public lopHocs: LopHoc[] = [];
-  public displayLopHocs:LopHoc[]=[];
-  
-  public lopHoc:LopHoc=Object.assign({},this.dataService.newLopHoc);
-  public submitted: boolean = false;
-  public selectedKhoiLop:KhoiLop|undefined;
-  public khoiLops:KhoiLop[]=[];
+  public displayLopHocs: LopHoc[] = [];
 
-  public selectedNienHoc:NienHoc|undefined;
-  public nienHocs:NienHoc[]=[];
-  
-  
+  public lopHoc: LopHoc = Object.assign({}, this.dataService.newLopHoc);
+  public submitted: boolean = false;
+  public selectedKhoiLop: KhoiLop | undefined;
+  public khoiLops: KhoiLop[] = [];
+
+  public selectedNienHoc: NienHoc | undefined;
+  public nienHocs: NienHoc[] = [];
 
   public ngOnInit(): void {
-    this.dataService.selectedNienHoc$.subscribe((nienHoc)=>{
-      this.selectedNienHoc=nienHoc;
+    this.dataService.selectedNienHoc$.subscribe((nienHoc) => {
+      this.selectedNienHoc = nienHoc;
     });
 
     this.getLopHocs();
   }
 
-  public exportExcel(){
-    const exportData:any[]=[];
-    this.lopHocs.forEach((table)=>{
+  public exportExcel() {
+    const exportData: any[] = [];
+    this.lopHocs.forEach((table) => {
       exportData.push({
         tenLop: table.tenLop,
-        khoiLop:table.khoiLop.tenKhoiLop,
-        hocPhi:table.hocPhi,
-        nienHoc:table.nienHoc.tenNienHoc,
+        khoiLop: table.khoiLop.tenKhoiLop,
+        hocPhi: table.hocPhi,
+        nienHoc: table.nienHoc.tenNienHoc,
       });
     });
     this.exportService.exportExcel(exportData, 'DanhSachLopHoc');
   }
 
-  public exportPdf(){
-    const exportData:any[]=[];
-    this.lopHocs.forEach((table)=>{
+  public exportPdf() {
+    const exportData: any[] = [];
+    this.lopHocs.forEach((table) => {
       exportData.push({
         tenLop: table.tenLop,
-        khoiLop:table.khoiLop.tenKhoiLop,
-        hocPhi:table.hocPhi,
-        nienHoc:table.nienHoc.tenNienHoc,
+        khoiLop: table.khoiLop.tenKhoiLop,
+        hocPhi: table.hocPhi,
+        nienHoc: table.nienHoc.tenNienHoc,
       });
     });
     this.exportService.exportPdf(
       {
-        tenLop: "Tên lớp", 
-        khoiLop: "Khối lớp", 
-        hocPhi: "Học phí",
-        nienHoc: "Niên học",
+        tenLop: 'Tên lớp',
+        khoiLop: 'Khối lớp',
+        hocPhi: 'Học phí',
+        nienHoc: 'Niên học',
       },
-      exportData, 
+      exportData,
       'DanhSachLopHoc'
     );
   }
 
-  public getKhoiLops():void{
-    this.loading=true;
-    this.dataService.getKhoiLops().subscribe((data)=>{
-      this.khoiLops=data;
-      this.loading=false;
+  public getKhoiLops(): void {
+    this.loading = true;
+    this.dataService.getKhoiLops().subscribe((data) => {
+      this.khoiLops = data;
+      this.loading = false;
       this.getLopHocs();
     });
   }
 
-  public getNienHocs():void{
-    this.dataService.getNienHocs().subscribe((data)=>{
-      this.nienHocs=data;
-    })
+  public getNienHocs(): void {
+    this.dataService.getNienHocs().subscribe((data) => {
+      this.nienHocs = data;
+    });
   }
-  
-  public getLopHocs():void{
-    this.loading=true;  
-    if(this.selectedNienHoc){
-      this.dataService.getLopHocsByNienHoc(this.selectedNienHoc?.maNienHoc).subscribe((data)=>{
-      this.lopHocs=data;
-      this.displayLopHocs=this.lopHocs.filter((lopHoc)=>lopHoc.nienHoc.maNienHoc===this.selectedNienHoc?.maNienHoc);
-      this.loading=false;
-      });
-      
+
+  public getLopHocs(): void {
+    this.loading = true;
+    if (this.selectedNienHoc) {
+      this.dataService
+        .getLopHocsByNienHoc(this.selectedNienHoc.maNienHoc)
+        .subscribe((data) => {
+          this.lopHocs = data;
+          //this.displayLopHocs=this.lopHocs.filter((lopHoc)=>lopHoc.nienHoc.maNienHoc===this.selectedNienHoc?.maNienHoc);
+          this.loading = false;
+        });
     }
-    
   }
 
   public openNew(): void {
-    if(!this.selectedNienHoc){
+    if (!this.selectedNienHoc) {
       this.messageService.add({
         severity: 'error',
         summary: 'Lỗi',
@@ -127,7 +124,7 @@ export class LopHocComponent implements OnInit {
   public editLopHoc(lopHoc: LopHoc): void {
     console.log('edit lopHoc:', lopHoc);
     this.lopHoc = lopHoc;
-    this.selectedKhoiLop=this.lopHoc.khoiLop;
+    this.selectedKhoiLop = this.lopHoc.khoiLop;
     this.lopHocDialog = true;
     this.getKhoiLops();
   }
@@ -139,7 +136,7 @@ export class LopHocComponent implements OnInit {
       header: 'Xác nhận',
       icon: 'pi pi-exclamation-triangle',
       accept: () => {
-        this.dataService.deleteLopHoc(lopHoc.maLop).subscribe((data)=>{
+        this.dataService.deleteLopHoc(lopHoc.maLop).subscribe((data) => {
           this.getLopHocs();
           this.messageService.add({
             severity: 'success',
@@ -147,7 +144,7 @@ export class LopHocComponent implements OnInit {
             detail: 'Xóa thành công',
             life: 3000,
           });
-        });        
+        });
       },
     });
   }
@@ -182,7 +179,7 @@ export class LopHocComponent implements OnInit {
 
   public saveLopHoc() {
     console.log('saveLopHoc: ', this.lopHoc);
-    if(!this.selectedKhoiLop){
+    if (!this.selectedKhoiLop) {
       this.messageService.add({
         severity: 'error',
         summary: 'Lỗi',
@@ -191,7 +188,7 @@ export class LopHocComponent implements OnInit {
       });
       return;
     }
-    if(!this.selectedNienHoc){
+    if (!this.selectedNienHoc) {
       this.messageService.add({
         severity: 'error',
         summary: 'Lỗi',
@@ -200,12 +197,11 @@ export class LopHocComponent implements OnInit {
       });
       return;
     }
-    this.lopHoc.maKhoiLop=this.selectedKhoiLop.maKhoiLop;
-    this.lopHoc.maNienHoc=this.selectedNienHoc.maNienHoc;
+    this.lopHoc.maKhoiLop = this.selectedKhoiLop.maKhoiLop;
+    this.lopHoc.maNienHoc = this.selectedNienHoc.maNienHoc;
     console.log('saveLopHoc: ', this.lopHoc);
 
     if (this.lopHoc.maLop === 0) {
-      
       this.dataService.postLopHoc(this.lopHoc).subscribe(
         (data) => {
           console.log('return data = ', data);
@@ -233,8 +229,8 @@ export class LopHocComponent implements OnInit {
     }
   }
 
-  public onKhoiLopChange(event:any):void{
-    const khopLop:KhoiLop=event;
-    this.selectedKhoiLop=khopLop;
+  public onKhoiLopChange(event: any): void {
+    const khopLop: KhoiLop = event;
+    this.selectedKhoiLop = khopLop;
   }
 }

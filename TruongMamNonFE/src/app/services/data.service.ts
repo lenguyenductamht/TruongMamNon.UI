@@ -3,7 +3,7 @@ import { Injectable } from '@angular/core';
 import { BehaviorSubject } from 'rxjs';
 import { Observable } from 'rxjs/internal/Observable';
 import { environment } from 'src/environments/environment';
-import { AUNienHocRequest } from '../models/au-nien-hoc-request.model';
+import { AUNienHocRequest } from '../request-models/au-nien-hoc.request.model';
 import { ChucVu } from '../models/chuc-vu.model';
 import { DanToc } from '../models/dan-toc.model';
 import { DanhMucThucDon } from '../models/danh-muc-thuc-don.model';
@@ -26,6 +26,22 @@ import { Vaccine } from '../models/vaccine.model';
 import { Vitamin } from '../models/vitamin.model';
 import { AddHocSinhRequest } from '../request-models/add-hoc-sinh.request.model';
 import { UpdateHocSinhRequest } from '../request-models/update-hoc-sinh.request.model';
+import { AddNhanSuRequest } from '../request-models/add-nhan-su.request.model';
+import { UpdateNhanSuRequest } from '../request-models/update-nhan-su.request.model';
+import { AUVaccineRequest } from '../request-models/au-vaccine.request.model';
+import { DotTiemVaccine } from '../models/dot-tiem-vaccine.model';
+import { AUDotTiemVaccineRequest } from '../request-models/au-dot-tiem-vaccine.request.model';
+import { AUPhieuTiemVaccineRequest } from '../request-models/au-phieu-tiem-vaccine.request.model';
+import { TrangThaiDiemDanh } from '../models/trang-thai-diem-danh.model';
+import { DiemDanh } from '../models/diem-danh.model';
+import { UpdateDiemDanhRequest } from '../request-models/update-diem-danh.request.model';
+import { AddDiemDanhRequest } from '../request-models/add-diem-danh.request.model';
+import { DanhMucThucPham } from '../models/danh-muc-thuc-pham.model';
+import { ThucPham } from '../models/thuc-pham.mode';
+import { PhieuNhapThucPham } from '../models/phieu-nhap-thuc-pham.model';
+import { ChiTietPhieuNhapThucPham } from '../models/chi-tiet-phieu-nhap-thuc-pham.model';
+import { AddPhieuNhapThucPhamRequest } from '../request-models/add-phieu-nhap-thuc-pham.request.model';
+import { UpdatePhieuNhapThucPhamRequest } from '../request-models/update-phieu-nhap-thuc-pham.request.model';
 
 @Injectable({
   providedIn: 'root',
@@ -201,6 +217,17 @@ export class DataService {
   public getQuocGias(): Observable<QuocGia[]> {
     return this.httpClient.get<QuocGia[]>(
       this.baseApiUrl + '/Commons/QuocGias'
+    );
+  }
+
+  public newTrangThaiDiemDanh: TrangThaiDiemDanh = {
+    maTrangThai: '',
+    tenTrangThai: '',
+  };
+
+  public getTrangThaiDiemDanhs(): Observable<TrangThaiDiemDanh[]> {
+    return this.httpClient.get<TrangThaiDiemDanh[]>(
+      this.baseApiUrl + '/Commons/TrangThaiDiemDanhs'
     );
   }
 
@@ -443,18 +470,20 @@ export class DataService {
     trangThaiHoc: this.newTrangThaiHoc,
     trangThaiTaiKhoan: this.newTrangThaiTaiKhoan,
   };
-  public getHocSinhs(): Observable<HocSinh[]> {
+  getHocSinhs(): Observable<HocSinh[]> {
     return this.httpClient.get<HocSinh[]>(this.baseApiUrl + '/HocSinhs');
   }
 
-  public getHocSinhsByKhoiLop(maKhoiLop: number): Observable<HocSinh[]> {
-    const url = `${this.REST_API_SERVER}/HocSinhs/KhoiLop/${maKhoiLop}`;
-    return this.httpClient.get<HocSinh[]>(url, this.httpOptions);
+  getHocSinhsByKhoiLop(maKhoiLop: number): Observable<HocSinh[]> {
+    return this.httpClient.get<HocSinh[]>(
+      this.baseApiUrl + '/HocSinhs/KhoiLop/' + maKhoiLop
+    );
   }
 
-  public getHocSinhsByLopHoc(maLopHoc: number): Observable<HocSinh[]> {
-    const url = `${this.REST_API_SERVER}/HocSinhs/LopHoc/${maLopHoc}`;
-    return this.httpClient.get<HocSinh[]>(url, this.httpOptions);
+  getHocSinhsByLopHoc(maLopHoc: number): Observable<HocSinh[]> {
+    return this.httpClient.get<HocSinh[]>(
+      this.baseApiUrl + '/HocSinhs/LopHoc/' + maLopHoc
+    );
   }
 
   addHocSinh(hocSinhRequest: HocSinh): Observable<HocSinh> {
@@ -569,33 +598,6 @@ export class DataService {
   }
   //#endregion
 
-  //#region Vaccine
-  public newVaccine: Vaccine = {
-    maVaccine: 0,
-    tenVaccine: '',
-    ghiChu: '',
-  };
-  public getVaccines(): Observable<Vaccine[]> {
-    const url = `${this.REST_API_SERVER}/Vaccines`;
-    return this.httpClient.get<Vaccine[]>(url, this.httpOptions);
-  }
-
-  public postVaccine(data: Vaccine): Observable<Vaccine> {
-    const url = `${this.REST_API_SERVER}/Vaccines`;
-    return this.httpClient.post<Vaccine>(url, data, this.httpOptions);
-  }
-
-  public putVaccine(ma: number, data: Vaccine): Observable<Vaccine> {
-    const url = `${this.REST_API_SERVER}/Vaccines/${ma}`;
-    return this.httpClient.put<Vaccine>(url, data, this.httpOptions);
-  }
-
-  public deleteVaccine(ma: number): Observable<Vaccine> {
-    const url = `${this.REST_API_SERVER}/Vaccines/${ma}`;
-    return this.httpClient.delete<Vaccine>(url, this.httpOptions);
-  }
-  //#endregion
-
   //#region Vitamin
   public newVitamin: Vitamin = {
     maVitamin: 0,
@@ -689,92 +691,456 @@ export class DataService {
     maNhanSu: '',
     ho: '',
     ten: '',
-    gioiTinh: '',
+    maGioiTinh: '',
     ngaySinh: new Date(),
     noiSinh: '',
     cmnd: '',
     ngayCap: new Date(),
-    danToc: '',
-    tonGiao: '',
-    quocTich: '',
+    maDanToc: '',
+    maTonGiao: '',
+    maQuocTich: '',
     ngayVaoTruong: new Date(),
     maPhongBan: 0,
-    trangThaiLamViec: '',
-    lyDoThoiViec: '',
+    maTrangThaiLamViec: '',
+    lyDoThoiViec: null,
     ngayCapNhat: new Date(),
     maLoaiNhanSu: 0,
-    maChucVu: 0,
-    maKhoiLop: 0,
-    soDienThoai: '',
-    email: '',
-    hoKhau: '',
-    diaChi: '',
-    hinhAnh: '',
+    maChucVu: null,
+    maKhoiLop: null,
+    soDienThoai: null,
+    email: null,
+    hoKhau: null,
+    diaChi: null,
+    hinhAnh: null,
     matKhau: '',
-    trangThaiTaiKhoan: '',
+    maTrangThaiTaiKhoan: '',
     phongBan: this.newPhongBan,
     loaiNhanSu: this.newLoaiNhanSu,
     chucVu: this.newChucVu,
     khoiLop: this.newKhoiLop,
+    gioiTinh: this.newGioiTinh,
+    danToc: this.newDanToc,
+    tonGiao: this.newTonGiao,
+    quocTich: this.newQuocGia,
+    trangThaiLamViec: this.newTrangThaiLamViec,
+    trangThaiTaiKhoan: this.newTrangThaiTaiKhoan,
   };
-  public getNhanSus(): Observable<NhanSu[]> {
-    const url = `${this.REST_API_SERVER}/NhanSus`;
-    return this.httpClient.get<NhanSu[]>(url, this.httpOptions);
+  getNhanSus(): Observable<NhanSu[]> {
+    return this.httpClient.get<NhanSu[]>(this.baseApiUrl + '/NhanSus');
   }
 
-  public postNhanSu(data: NhanSu): Observable<NhanSu> {
-    const url = `${this.REST_API_SERVER}/NhanSus`;
-    return this.httpClient.post<NhanSu>(url, data, this.httpOptions);
+  addNhanSu(nhanSuRequest: NhanSu): Observable<NhanSu> {
+    const addNhanSuRequest: AddNhanSuRequest = {
+      maNhanSu: nhanSuRequest.maNhanSu,
+      ho: nhanSuRequest.ho,
+      ten: nhanSuRequest.ten,
+      maGioiTinh: nhanSuRequest.maGioiTinh,
+      ngaySinh: nhanSuRequest.ngaySinh,
+      noiSinh: nhanSuRequest.noiSinh,
+      cmnd: nhanSuRequest.cmnd,
+      ngayCap: nhanSuRequest.ngayCap,
+      maDanToc: nhanSuRequest.maDanToc,
+      maTonGiao: nhanSuRequest.maTonGiao,
+      maQuocTich: nhanSuRequest.maQuocTich,
+      ngayVaoTruong: nhanSuRequest.ngayVaoTruong,
+      maPhongBan: nhanSuRequest.maPhongBan,
+      maTrangThaiLamViec: nhanSuRequest.maTrangThaiLamViec,
+      lyDoThoiViec: nhanSuRequest.lyDoThoiViec,
+      ngayCapNhat: nhanSuRequest.ngayCapNhat,
+      maLoaiNhanSu: nhanSuRequest.maLoaiNhanSu,
+      maChucVu: nhanSuRequest.maChucVu,
+      maKhoiLop: nhanSuRequest.maKhoiLop,
+      soDienThoai: nhanSuRequest.soDienThoai,
+      email: nhanSuRequest.email,
+      hoKhau: nhanSuRequest.hoKhau,
+      diaChi: nhanSuRequest.diaChi,
+      matKhau: nhanSuRequest.matKhau,
+      maTrangThaiTaiKhoan: nhanSuRequest.maTrangThaiTaiKhoan,
+    };
+
+    return this.httpClient.post<NhanSu>(
+      this.baseApiUrl + '/NhanSus',
+      addNhanSuRequest
+    );
+  }
+  updateNhanSu(maNhanSu: string, nhanSuRequest: NhanSu): Observable<NhanSu> {
+    const updateNhanSuRequest: UpdateNhanSuRequest = {
+      ho: nhanSuRequest.ho,
+      ten: nhanSuRequest.ten,
+      maGioiTinh: nhanSuRequest.maGioiTinh,
+      ngaySinh: nhanSuRequest.ngaySinh,
+      noiSinh: nhanSuRequest.noiSinh,
+      cmnd: nhanSuRequest.cmnd,
+      ngayCap: nhanSuRequest.ngayCap,
+      maDanToc: nhanSuRequest.maDanToc,
+      maTonGiao: nhanSuRequest.maTonGiao,
+      maQuocTich: nhanSuRequest.maQuocTich,
+      ngayVaoTruong: nhanSuRequest.ngayVaoTruong,
+      maPhongBan: nhanSuRequest.maPhongBan,
+      maTrangThaiLamViec: nhanSuRequest.maTrangThaiLamViec,
+      lyDoThoiViec: nhanSuRequest.lyDoThoiViec,
+      ngayCapNhat: nhanSuRequest.ngayCapNhat,
+      maLoaiNhanSu: nhanSuRequest.maLoaiNhanSu,
+      maChucVu: nhanSuRequest.maChucVu,
+      maKhoiLop: nhanSuRequest.maKhoiLop,
+      soDienThoai: nhanSuRequest.soDienThoai,
+      email: nhanSuRequest.email,
+      hoKhau: nhanSuRequest.hoKhau,
+      diaChi: nhanSuRequest.diaChi,
+    };
+
+    return this.httpClient.put<NhanSu>(
+      this.baseApiUrl + '/NhanSus/' + maNhanSu,
+      updateNhanSuRequest
+    );
   }
 
-  public putNhanSu(ma: string, data: NhanSu): Observable<NhanSu> {
-    const url = `${this.REST_API_SERVER}/NhanSus/${ma}`;
-    return this.httpClient.put<NhanSu>(url, data, this.httpOptions);
-  }
-
-  public deleteNhanSu(ma: string): Observable<NhanSu> {
-    const url = `${this.REST_API_SERVER}/NhanSus/${ma}`;
-    return this.httpClient.delete<NhanSu>(url, this.httpOptions);
+  deleteNhanSu(maNhanSu: string): Observable<NhanSu> {
+    return this.httpClient.delete<NhanSu>(
+      this.baseApiUrl + '/NhanSus/' + maNhanSu
+    );
   }
   //#endregion
 
-  //#region Nhan su
-  public newPhieuTiemVaccine: PhieuTiemVaccine = {
+  //#region Vaccine
+  public newVaccine: Vaccine = {
     maVaccine: 0,
-    maHocSinh: '',
-    ngayTiem: new Date(),
+    tenVaccine: '',
+    ghiChu: '',
+  };
+  getVaccines(): Observable<Vaccine[]> {
+    return this.httpClient.get<Vaccine[]>(this.baseApiUrl + '/Vaccines');
+  }
+
+  updateVaccine(
+    maVaccine: number,
+    vaccineRequest: Vaccine
+  ): Observable<Vaccine> {
+    const updateVaccineRequest: AUVaccineRequest = {
+      tenVaccine: vaccineRequest.tenVaccine,
+      ghiChu: vaccineRequest.ghiChu,
+    };
+
+    return this.httpClient.put<Vaccine>(
+      this.baseApiUrl + '/Vaccines/' + maVaccine,
+      updateVaccineRequest
+    );
+  }
+
+  deleteVaccine(maVaccine: number): Observable<Vaccine> {
+    return this.httpClient.delete<Vaccine>(
+      this.baseApiUrl + '/Vaccines/' + maVaccine
+    );
+  }
+
+  addVaccine(vaccineRequest: Vaccine): Observable<Vaccine> {
+    const addVaccineRequest: AUVaccineRequest = {
+      tenVaccine: vaccineRequest.tenVaccine,
+      ghiChu: vaccineRequest.ghiChu,
+    };
+
+    return this.httpClient.post<Vaccine>(
+      this.baseApiUrl + '/Vaccines',
+      addVaccineRequest
+    );
+  }
+  //#endregion
+
+  //#region Dot tiem vaccine
+  public newDotTiemVaccine: DotTiemVaccine = {
+    maDotTiemVaccine: 0,
+    tenDotTiemVaccine: '',
+    ngayTiemVaccine: new Date(),
+    maVaccine: 0,
+    maNienHoc: 0,
     vaccine: this.newVaccine,
+    nienHoc: this.newNienHoc,
+  };
+  getDotTiemVaccines(): Observable<DotTiemVaccine[]> {
+    return this.httpClient.get<DotTiemVaccine[]>(
+      this.baseApiUrl + '/DotTiemVaccines'
+    );
+  }
+
+  getDotTiemVaccinesByNienHoc(maNienHoc: number): Observable<DotTiemVaccine[]> {
+    return this.httpClient.get<DotTiemVaccine[]>(
+      this.baseApiUrl + '/DotTiemVaccines/NienHoc/' + maNienHoc
+    );
+  }
+
+  updateDotTiemVaccine(
+    maDotTiemVaccine: number,
+    dotTiemVaccineRequest: DotTiemVaccine
+  ): Observable<DotTiemVaccine> {
+    const updateDotTiemVaccineRequest: AUDotTiemVaccineRequest = {
+      tenDotTiemVaccine: dotTiemVaccineRequest.tenDotTiemVaccine,
+      ngayTiemVaccine: dotTiemVaccineRequest.ngayTiemVaccine,
+      maVaccine: dotTiemVaccineRequest.maVaccine,
+      maNienHoc: dotTiemVaccineRequest.maNienHoc,
+    };
+
+    return this.httpClient.put<DotTiemVaccine>(
+      this.baseApiUrl + '/DotTiemVaccines/' + maDotTiemVaccine,
+      updateDotTiemVaccineRequest
+    );
+  }
+
+  deleteDotTiemVaccine(maDotTiemVaccine: number): Observable<DotTiemVaccine> {
+    return this.httpClient.delete<DotTiemVaccine>(
+      this.baseApiUrl + '/DotTiemVaccines/' + maDotTiemVaccine
+    );
+  }
+
+  addDotTiemVaccine(
+    dotTiemVaccineRequest: DotTiemVaccine
+  ): Observable<DotTiemVaccine> {
+    const addDotTiemVaccineRequest: AUDotTiemVaccineRequest = {
+      tenDotTiemVaccine: dotTiemVaccineRequest.tenDotTiemVaccine,
+      ngayTiemVaccine: dotTiemVaccineRequest.ngayTiemVaccine,
+      maVaccine: dotTiemVaccineRequest.maVaccine,
+      maNienHoc: dotTiemVaccineRequest.maNienHoc,
+    };
+
+    return this.httpClient.post<DotTiemVaccine>(
+      this.baseApiUrl + '/DotTiemVaccines',
+      addDotTiemVaccineRequest
+    );
+  }
+  //#endregion
+
+  //#region phieu tiem vaccine
+  public newPhieuTiemVaccine: PhieuTiemVaccine = {
+    maPhieuTiemVaccine: 0,
+    maDotTiemVaccine: 0,
+    maHocSinh: '',
+    trangThai: '',
+    dotTiemVaccine: this.newDotTiemVaccine,
     hocSinh: this.newHocSinh,
   };
-  public getPhieuTiemVaccines(): Observable<PhieuTiemVaccine[]> {
-    const url = `${this.REST_API_SERVER}/PhieuTiemVaccines`;
-    return this.httpClient.get<PhieuTiemVaccine[]>(url, this.httpOptions);
+  getPhieuTiemVaccines(): Observable<PhieuTiemVaccine[]> {
+    return this.httpClient.get<PhieuTiemVaccine[]>(
+      this.baseApiUrl + '/PhieuTiemVaccines'
+    );
   }
 
-  public postPhieuTiemVaccine(
-    data: PhieuTiemVaccine
-  ): Observable<PhieuTiemVaccine> {
-    const url = `${this.REST_API_SERVER}/PhieuTiemVaccines`;
-    return this.httpClient.post<PhieuTiemVaccine>(url, data, this.httpOptions);
+  getPhieuTiemVaccinesByNienHoc(
+    maNienHoc: number
+  ): Observable<PhieuTiemVaccine[]> {
+    return this.httpClient.get<PhieuTiemVaccine[]>(
+      this.baseApiUrl + '/PhieuTiemVaccines/NienHoc/' + maNienHoc
+    );
   }
 
-  public putPhieuTiemVaccine(
-    maVaccine: number,
-    maHocSinh: string,
-    ngayTiem: Date,
-    data: PhieuTiemVaccine
+  updatePhieuTiemVaccine(
+    maPhieuTiemVaccine: number,
+    phieuTiemVaccineRequest: PhieuTiemVaccine
   ): Observable<PhieuTiemVaccine> {
-    const url = `${this.REST_API_SERVER}/PhieuTiemVaccines/${maVaccine}/${maHocSinh}/${ngayTiem}`;
-    return this.httpClient.put<PhieuTiemVaccine>(url, data, this.httpOptions);
+    const updatePhieuTiemVaccineRequest: AUPhieuTiemVaccineRequest = {
+      maDotTiemVaccine: phieuTiemVaccineRequest.maDotTiemVaccine,
+      maHocSinh: phieuTiemVaccineRequest.maHocSinh,
+      trangThai: phieuTiemVaccineRequest.trangThai,
+    };
+
+    return this.httpClient.put<PhieuTiemVaccine>(
+      this.baseApiUrl + '/PhieuTiemVaccines/' + maPhieuTiemVaccine,
+      updatePhieuTiemVaccineRequest
+    );
   }
 
-  public deletePhieuTiemVaccine(
-    maVaccine: number,
-    maHocSinh: string,
-    ngayTiem: Date
+  deletePhieuTiemVaccine(
+    maPhieuTiemVaccine: number
   ): Observable<PhieuTiemVaccine> {
-    const url = `${this.REST_API_SERVER}/PhieuTiemVaccines/${maVaccine}/${maHocSinh}/${ngayTiem}`;
-    return this.httpClient.delete<PhieuTiemVaccine>(url, this.httpOptions);
+    return this.httpClient.delete<PhieuTiemVaccine>(
+      this.baseApiUrl + '/PhieuTiemVaccines/' + maPhieuTiemVaccine
+    );
   }
+
+  addPhieuTiemVaccine(
+    phieuTiemVaccineRequest: PhieuTiemVaccine
+  ): Observable<PhieuTiemVaccine> {
+    const addPhieuTiemVaccineRequest: AUPhieuTiemVaccineRequest = {
+      maDotTiemVaccine: phieuTiemVaccineRequest.maDotTiemVaccine,
+      maHocSinh: phieuTiemVaccineRequest.maHocSinh,
+      trangThai: phieuTiemVaccineRequest.trangThai,
+    };
+
+    return this.httpClient.post<PhieuTiemVaccine>(
+      this.baseApiUrl + '/PhieuTiemVaccines',
+      addPhieuTiemVaccineRequest
+    );
+  }
+  //#endregion
+
+  //#region Diem danh
+  newDiemDanh: DiemDanh = {
+    maDiemDanh: 0,
+    ngayDiemDanh: new Date(),
+    maHocSinh: '',
+    maTrangThaiDiemDanh: '',
+    hocSinh: this.newHocSinh,
+    trangThaiDiemDanh: this.newTrangThaiDiemDanh,
+  };
+  // getDiemDanhs(): Observable<DiemDanh[]> {
+  //   return this.httpClient.get<DiemDanh[]>(
+  //     this.baseApiUrl + '/DiemDanhs'
+  //   );
+  // }
+
+  // getDiemDanhsByDate(from: string, to: string): Observable<DiemDanh[]> {
+  //   return this.httpClient.get<DiemDanh[]>(
+  //     this.baseApiUrl + '/DiemDanhs/from/' + from + '/to/' + to
+  //   );
+  // }
+
+  getDiemDanhsByDateLopHoc(
+    from: string,
+    to: string,
+    maLopHoc: number
+  ): Observable<DiemDanh[]> {
+    return this.httpClient.get<DiemDanh[]>(
+      this.baseApiUrl +
+        '/DiemDanhs/LopHoc/' +
+        maLopHoc +
+        '/from/' +
+        from +
+        '/to/' +
+        to
+    );
+  }
+
+  updateDiemDanh(
+    maDiemDanh: number,
+    diemDanhRequest: DiemDanh
+  ): Observable<DiemDanh> {
+    const updateDiemDanhRequest: UpdateDiemDanhRequest = {
+      maTrangThaiDiemDanh: diemDanhRequest.maTrangThaiDiemDanh,
+    };
+
+    return this.httpClient.put<DiemDanh>(
+      this.baseApiUrl + '/DiemDanhs/' + maDiemDanh,
+      updateDiemDanhRequest
+    );
+  }
+
+  deleteDiemDanh(maDiemDanh: number): Observable<DiemDanh> {
+    return this.httpClient.delete<DiemDanh>(
+      this.baseApiUrl + '/DiemDanhs/' + maDiemDanh
+    );
+  }
+
+  addDiemDanh(diemDanhRequest: DiemDanh): Observable<DiemDanh> {
+    const addDiemDanhRequest: AddDiemDanhRequest = {
+      ngayDiemDanh: diemDanhRequest.ngayDiemDanh,
+      maHocSinh: diemDanhRequest.maHocSinh,
+      maTrangThaiDiemDanh: diemDanhRequest.maTrangThaiDiemDanh,
+    };
+
+    return this.httpClient.post<DiemDanh>(
+      this.baseApiUrl + '/DiemDanhs',
+      addDiemDanhRequest
+    );
+  }
+  //#endregion
+
+  //#region Danh muc thuc pham
+  newDanhMucThucPham: DanhMucThucPham = {
+    maDanhMuc: 0,
+    tenDanhMuc: '',
+    ghiChu: '',
+  };
+
+  getDanhMucThucPhams(): Observable<DanhMucThucPham[]> {
+    return this.httpClient.get<DanhMucThucPham[]>(
+      this.baseApiUrl + '/DanhMucThucPhams'
+    );
+  }
+  //#endregion
+
+  //#region Thuc pham
+  newThucPham: ThucPham = {
+    maThucPham: 0,
+    tenThucPham: '',
+    donViTinh: '',
+    tonKho: 0,
+    maDanhMuc: 0,
+    nangLuong: 0,
+    chatDam: 0,
+    chatBeo: 0,
+    chatBot: 0,
+    danhMucThucPham: this.newDanhMucThucPham,
+  };
+
+  getThucPhams(): Observable<ThucPham[]> {
+    return this.httpClient.get<ThucPham[]>(this.baseApiUrl + '/ThucPhams');
+  }
+  //#endregion
+
+  //#region Phieu nhap thuc pham
+  newPhieuNhapThucPham: PhieuNhapThucPham = {
+    maPhieuNhapThucPham: 0,
+    ngayNhap: new Date(),
+    maNguoiNhap: '',
+    ghiChu: '',
+    trangThai: '',
+    nguoiNhap: this.newNhanSu,
+  };
+
+  getPhieuNhapThucPhams(): Observable<PhieuNhapThucPham[]> {
+    return this.httpClient.get<PhieuNhapThucPham[]>(
+      this.baseApiUrl + '/PhieuNhapThucPhams'
+    );
+  }
+
+  addPhieuNhapThucPham(
+    phieuNhapThucPhamRequest: PhieuNhapThucPham
+  ): Observable<PhieuNhapThucPham> {
+    const addPhieuNhapThucPham: AddPhieuNhapThucPhamRequest = {
+      ngayNhap: phieuNhapThucPhamRequest.ngayNhap,
+      maNguoiNhap: phieuNhapThucPhamRequest.maNguoiNhap,
+      ghiChu: phieuNhapThucPhamRequest.ghiChu,
+      trangThai: phieuNhapThucPhamRequest.trangThai,
+    };
+    return this.httpClient.post<PhieuNhapThucPham>(
+      this.baseApiUrl + '/PhieuNhapThucPhams',
+      addPhieuNhapThucPham
+    );
+  }
+
+  updatePhieuNhapThucPham(
+    maPhieuNhapThucPham: number,
+    phieuNhapThucPhamRequest: PhieuNhapThucPham
+  ): Observable<PhieuNhapThucPham> {
+    const updatePhieuNhapThucPham: UpdatePhieuNhapThucPhamRequest = {
+      ngayNhap: phieuNhapThucPhamRequest.ngayNhap,
+      maNguoiNhap: phieuNhapThucPhamRequest.maNguoiNhap,
+      ghiChu: phieuNhapThucPhamRequest.ghiChu,
+      trangThai: phieuNhapThucPhamRequest.trangThai,
+    };
+    return this.httpClient.put<PhieuNhapThucPham>(
+      this.baseApiUrl + '/PhieuNhapThucPhams/' + maPhieuNhapThucPham,
+      updatePhieuNhapThucPham
+    );
+  }
+
+  deletePhieuNhapThucPham(
+    maPhieuNhapThucPham: number
+  ): Observable<PhieuNhapThucPham> {
+    return this.httpClient.delete<PhieuNhapThucPham>(
+      this.baseApiUrl + '/PhieuNhapThucPham/' + maPhieuNhapThucPham
+    );
+  }
+  //#endregion
+
+  //#region Chi tiet phieu nhap thuc pham
+  newChiTietPhieuNhapThucPham: ChiTietPhieuNhapThucPham = {
+    maPhieuNhapThucPham: 0,
+    maThucPham: 0,
+    donGia: 0,
+    soLuong: 0,
+    phieuNhapThucPham: this.newPhieuNhapThucPham,
+    thucPham: this.newThucPham,
+  };
+
+  //getChiTietPhieuNhapThucPham():Observable
   //#endregion
 }

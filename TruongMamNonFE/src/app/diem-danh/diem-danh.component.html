@@ -27,7 +27,7 @@
         pTooltip="Tải lại"
         tooltipPosition="bottom"
         *ngIf="selectedNienHoc"
-        (click)="getPhieuTiemVaccinesByNienHoc()"
+        (click)="getDiemDanhsByDateLopHoc()"
       ></button>
     </ng-template>
 
@@ -70,13 +70,13 @@
 
   <p-table
     #dt
-    [value]="phieuTiemVaccines"
+    [value]="diemDanhs"
     [rows]="10"
     [paginator]="true"
     [globalFilterFields]="['vaccine.tenVaccine', 'hocSinh.ho', 'hocSinh.ten']"
     [tableStyle]="{ 'min-width': '75rem' }"
     [rowHover]="true"
-    dataKey="['maVaccine', 'maHocSinh', ngayTiem]"
+    dataKey="[maHocSinh]"
     currentPageReportTemplate="Hiển thị {first} đến {last} trong {totalRecords} mục"
     [showCurrentPageReport]="true"
     [rowsPerPageOptions]="[10, 25, 50]"
@@ -84,20 +84,83 @@
   >
     <ng-template pTemplate="caption">
       <div class="flex align-items-center justify-content-between mt-3">
-        <h3 class="m-0">Danh sách chức vụ</h3>
+        <h3 class="m-0">Danh sách phiếu điểm danh</h3>
         <div class="flex">
-          <!-- <span class="p-float-label mr-2">
+          <span class="p-float-label mr-2">
             <p-dropdown
-              inputId="filterLoaiNhanSu"
-              [options]="loaiNhanSus"
-              [(ngModel)]="filterSelectedLoaiNhanSu"
-              optionLabel="tenLoaiNhanSu"
-              placeholder="Chọn loại nhân sự"
+              [options]="khoiLops"
+              [(ngModel)]="selectedKhoiLop"
+              optionLabel="tenKhoiLop"
+              [filter]="true"
+              filterBy="tenKhoiLop"
+              dataKey="maKhoiLop"
+              placeholder="Chọn khối lớp"
+              (onChange)="onKhoiLopChange($event.value)"
+              appendTo="body"
               [showClear]="true"
-              (onChange)="onFilterLoaiNhanSuChange($event.value)"
-            ></p-dropdown>
-            <label for="filterLoaiNhanSu">Loại nhân sự</label>
-          </span> -->
+            >
+              <ng-template pTemplate="selectedItem">
+                <div
+                  class="khoiLop-item khoiLop-item-value"
+                  *ngIf="selectedKhoiLop"
+                >
+                  <div>{{ selectedKhoiLop.tenKhoiLop }}</div>
+                </div>
+              </ng-template>
+              <ng-template let-khoiLop pTemplate="item">
+                <div class="khoiLop-item">
+                  <div>{{ khoiLop?.tenKhoiLop }}</div>
+                </div>
+              </ng-template>
+            </p-dropdown>
+            <label for="khoiLop">Khối lớp</label>
+          </span>
+
+          <span class="p-float-label mr-2">
+            <p-dropdown
+              [options]="lopHocs"
+              [(ngModel)]="selectedLopHoc"
+              optionLabel="tenLop"
+              [filter]="true"
+              filterBy="tenLop"
+              dataKey="maLop"
+              (onChange)="onLopHocChange($event.value)"
+              appendTo="body"
+              placeholder="Chọn lớp học"
+            >
+              <ng-template pTemplate="selectedItem">
+                <div
+                  class="lopHoc-item lopHoc-item-value"
+                  *ngIf="selectedLopHoc"
+                >
+                  <div>{{ selectedLopHoc.tenLop }}</div>
+                </div>
+              </ng-template>
+              <ng-template let-lopHoc pTemplate="item">
+                <div class="lopHoc-item">
+                  <div>{{ lopHoc?.tenLop }}</div>
+                </div>
+              </ng-template>
+            </p-dropdown>
+            <label for="lopHoc" class="required-field">Lớp học</label>
+          </span>
+
+          <span class="p-float-label mr-2">
+            <p-calendar
+              inputId="fromDate"
+              [(ngModel)]="fromDate"
+              dateFormat="dd/mm/yy"
+            ></p-calendar>
+            <label for="fromDate">Từ ngày</label>
+          </span>
+          <span class="p-float-label mr-2">
+            <p-calendar
+              inputId="toDate"
+              [(ngModel)]="toDate"
+              dateFormat="dd/mm/yy"
+            ></p-calendar>
+            <label for="toDate">Đến ngày</label>
+          </span>
           <span class="p-input-icon-left">
             <i class="pi pi-search"></i>
             <input
@@ -112,9 +175,6 @@
     </ng-template>
     <ng-template pTemplate="header">
       <tr>
-        <th pSortableColumn="dotTiemVaccine" style="min-width: 10rem">
-          Đợt tiêm vaccine <p-sortIcon field="dotTiemVaccine"></p-sortIcon>
-        </th>
         <th pSortableColumn="maHocSinh" style="min-width: 10rem">
           Mã học sinh <p-sortIcon field="maHocSinh"></p-sortIcon>
         </th>
@@ -134,23 +194,34 @@
         <th pSortableColumn="hocSinh.lopHoc.tenLopHoc" style="min-width: 10rem">
           Lớp học <p-sortIcon field="hocSinh.lopHoc.tenLopHoc"></p-sortIcon>
         </th>
+        <th pSortableColumn="ngayDiemDanh" style="min-width: 10rem">
+          Ngày nghỉ <p-sortIcon field="ngayDiemDanh"></p-sortIcon>
+        </th>
+        <th
+          pSortableColumn="trangThaiDiemDanh.tenTrangThai"
+          style="min-width: 10rem"
+        >
+          Trạng thái
+          <p-sortIcon field="trangThaiDiemDanh.tenTrangThai"></p-sortIcon>
+        </th>
         <th style="width: 8rem"></th>
       </tr>
     </ng-template>
-    <ng-template pTemplate="body" let-phieuTiemVaccine>
+    <ng-template pTemplate="body" let-diemDanh>
       <tr>
-        <td>{{ phieuTiemVaccine.dotTiemVaccine?.tenDotTiemVaccine }}</td>
-        <td>{{ phieuTiemVaccine.maHocSinh }}</td>
-        <td>{{ phieuTiemVaccine.hocSinh?.ho }}</td>
-        <td>{{ phieuTiemVaccine.hocSinh?.ten }}</td>
-        <td>{{ phieuTiemVaccine.hocSinh?.gioiTinh?.tenGioiTinh }}</td>
-        <td>{{ phieuTiemVaccine.hocSinh?.ngaySinh | date : "dd/MM/yyyy" }}</td>
+        <td>{{ diemDanh.maHocSinh }}</td>
+        <td>{{ diemDanh.hocSinh?.ho }}</td>
+        <td>{{ diemDanh.hocSinh?.ten }}</td>
+        <td>{{ diemDanh.hocSinh?.gioiTinh?.tenGioiTinh }}</td>
+        <td>{{ diemDanh.hocSinh?.ngaySinh | date : "dd/MM/yyyy" }}</td>
         <td>
-          {{
-            phieuTiemVaccine.hocSinh?.lopHoc
-              ? phieuTiemVaccine.hocSinh.lopHoc.tenLop
-              : ""
-          }}
+          {{ diemDanh.hocSinh?.lopHoc ? diemDanh.hocSinh.lopHoc.tenLop : "" }}
+        </td>
+        <td>
+          {{ diemDanh.ngayDiemDanh | date : "dd/MM/yyyy" }}
+        </td>
+        <td>
+          {{ diemDanh.trangThaiDiemDanh?.tenTrangThai }}
         </td>
         <td>
           <button
@@ -160,7 +231,7 @@
             class="p-button-rounded p-button-success mr-2"
             pTooltip="Sửa"
             tooltipPosition="top"
-            (click)="editPhieuTiemVaccine(phieuTiemVaccine)"
+            (click)="editDiemDanh(diemDanh)"
           ></button>
           <button
             pButton
@@ -169,21 +240,21 @@
             class="p-button-rounded p-button-warning"
             pTooltip="Xóa"
             tooltipPosition="top"
-            (click)="deletePhieuTiemVaccine(phieuTiemVaccine)"
+            (click)="deleteDiemDanh(diemDanh)"
           ></button>
         </td>
       </tr>
     </ng-template>
     <ng-template pTemplate="summary">
       <div class="flex align-items-center justify-content-between">
-        Tổng cộng có {{ phieuTiemVaccines ? phieuTiemVaccines.length : 0 }} mục.
+        Tổng cộng có {{ diemDanhs ? diemDanhs.length : 0 }} mục.
       </div>
     </ng-template>
   </p-table>
 </div>
 
 <p-dialog
-  [(visible)]="phieuTiemVaccineDialog"
+  [(visible)]="diemDanhDialog"
   [style]="{ width: '75%' }"
   header="Chi tiết tiêm vaccine"
   [modal]="true"
@@ -191,46 +262,6 @@
 >
   <ng-template pTemplate="content">
     <div class="p-fluid grid mt-4">
-      <div class="field col-12 md:col-3">
-        <span class="p-float-label">
-          <p-dropdown
-            [options]="dotTiemVaccines"
-            [(ngModel)]="selectedDotTiemVaccine"
-            optionLabel="tenDotTiemVaccine"
-            [filter]="true"
-            filterBy="tenDotTiemVaccine"
-            dataKey="maDotTiemVaccine"
-            placeholder="Chọn đợt tiêm"
-            (onChange)="onDotTiemVaccineChange($event.value)"
-            appendTo="body"
-            inputId="dotTiemVaccine"
-          >
-            <ng-template pTemplate="selectedItem">
-              <div
-                class="dotTiemVaccine-item dotTiemVaccine-item-value"
-                *ngIf="selectedDotTiemVaccine"
-              >
-                <div>{{ selectedDotTiemVaccine.tenDotTiemVaccine }}</div>
-              </div>
-            </ng-template>
-            <ng-template let-dotTiemVaccine pTemplate="item">
-              <div class="dotTiemVaccine-item">
-                <div>{{ dotTiemVaccine?.tenDotTiemVaccine }}</div>
-              </div>
-            </ng-template>
-          </p-dropdown>
-
-          <label for="dotTiemVaccine" class="required-field">
-            Đợt tiêm vaccine</label
-          >
-          <small
-            class="p-error"
-            *ngIf="submitted && !phieuTiemVaccine.maDotTiemVaccine"
-            >Chưa chọn đợt tiêm vaccine</small
-          >
-        </span>
-      </div>
-
       <div class="field col-12 md:col-3">
         <span class="p-float-label">
           <p-dropdown
@@ -244,6 +275,7 @@
             (onChange)="onKhoiLopChange($event.value)"
             appendTo="body"
             [showClear]="true"
+            [disabled]="!(diemDanh.maDiemDanh === 0)"
           >
             <ng-template pTemplate="selectedItem">
               <div
@@ -274,8 +306,8 @@
             dataKey="maLop"
             (onChange)="onLopHocChange($event.value)"
             appendTo="body"
-            [showClear]="true"
             placeholder="Chọn lớp học"
+            [disabled]="!(diemDanh.maDiemDanh === 0)"
           >
             <ng-template pTemplate="selectedItem">
               <div class="lopHoc-item lopHoc-item-value" *ngIf="selectedLopHoc">
@@ -288,87 +320,90 @@
               </div>
             </ng-template>
           </p-dropdown>
-          <label for="lopHoc">Lớp học</label>
+          <label for="lopHoc" class="required-field">Lớp học</label>
         </span>
       </div>
     </div>
 
-    <div class="card">
-      <p-table
-        #dt
-        [value]="hocSinhs"
-        [rows]="10"
-        [paginator]="true"
-        [globalFilterFields]="['maHocSinh', 'ho', 'ten']"
-        [tableStyle]="{ 'min-width': '75%' }"
-        [(selection)]="selectedHocSinhs"
-        [rowHover]="true"
-        dataKey="maHocSinh"
-        currentPageReportTemplate="Hiển thị {first} đến {last} trong {totalRecords} mục"
-        [showCurrentPageReport]="true"
-        [rowsPerPageOptions]="[10, 25, 50]"
-        styleClass="p-datatable-sm p-datatable-striped p-datatable-gridlines"
-      >
-        <ng-template pTemplate="caption">
-          <div class="flex align-items-center justify-content-between">
-            <h3 class="m-0">Danh sách học sinh</h3>
-            <span class="p-input-icon-left">
-              <i class="pi pi-search"></i>
-              <input
-                pInputText
-                type="text"
-                (input)="dt.filterGlobal($any($event.target).value, 'contains')"
-                placeholder="Tìm kiếm..."
-              />
-            </span>
-          </div>
-        </ng-template>
-        <ng-template pTemplate="header">
-          <tr>
-            <th pSortableColumn="lopHoc" style="min-width: 5rem">
-              Lớp học <p-sortIcon field="lopHoc"></p-sortIcon>
-            </th>
-            <th pSortableColumn="maHocSinh" style="min-width: 5rem">
-              Mã học sinh <p-sortIcon field="maHocSinh"></p-sortIcon>
-            </th>
-            <th pSortableColumn="ho" style="min-width: 5rem">
-              Họ <p-sortIcon field="ho"></p-sortIcon>
-            </th>
-            <th pSortableColumn="ten" style="min-width: 5rem">
-              Tên <p-sortIcon field="ten"></p-sortIcon>
-            </th>
-            <th pSortableColumn="gioiTinh" style="min-width: 5rem">
-              Giới tính<p-sortIcon field="gioiTinh"></p-sortIcon>
-            </th>
-            <th pSortableColumn="ngaySinh" style="min-width: 5rem">
-              Ngày sinh<p-sortIcon field="ngaySinh"></p-sortIcon>
-            </th>
-            <th style="width: 4rem">
-              <p-tableHeaderCheckbox></p-tableHeaderCheckbox>
-            </th>
-          </tr>
-        </ng-template>
-        <ng-template pTemplate="body" let-hocSinh>
-          <tr>
-            <td>{{ hocSinh.lopHoc ? hocSinh.lopHoc.tenLop : "" }}</td>
-            <td>{{ hocSinh.maHocSinh }}</td>
-            <td>{{ hocSinh.ho }}</td>
-            <td>{{ hocSinh.ten }}</td>
-            <td>
-              {{ hocSinh.gioiTinh?.tenGioiTinh }}
-            </td>
-            <td>{{ hocSinh.ngaySinh | date : "dd/MM/yyyy" }}</td>
-            <td>
-              <p-tableCheckbox [value]="hocSinh"></p-tableCheckbox>
-            </td>
-          </tr>
-        </ng-template>
-        <ng-template pTemplate="summary">
-          <div class="flex align-items-center justify-content-between">
-            Tổng cộng có {{ hocSinhs ? hocSinhs.length : 0 }} mục.
-          </div>
-        </ng-template>
-      </p-table>
+    <div class="p-fluid grid">
+      <div class="field col-12 md:col-4">
+        <span class="p-float-label">
+          <p-dropdown
+            [options]="hocSinhs"
+            [(ngModel)]="selectedHocSinh"
+            optionLabel="ten"
+            [filter]="true"
+            filterBy="ho,ten,maHocSinh"
+            dataKey="maHocSinh"
+            (onChange)="onHocSinhChange($event.value)"
+            appendTo="body"
+            placeholder="Chọn học sinh"
+            [disabled]="!(diemDanh.maDiemDanh === 0)"
+          >
+            <ng-template pTemplate="selectedItem">
+              <div
+                class="hocSinh-item hocSinh-item-value"
+                *ngIf="selectedHocSinh"
+              >
+                <div>{{ selectedHocSinh.ho + " " + selectedHocSinh.ten }}</div>
+              </div>
+            </ng-template>
+            <ng-template let-hocSinh pTemplate="item">
+              <div class="hocSinh-item">
+                <div>{{ hocSinh.maHocSinh }}</div>
+                <div>{{ hocSinh.ho + " " + hocSinh.ten }}</div>
+                <div>{{ hocSinh.ngaySinh | date : "dd/MM/yyyy" }}</div>
+              </div>
+            </ng-template>
+          </p-dropdown>
+          <label for="hocSinh" class="required-field">Học sinh</label>
+        </span>
+      </div>
+      <div class="field col-12 md:col-4">
+        <span class="p-float-label">
+          <p-calendar
+            inputId="ngayDiemDanh"
+            [(ngModel)]="ngayDiemDanh"
+            dateFormat="dd/mm/yy"
+            appendTo="body"
+            [disabled]="!(diemDanh.maDiemDanh === 0)"
+          ></p-calendar>
+          <label for="ngayDiemDanh" class="required-field"
+            >Ngày điểm danh</label
+          >
+        </span>
+      </div>
+      <div class="field col-12 md:col-4">
+        <span class="p-float-label">
+          <p-dropdown
+            [options]="trangThaiDiemDanhs"
+            [(ngModel)]="selectedTrangThaiDiemDanh"
+            optionLabel="tenTrangThai"
+            dataKey="maTrangThai"
+            (onChange)="onTrangThaiDiemDanhChange($event.value)"
+            appendTo="body"
+            [showClear]="true"
+            placeholder="Chọn trạng thái"
+          >
+            <ng-template pTemplate="selectedItem">
+              <div
+                class="trangThaiDiemDanh-item trangThaiDiemDanh-item-value"
+                *ngIf="selectedTrangThaiDiemDanh"
+              >
+                <div>{{ selectedTrangThaiDiemDanh.tenTrangThai }}</div>
+              </div>
+            </ng-template>
+            <ng-template let-trangThaiDiemDanh pTemplate="item">
+              <div class="trangThaiDiemDanh-item">
+                <div>{{ trangThaiDiemDanh.tenTrangThai }}</div>
+              </div>
+            </ng-template>
+          </p-dropdown>
+          <label for="trangThaiDiemDanh" class="required-field"
+            >Trạng thái</label
+          >
+        </span>
+      </div>
     </div>
   </ng-template>
 
@@ -389,7 +424,7 @@
       label="Lưu"
       icon="pi pi-check"
       class="p-button-text"
-      (click)="savePhieuTiemVaccine()"
+      (click)="saveDiemDanh()"
       pTooltip="Lưu"
       tooltipPosition="top"
     ></button>

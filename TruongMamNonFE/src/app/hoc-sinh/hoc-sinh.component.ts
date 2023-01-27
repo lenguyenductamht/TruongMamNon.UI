@@ -100,6 +100,7 @@ export class HocSinhComponent implements OnInit {
     this.loading = true;
     this.dataService.getHocSinhs().subscribe((success) => {
       this.hocSinhs = success;
+      console.log(this.hocSinh);
       //this.displayHocSinhs=this.hocSinhs.filter((hocSinh)=>hocSinh.nienHoc.maNienHoc===this.selectedNienHoc?.maNienHoc);
       this.loading = false;
     });
@@ -281,7 +282,7 @@ export class HocSinhComponent implements OnInit {
             this.getHocSinhs();
           },
           (error) => {
-            console.log('error');
+            console.log(error);
             this.hideDialog(false, false);
           }
         );
@@ -295,7 +296,7 @@ export class HocSinhComponent implements OnInit {
               this.getHocSinhs();
             },
             (error) => {
-              console.log('error');
+              console.log(error);
               this.hideDialog(false, false);
             }
           );

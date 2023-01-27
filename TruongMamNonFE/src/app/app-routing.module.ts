@@ -14,27 +14,33 @@ import { LoaiNhanSuComponent } from './loai-nhan-su/loai-nhan-su.component';
 import { ChucVuComponent } from './chuc-vu/chuc-vu.component';
 import { NhanSuComponent } from './nhan-su/nhan-su.component';
 import { PhieuTiemVaccineComponent } from './phieu-tiem-vaccine/phieu-tiem-vaccine.component';
+import { DotTiemVaccineComponent } from './dot-tiem-vaccine/dot-tiem-vaccine.component';
+import { DiemDanhComponent } from './diem-danh/diem-danh.component';
+import { PhieuNhapThucPhamComponent } from './phieu-nhap-thuc-pham/phieu-nhap-thuc-pham.component';
 
 const routes: Routes = [
-  {path:'CauHinhNienHoc', component:NienHocComponent},
-  {path:'PhongBan', component:PhongBanComponent},
-  {path:'ChucVu', component:ChucVuComponent},
-  {path:'LoaiNhanSu', component:LoaiNhanSuComponent},
-  {path:'TraCuuNhanSu', component:NhanSuComponent},
-  {path:'DanhSachLopHoc', component:LopHocComponent},
-  {path:'HoSoHocSinh', component:HocSinhComponent},
-  {path:'DanhMucVaccine', component:VaccineComponent},
-  {path:'DanhMucThuocSoGiun', component:ThuocSoGiunComponent},
-  {path:'DanhMucVitamin', component:VitaminComponent},
-  {path:'QuanLyTiemChung', component:PhieuTiemVaccineComponent},
-  {path:'DanhMucThucDon', component:DanhMucThucDonComponent},
-  {path: '', component:HomeComponent},
-  {path: 'home', component:HomeComponent},
-  {path:'**', component:PageNotFoundComponent},
+  { path: 'CauHinhNienHoc', component: NienHocComponent },
+  { path: 'PhongBan', component: PhongBanComponent },
+  { path: 'ChucVu', component: ChucVuComponent },
+  { path: 'LoaiNhanSu', component: LoaiNhanSuComponent },
+  { path: 'TraCuuNhanSu', component: NhanSuComponent },
+  { path: 'DanhSachLopHoc', component: LopHocComponent },
+  { path: 'HoSoHocSinh', component: HocSinhComponent },
+  { path: 'DanhMucVaccine', component: VaccineComponent },
+  { path: 'DotTiemVaccine', component: DotTiemVaccineComponent },
+  { path: 'PhieuTiemVaccine', component: PhieuTiemVaccineComponent },
+  { path: 'DiemDanh', component: DiemDanhComponent },
+  { path: 'NhapThucPham', component: PhieuNhapThucPhamComponent },
+  { path: 'DanhMucThuocSoGiun', component: ThuocSoGiunComponent },
+  { path: 'DanhMucVitamin', component: VitaminComponent },
+  { path: 'DanhMucThucDon', component: DanhMucThucDonComponent },
+  { path: '', component: HomeComponent },
+  { path: 'home', component: HomeComponent },
+  { path: '**', component: PageNotFoundComponent },
 ];
 
 @NgModule({
   imports: [RouterModule.forRoot(routes)],
-  exports: [RouterModule]
+  exports: [RouterModule],
 })
-export class AppRoutingModule { }
+export class AppRoutingModule {}

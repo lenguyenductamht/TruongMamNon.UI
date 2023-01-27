@@ -47,6 +47,10 @@ import { NhanSuComponent } from './nhan-su/nhan-su.component';
 import { PhieuTiemVaccineComponent } from './phieu-tiem-vaccine/phieu-tiem-vaccine.component';
 import {TreeModule} from 'primeng/tree';
 import {TreeNode} from 'primeng/api';
+import { MenuBarComponent } from './menu-bar/menu-bar.component';
+import { DotTiemVaccineComponent } from './dot-tiem-vaccine/dot-tiem-vaccine.component';
+import { DiemDanhComponent } from './diem-danh/diem-danh.component';
+import { PhieuNhapThucPhamComponent } from './phieu-nhap-thuc-pham/phieu-nhap-thuc-pham.component';
 
 
 @NgModule({  
@@ -66,6 +70,10 @@ import {TreeNode} from 'primeng/api';
     ChucVuComponent,
     NhanSuComponent,
     PhieuTiemVaccineComponent,
+    MenuBarComponent,
+    DotTiemVaccineComponent,
+    DiemDanhComponent,
+    PhieuNhapThucPhamComponent,
   ],
   imports: [
     BrowserModule,

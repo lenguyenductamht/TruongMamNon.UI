@@ -132,9 +132,9 @@
         <td>{{ nhanSu.maNhanSu }}</td>
         <td>{{ nhanSu.ho }}</td>
         <td>{{ nhanSu.ten }}</td>
-        <td>{{ nhanSu.gioiTinh }}</td>
+        <td>{{ nhanSu.gioiTinh?.tenGioiTinh }}</td>
         <td>{{ nhanSu.ngaySinh | date : "dd/MM/yyyy" }}</td>
-        <td>{{ nhanSu.trangThaiLamViec }}</td>
+        <td>{{ nhanSu.trangThaiLamViec?.tenTrangThai }}</td>
         <td>{{ nhanSu.loaiNhanSu?.tenLoaiNhanSu }}</td>
         <td>{{ nhanSu.chucVu ? nhanSu.chucVu.tenChucVu : "" }}</td>
         <td>{{ nhanSu.phongBan?.tenPhongBan }}</td>
@@ -216,9 +216,7 @@
           [(ngModel)]="nhanSu.ten"
           required
         />
-        <small class="p-error" *ngIf="submitted && !nhanSu.ten"
-          >Tên không được để trống</small
-        >
+        <small class="p-error" *ngIf="submitted && !nhanSu.ten">Nhập tên</small>
         <label for="ten" class="required-field">Tên</label>
       </span>
     </div>
@@ -230,6 +228,8 @@
           inputId="gioiTinh"
           [options]="gioiTinhs"
           placeholder="Chọn giới tính"
+          optionLabel="tenGioiTinh"
+          dataKey="maGioiTinh"
           appendTo="body"
         >
           <ng-template pTemplate="selectedItem">
@@ -237,15 +237,18 @@
               class="gioiTinh-item gioiTinh-item-value"
               *ngIf="selectedGioiTinh"
             >
-              <div>{{ selectedGioiTinh.name }}</div>
+              <div>{{ selectedGioiTinh.tenGioiTinh }}</div>
             </div>
           </ng-template>
           <ng-template let-gioiTinh pTemplate="item">
             <div class="gioiTinh-item">
-              <div>{{ gioiTinh?.name }}</div>
+              <div>{{ gioiTinh?.tenGioiTinh }}</div>
             </div>
           </ng-template>
         </p-dropdown>
+        <small class="p-error" *ngIf="submitted && !nhanSu.maGioiTinh"
+          >Chưa chọn giới tính</small
+        >
         <label for="gioiTinh" class="required-field">Giới tính</label>
       </span>
     </div>
@@ -253,12 +256,14 @@
     <div class="field col-12 md:col-3">
       <span class="p-float-label">
         <p-calendar
-          [(ngModel)]="nhanSu.ngaySinh"
+          [(ngModel)]="_ngaySinh"
           [showIcon]="true"
           dateFormat="dd/mm/yy"
           appendTo="body"
-          [defaultDate]="nhanSu.ngaySinh"
         ></p-calendar>
+        <small class="p-error" *ngIf="submitted && !nhanSu.ngaySinh"
+          >Chưa nhập ngày sinh</small
+        >
         <label class="required-field" for="ngaySinh">Ngày sinh</label>
       </span>
     </div>
@@ -272,25 +277,27 @@
           [(ngModel)]="nhanSu.noiSinh"
           required
         />
-        <label for="noiSinh" class="required-field">Nơi sinh</label>
+        <label for="noiSinh">Nơi sinh</label>
       </span>
     </div>
 
     <div class="field col-12 md:col-3">
       <span class="p-float-label">
         <input type="text" pInputText id="cmnd" [(ngModel)]="nhanSu.cmnd" />
-        <label for="cmnd" class="required-field">CMND</label>
+        <small class="p-error" *ngIf="submitted && !nhanSu.cmnd"
+          >CMND/CCCD không được để trống</small
+        >
+        <label for="cmnd" class="required-field">CMND/CCCD</label>
       </span>
     </div>
 
     <div class="field col-12 md:col-3">
       <span class="p-float-label">
         <p-calendar
-          [(ngModel)]="nhanSu.ngayCap"
+          [(ngModel)]="_ngayCap"
           [showIcon]="true"
           dateFormat="dd/mm/yy"
           appendTo="body"
-          [defaultDate]="nhanSu.ngayCap"
         ></p-calendar>
         <label for="ngayCap">Ngày cấp</label>
       </span>
@@ -302,14 +309,24 @@
           [autoDisplayFirst]="false"
           [options]="danTocs"
           [(ngModel)]="selectedDanToc"
-          optionLabel="TenDanToc"
-          [autoDisplayFirst]="true"
-          appendTo="body"
-          [filter]="true"
-          filterBy="TenDanToc"
-          dataKey="MaDanToc"
+          optionLabel="tenDanToc"
+          dataKey="maDanToc"
           (onChange)="onDanTocChange($event.value)"
-        ></p-dropdown>
+        >
+          <ng-template pTemplate="selectedItem">
+            <div class="danToc-item danToc-item-value" *ngIf="selectedDanToc">
+              <div>{{ selectedDanToc.tenDanToc }}</div>
+            </div>
+          </ng-template>
+          <ng-template let-danToc pTemplate="item">
+            <div class="danToc-item">
+              <div>{{ danToc?.tenDanToc }}</div>
+            </div>
+          </ng-template></p-dropdown
+        >
+        <small class="p-error" *ngIf="submitted && !nhanSu.maDanToc"
+          >Chưa chọn dân tộc</small
+        >
         <label for="danToc" class="required-field">Dân tộc</label>
       </span>
     </div>
@@ -320,14 +337,27 @@
           [autoDisplayFirst]="false"
           [options]="tonGiaos"
           [(ngModel)]="selectedTonGiao"
-          optionLabel="TenTonGiao"
-          [autoDisplayFirst]="true"
-          appendTo="body"
-          [filter]="true"
-          filterBy="TenTonGiao"
-          dataKey="MaTonGiao"
+          optionLabel="tenTonGiao"
+          dataKey="maTonGiao"
           (onChange)="onTonGiaoChange($event.value)"
-        ></p-dropdown>
+        >
+          <ng-template pTemplate="selectedItem">
+            <div
+              class="tonGiao-item tonGiao-item-value"
+              *ngIf="selectedTonGiao"
+            >
+              <div>{{ selectedTonGiao.tenTonGiao }}</div>
+            </div>
+          </ng-template>
+          <ng-template let-tonGiao pTemplate="item">
+            <div class="tonGiao-item">
+              <div>{{ tonGiao?.tenTonGiao }}</div>
+            </div>
+          </ng-template></p-dropdown
+        >
+        <small class="p-error" *ngIf="submitted && !nhanSu.maTonGiao"
+          >Chưa chọn tôn giáo</small
+        >
         <label for="tonGiao" class="required-field">Tôn giáo</label>
       </span>
     </div>
@@ -338,14 +368,27 @@
           [autoDisplayFirst]="false"
           [options]="quocTichs"
           [(ngModel)]="selectedQuocTich"
-          optionLabel="TenQuocGia"
-          [autoDisplayFirst]="true"
-          appendTo="body"
-          [filter]="true"
-          filterBy="TenQuocGia"
-          dataKey="MaQuocGia"
+          optionLabel="tenQuocGia"
+          dataKey="maQuocGia"
           (onChange)="onQuocTichChange($event.value)"
-        ></p-dropdown>
+        >
+          <ng-template pTemplate="selectedItem">
+            <div
+              class="quocTich-item quocTich-item-value"
+              *ngIf="selectedQuocTich"
+            >
+              <div>{{ selectedQuocTich.tenQuocGia }}</div>
+            </div>
+          </ng-template>
+          <ng-template let-quocTich pTemplate="item">
+            <div class="quocTich-item">
+              <div>{{ quocTich?.tenQuocGia }}</div>
+            </div>
+          </ng-template></p-dropdown
+        >
+        <small class="p-error" *ngIf="submitted && !nhanSu.maQuocTich"
+          >Chưa chọn quốc tịch</small
+        >
         <label for="quocTich" class="required-field">Quốc tịch</label>
       </span>
     </div>
@@ -353,11 +396,10 @@
     <div class="field col-12 md:col-3">
       <span class="p-float-label">
         <p-calendar
-          [(ngModel)]="nhanSu.ngayVaoTruong"
+          [(ngModel)]="_ngayVaoTruong"
           [showIcon]="true"
           dateFormat="dd/mm/yy"
           appendTo="body"
-          [defaultDate]="nhanSu.ngayVaoTruong"
         ></p-calendar>
         <label for="ngayVaoTruong">Ngày vào trường</label>
       </span>
@@ -391,6 +433,9 @@
             </div>
           </ng-template>
         </p-dropdown>
+        <small class="p-error" *ngIf="submitted && !nhanSu.maPhongBan"
+          >Chưa chọn phòng ban</small
+        >
         <label for="phongBan" class="required-field">Phòng ban</label>
       </span>
     </div>
@@ -401,26 +446,30 @@
           [autoDisplayFirst]="false"
           [options]="trangThaiLamViecs"
           [(ngModel)]="selectedTrangThaiLamViec"
-          optionLabel="name"
+          optionLabel="tenTrangThai"
           [autoDisplayFirst]="true"
-          (onChange)="onTrangThaiHocChange($event.value)"
+          dataKey="maTrangThai"
+          (onChange)="onTrangThaiLamViecChange($event.value)"
         >
           <ng-template pTemplate="selectedItem">
             <div
               class="trangThaiLamViec-item trangThaiLamViec-item-value"
               *ngIf="selectedTrangThaiLamViec"
             >
-              <div>{{ selectedTrangThaiLamViec.name }}</div>
+              <div>{{ selectedTrangThaiLamViec.tenTrangThai }}</div>
             </div>
           </ng-template>
           <ng-template let-trangThaiLamViec pTemplate="item">
             <div class="trangThaiLamViec-item">
-              <div>{{ trangThaiLamViec?.name }}</div>
+              <div>{{ trangThaiLamViec?.tenTrangThai }}</div>
             </div>
           </ng-template></p-dropdown
         >
+        <small class="p-error" *ngIf="submitted && !nhanSu.maTrangThaiLamViec"
+          >Chưa chọn trạng thái làm việc</small
+        >
         <label for="trangThaiLamViec" class="required-field"
-          >Trạng thái làm việc</label
+          >Trạng thái học</label
         >
       </span>
     </div>
@@ -440,10 +489,11 @@
     <div class="field col-12 md:col-3">
       <span class="p-float-label">
         <p-calendar
-          [(ngModel)]="nhanSu.ngayCapNhat"
+          [(ngModel)]="_ngayCapNhat"
           [showIcon]="true"
           dateFormat="dd/mm/yy"
           appendTo="body"
+          [disabled]="true"
         ></p-calendar>
         <label for="ngayCapNhat">Ngày cập nhật</label>
       </span>
@@ -477,6 +527,9 @@
             </div>
           </ng-template>
         </p-dropdown>
+        <small class="p-error" *ngIf="submitted && !nhanSu.maLoaiNhanSu"
+          >Chưa chọn loại nhân sự</small
+        >
         <label for="loaiNhanSu" class="required-field">Loại nhân sự</label>
       </span>
     </div>
@@ -493,7 +546,7 @@
           placeholder="Chọn chức vụ"
           (onChange)="onChucVuChange($event.value)"
           appendTo="body"
-          [showClear]="false"
+          [showClear]="true"
         >
           <ng-template pTemplate="selectedItem">
             <div class="chucVu-item chucVu-item-value" *ngIf="selectedChucVu">
@@ -522,7 +575,7 @@
           placeholder="Chọn khối lớp"
           (onChange)="onKhoiLopChange($event.value)"
           appendTo="body"
-          [showClear]="false"
+          [showClear]="true"
         >
           <ng-template pTemplate="selectedItem">
             <div
@@ -570,7 +623,7 @@
           pInputTextarea
           [(ngModel)]="nhanSu.hoKhau"
         ></textarea>
-        <label for="hoKhau" class="required-field">Hộ khẩu</label>
+        <label for="hoKhau">Hộ khẩu</label>
       </span>
     </div>
 
@@ -583,7 +636,7 @@
           pInputTextarea
           [(ngModel)]="nhanSu.diaChi"
         ></textarea>
-        <label for="diaChi" class="required-field">Chỗ ở hiện nay</label>
+        <label for="diaChi">Chỗ ở hiện nay</label>
       </span>
     </div>
   </div>

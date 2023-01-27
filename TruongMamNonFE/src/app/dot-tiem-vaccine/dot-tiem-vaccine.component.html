@@ -17,32 +17,20 @@
         pTooltip="Thêm"
         tooltipPosition="bottom"
         (click)="openNew()"
-        [disabled]="!selectedNienHoc"
       ></button>
       <button
         pButton
         pRipple
         label="Tải lại"
         icon="pi pi-refresh"
-        class="p-button-info mr-2"
+        class="p-button-primary mr-2"
         pTooltip="Tải lại"
         tooltipPosition="bottom"
-        [disabled]="!selectedNienHoc"
-        (click)="getLopHocs()"
+        (click)="getDotTiemVaccinesByNienHoc()"
       ></button>
     </ng-template>
 
     <ng-template pTemplate="right">
-      <p-fileUpload
-        mode="basic"
-        accept="image/*"
-        [maxFileSize]="1000000"
-        label="Nhập file"
-        chooseLabel="Nhập file"
-        pTooltip="Nhập file"
-        tooltipPosition="bottom"
-        class="p-mr-2 p-d-inline-block mr-2"
-      ></p-fileUpload>
       <button
         type="button"
         pButton
@@ -50,10 +38,11 @@
         icon="pi pi-file-excel"
         (click)="exportExcel()"
         class="p-button-success mr-2"
-        label="Excel"
+        label="Xuất Excel"
         pTooltip="Xuất Excel"
         tooltipPosition="bottom"
       ></button>
+
       <button
         type="button"
         pButton
@@ -61,7 +50,7 @@
         icon="pi pi-file-pdf"
         (click)="exportPdf()"
         class="p-button-warning"
-        label="PDF"
+        label="Xuất PDF"
         pTooltip="Xuất PDF"
         tooltipPosition="bottom"
       ></button>
@@ -70,13 +59,13 @@
 
   <p-table
     #dt
-    [value]="lopHocs"
+    [value]="dotTiemVaccines"
     [rows]="10"
     [paginator]="true"
-    [globalFilterFields]="['tenLop']"
-    [tableStyle]="{ 'min-width': '50rem' }"
+    [globalFilterFields]="['tenDotTiemVaccine']"
+    [tableStyle]="{ 'min-width': '75rem' }"
     [rowHover]="true"
-    dataKey="maLopHoc"
+    dataKey="maDotTiemVaccine"
     currentPageReportTemplate="Hiển thị {first} đến {last} trong {totalRecords} mục"
     [showCurrentPageReport]="true"
     [rowsPerPageOptions]="[10, 25, 50]"
@@ -84,9 +73,8 @@
   >
     <ng-template pTemplate="caption">
       <div class="flex align-items-center justify-content-between">
-        <h3 class="m-0">Danh sách lớp học</h3>
-        <span class="ml-auto"> </span>
-        <span class="p-input-icon-left ml-2">
+        <h3 class="m-0">Danh sách đợt tiêm vaccine</h3>
+        <span class="p-input-icon-left">
           <i class="pi pi-search"></i>
           <input
             pInputText
@@ -99,111 +87,125 @@
     </ng-template>
     <ng-template pTemplate="header">
       <tr>
-        <th pSortableColumn="tenLop" style="min-width: 15rem">
-          Tên lớp <p-sortIcon field="tenLop"></p-sortIcon>
+        <th pSortableColumn="tenDotTiemVaccine" style="min-width: 15rem">
+          Tên đợt tiêm vaccine
+          <p-sortIcon field="tenDotTiemVaccine"></p-sortIcon>
         </th>
-        <th pSortableColumn="khoiLop" style="min-width: 10rem">
-          Khối lớp <p-sortIcon field="khoiLop"></p-sortIcon>
+        <th pSortableColumn="ngayTiemVaccine" style="min-width: 10rem">
+          Ngày tiêm vaccine <p-sortIcon field="ngayTiemVaccine"></p-sortIcon>
         </th>
-        <th pSortableColumn="hocPhi" style="min-width: 5rem">
-          Học phí <p-sortIcon field="hocPhi"></p-sortIcon>
+        <th pSortableColumn="vaccine" style="min-width: 10rem">
+          Vaccine <p-sortIcon field="vaccine"></p-sortIcon>
         </th>
-        <th pSortableColumn="nienHoc" style="min-width: 5rem">
+        <th pSortableColumn="nienHoc" style="min-width: 10rem">
           Niên học <p-sortIcon field="nienHoc"></p-sortIcon>
         </th>
-        <th style="min-width: 5rem"></th>
+        <th style="width: 8rem"></th>
       </tr>
     </ng-template>
-    <ng-template pTemplate="body" let-lopHoc>
+    <ng-template pTemplate="body" let-dotTiemVaccine>
       <tr>
-        <td>{{ lopHoc.tenLop }}</td>
-        <td>{{ lopHoc.khoiLop?.tenKhoiLop }}</td>
-        <td>{{ lopHoc.hocPhi | currency : "VND" : "symbol" : "0.0-0" }}</td>
-        <td>{{ lopHoc.nienHoc?.tenNienHoc }}</td>
+        <td>{{ dotTiemVaccine.tenDotTiemVaccine }}</td>
+        <td>{{ dotTiemVaccine.ngayTiemVaccine | date : "dd/MM/yyyy" }}</td>
+        <td>{{ dotTiemVaccine.vaccine?.tenVaccine }}</td>
+        <td>{{ dotTiemVaccine.nienHoc?.tenNienHoc }}</td>
         <td>
           <button
             pButton
             pRipple
             icon="pi pi-pencil"
             class="p-button-rounded p-button-success mr-2"
-            title="Sửa"
-            (click)="editLopHoc(lopHoc)"
+            pTooltip="Sửa"
+            tooltipPosition="top"
+            (click)="editDotTiemVaccine(dotTiemVaccine)"
           ></button>
           <button
             pButton
             pRipple
             icon="pi pi-trash"
             class="p-button-rounded p-button-warning"
-            title="Xóa"
-            (click)="deleteLopHoc(lopHoc)"
+            pTooltip="Xóa"
+            tooltipPosition="top"
+            (click)="deleteDotTiemVaccine(dotTiemVaccine)"
           ></button>
         </td>
       </tr>
     </ng-template>
     <ng-template pTemplate="summary">
       <div class="flex align-items-center justify-content-between">
-        Tổng cộng có {{ lopHocs ? lopHocs.length : 0 }} mục.
+        Tổng cộng có {{ dotTiemVaccines ? dotTiemVaccines.length : 0 }} mục.
       </div>
     </ng-template>
   </p-table>
 </div>
 
 <p-dialog
-  [(visible)]="lopHocDialog"
-  [style]="{ width: '750px' }"
-  header="Chi tiết lớp học"
+  [(visible)]="dotTiemVaccineDialog"
+  [style]="{ width: '55%' }"
+  header="Chi tiết dotTiemVaccine"
   [modal]="true"
   styleClass="p-fluid"
 >
   <ng-template pTemplate="content">
     <div class="field">
-      <label for="tenLopHoc">Tên lớp học</label>
+      <label for="tenDotTiemVaccine" class="required-field"
+        >Tên đợt tiêm vaccine</label
+      >
       <input
         type="text"
         pInputText
-        id="tenLopHoc"
-        [(ngModel)]="lopHoc.tenLop"
+        id="tenDotTiemVaccine"
+        [(ngModel)]="dotTiemVaccine.tenDotTiemVaccine"
         required
         autofocus
       />
-      <small class="p-error" *ngIf="submitted && !lopHoc.tenLop"
-        >Tên lớp học không được để trống</small
+      <small
+        class="p-error"
+        *ngIf="submitted && !dotTiemVaccine.tenDotTiemVaccine"
+        >Tên đợt tiêm vaccine không được để trống</small
       >
     </div>
+
     <div class="field">
-      <label for="khoiLop">Khối lớp</label>
+      <label for="ngayTiemVaccine">Ngày tiêm vaccine</label>
+      <p-calendar
+        [(ngModel)]="_ngayTiemVaccine"
+        [showIcon]="true"
+        dateFormat="dd/mm/yy"
+        appendTo="body"
+      ></p-calendar>
+      <small class="p-error" *ngIf="submitted && !_ngayTiemVaccine"
+        >Ngày tiêm vaccine không được để trống</small
+      >
+    </div>
+
+    <div class="field">
+      <label for="vaccine" class="required-field">Vaccine</label>
       <p-dropdown
-        [options]="khoiLops"
-        [(ngModel)]="selectedKhoiLop"
-        optionLabel="tenKhoiLop"
+        [options]="vaccines"
+        [(ngModel)]="selectedVaccine"
+        optionLabel="tenVaccine"
         [filter]="true"
-        filterBy="tenKhoiLop"
-        [showClear]="false"
-        dataKey="maKhoiLop"
-        placeholder="Chọn khối lớp"
-        (onChange)="onKhoiLopChange($event.value)"
+        filterBy="tenVaccine"
+        dataKey="maVaccine"
+        placeholder="Chọn vaccine"
+        (onChange)="onVaccineChange($event.value)"
         appendTo="body"
       >
         <ng-template pTemplate="selectedItem">
-          <div class="khoiLop-item khoiLop-item-value" *ngIf="selectedKhoiLop">
-            <div>{{ selectedKhoiLop.tenKhoiLop }}</div>
+          <div class="vaccine-item vaccine-item-value" *ngIf="selectedVaccine">
+            <div>{{ selectedVaccine.tenVaccine }}</div>
           </div>
         </ng-template>
-        <ng-template let-khoiLop pTemplate="item">
-          <div class="nienHoc-item">
-            <div>{{ khoiLop?.tenKhoiLop }}</div>
+        <ng-template let-vaccine pTemplate="item">
+          <div class="vaccine-item">
+            <div>{{ vaccine?.tenVaccine }}</div>
           </div>
         </ng-template>
       </p-dropdown>
-    </div>
-    <div class="field">
-      <label for="hocPhi">Học phí</label>
-      <p-inputNumber
-        inputId="hocPhi"
-        [(ngModel)]="lopHoc.hocPhi"
-        locale="de-DE"
+      <small class="p-error" *ngIf="submitted && !dotTiemVaccine.maVaccine"
+        >Chưa chọn vaccine</small
       >
-      </p-inputNumber>
     </div>
   </ng-template>
 
@@ -215,6 +217,8 @@
       icon="pi pi-times"
       class="p-button-text"
       (click)="hideDialog()"
+      pTooltip="Hủy"
+      tooltipPosition="top"
     ></button>
     <button
       pButton
@@ -222,7 +226,9 @@
       label="Lưu"
       icon="pi pi-check"
       class="p-button-text"
-      (click)="saveLopHoc()"
+      (click)="saveDotTiemVaccine()"
+      pTooltip="Lưu"
+      tooltipPosition="top"
     ></button>
   </ng-template>
 </p-dialog>
