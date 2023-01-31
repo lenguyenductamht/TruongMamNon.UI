@@ -17,6 +17,8 @@ import { PhieuTiemVaccineComponent } from './phieu-tiem-vaccine/phieu-tiem-vacci
 import { DotTiemVaccineComponent } from './dot-tiem-vaccine/dot-tiem-vaccine.component';
 import { DiemDanhComponent } from './diem-danh/diem-danh.component';
 import { PhieuNhapThucPhamComponent } from './phieu-nhap-thuc-pham/phieu-nhap-thuc-pham.component';
+import { PhieuXuatThucPhamComponent } from './phieu-xuat-thuc-pham/phieu-xuat-thuc-pham.component';
+import { ThucPhamComponent } from './thuc-pham/thuc-pham.component';
 
 const routes: Routes = [
   { path: 'CauHinhNienHoc', component: NienHocComponent },
@@ -31,6 +33,9 @@ const routes: Routes = [
   { path: 'PhieuTiemVaccine', component: PhieuTiemVaccineComponent },
   { path: 'DiemDanh', component: DiemDanhComponent },
   { path: 'NhapThucPham', component: PhieuNhapThucPhamComponent },
+  { path: 'XuatThucPham', component: PhieuXuatThucPhamComponent },
+  { path: 'ThucPham', component: ThucPhamComponent },
+
   { path: 'DanhMucThuocSoGiun', component: ThuocSoGiunComponent },
   { path: 'DanhMucVitamin', component: VitaminComponent },
   { path: 'DanhMucThucDon', component: DanhMucThucDonComponent },

@@ -37,11 +37,20 @@ import { DiemDanh } from '../models/diem-danh.model';
 import { UpdateDiemDanhRequest } from '../request-models/update-diem-danh.request.model';
 import { AddDiemDanhRequest } from '../request-models/add-diem-danh.request.model';
 import { DanhMucThucPham } from '../models/danh-muc-thuc-pham.model';
-import { ThucPham } from '../models/thuc-pham.mode';
+import { ThucPham } from '../models/thuc-pham.model';
 import { PhieuNhapThucPham } from '../models/phieu-nhap-thuc-pham.model';
 import { ChiTietPhieuNhapThucPham } from '../models/chi-tiet-phieu-nhap-thuc-pham.model';
 import { AddPhieuNhapThucPhamRequest } from '../request-models/add-phieu-nhap-thuc-pham.request.model';
 import { UpdatePhieuNhapThucPhamRequest } from '../request-models/update-phieu-nhap-thuc-pham.request.model';
+import { AddChiTietPhieuNhapThucPhamRequest } from '../request-models/add-chi-tiet-phieu-nhap-thuc-pham.request.model';
+import { UpdateChiTietPhieuNhapThucPhamRequest } from '../request-models/update-chi-tiet-phieu-nhap-thuc-pham.request.model';
+import { PhieuXuatThucPham } from '../models/phieu-xuat-thuc-pham.model';
+import { AddPhieuXuatThucPhamRequest } from '../request-models/add-phieu-xuat-thuc-pham.request.model';
+import { UpdatePhieuXuatThucPhamRequest } from '../request-models/update-phieu-xuat-thuc-pham.request.model';
+import { ChiTietPhieuXuatThucPham } from '../models/chi-tiet-phieu-xuat-thuc-pham.model';
+import { AddChiTietPhieuXuatThucPhamRequest } from '../request-models/add-chi-tiet-phieu-xuat-thuc-pham.request.model';
+import { UpdateChiTietPhieuXuatThucPhamRequest } from '../request-models/update-chi-tiet-phieu-xuat-thuc-pham.request.model';
+import { AUThucPhamRequest } from '../request-models/au-thuc-pham.request.model';
 
 @Injectable({
   providedIn: 'root',
@@ -1073,6 +1082,73 @@ export class DataService {
   getThucPhams(): Observable<ThucPham[]> {
     return this.httpClient.get<ThucPham[]>(this.baseApiUrl + '/ThucPhams');
   }
+
+  updateThucPham(
+    maThucPham: number,
+    thucPhamRequest: ThucPham
+  ): Observable<ThucPham> {
+    const updateThucPhamRequest: AUThucPhamRequest = {
+      tenThucPham: thucPhamRequest.tenThucPham,
+      donViTinh: thucPhamRequest.donViTinh,
+      tonKho: thucPhamRequest.tonKho,
+      maDanhMuc: thucPhamRequest.maDanhMuc,
+      nangLuong: thucPhamRequest.nangLuong,
+      chatDam: thucPhamRequest.chatDam,
+      chatBeo: thucPhamRequest.chatBeo,
+      chatBot: thucPhamRequest.chatBot,
+    };
+
+    return this.httpClient.put<ThucPham>(
+      this.baseApiUrl + '/ThucPhams/' + maThucPham,
+      updateThucPhamRequest
+    );
+  }
+
+  deleteThucPham(maThucPham: number): Observable<ThucPham> {
+    return this.httpClient.delete<ThucPham>(
+      this.baseApiUrl + '/ThucPhams/' + maThucPham
+    );
+  }
+
+  addThucPham(thucPhamRequest: ThucPham): Observable<ThucPham> {
+    const addThucPhamRequest: AUThucPhamRequest = {
+      tenThucPham: thucPhamRequest.tenThucPham,
+      donViTinh: thucPhamRequest.donViTinh,
+      tonKho: thucPhamRequest.tonKho,
+      maDanhMuc: thucPhamRequest.maDanhMuc,
+      nangLuong: thucPhamRequest.nangLuong,
+      chatDam: thucPhamRequest.chatDam,
+      chatBeo: thucPhamRequest.chatBeo,
+      chatBot: thucPhamRequest.chatBot,
+    };
+
+    return this.httpClient.post<ThucPham>(
+      this.baseApiUrl + '/ThucPhams',
+      addThucPhamRequest
+    );
+  }
+
+  tangSoLuong(maThucPham: number, soLuongTang: number): Observable<ThucPham> {
+    return this.httpClient.put<ThucPham>(
+      this.baseApiUrl +
+        '/ThucPhams/' +
+        maThucPham +
+        '/TangSoLuong/' +
+        soLuongTang,
+      this.httpOptions
+    );
+  }
+
+  giamSoLuong(maThucPham: number, soLuongGiam: number): Observable<ThucPham> {
+    return this.httpClient.put<ThucPham>(
+      this.baseApiUrl +
+        '/ThucPhams/' +
+        maThucPham +
+        '/GiamSoLuong/' +
+        soLuongGiam,
+      this.httpOptions
+    );
+  }
   //#endregion
 
   //#region Phieu nhap thuc pham
@@ -1126,7 +1202,7 @@ export class DataService {
     maPhieuNhapThucPham: number
   ): Observable<PhieuNhapThucPham> {
     return this.httpClient.delete<PhieuNhapThucPham>(
-      this.baseApiUrl + '/PhieuNhapThucPham/' + maPhieuNhapThucPham
+      this.baseApiUrl + '/PhieuNhapThucPhams/' + maPhieuNhapThucPham
     );
   }
   //#endregion
@@ -1141,6 +1217,183 @@ export class DataService {
     thucPham: this.newThucPham,
   };
 
-  //getChiTietPhieuNhapThucPham():Observable
+  getChiTietPhieuNhapThucPhamsByMaPhieuNhapThucPham(
+    maPhieuNhapThucPham: number
+  ): Observable<ChiTietPhieuNhapThucPham[]> {
+    return this.httpClient.get<ChiTietPhieuNhapThucPham[]>(
+      this.baseApiUrl + '/ChiTietPhieuNhapThucPhams/' + maPhieuNhapThucPham
+    );
+  }
+
+  addChiTietPhieuNhapThucPham(
+    chiTietPhieuNhapThucPhamRequest: ChiTietPhieuNhapThucPham
+  ): Observable<ChiTietPhieuNhapThucPham> {
+    const addChiTietPhieuNhapThucPham: AddChiTietPhieuNhapThucPhamRequest = {
+      maPhieuNhapThucPham: chiTietPhieuNhapThucPhamRequest.maPhieuNhapThucPham,
+      maThucPham: chiTietPhieuNhapThucPhamRequest.maThucPham,
+      donGia: chiTietPhieuNhapThucPhamRequest.donGia,
+      soLuong: chiTietPhieuNhapThucPhamRequest.soLuong,
+    };
+    return this.httpClient.post<ChiTietPhieuNhapThucPham>(
+      this.baseApiUrl + '/ChiTietPhieuNhapThucPhams',
+      addChiTietPhieuNhapThucPham
+    );
+  }
+
+  updateChiTietPhieuNhapThucPham(
+    maPhieuNhapThucPham: number,
+    maThucPham: number,
+    chiTietPhieuNhapThucPhamRequest: ChiTietPhieuNhapThucPham
+  ): Observable<ChiTietPhieuNhapThucPham> {
+    const updateChiTietPhieuNhapThucPham: UpdateChiTietPhieuNhapThucPhamRequest =
+      {
+        donGia: chiTietPhieuNhapThucPhamRequest.donGia,
+        soLuong: chiTietPhieuNhapThucPhamRequest.soLuong,
+      };
+    return this.httpClient.put<ChiTietPhieuNhapThucPham>(
+      this.baseApiUrl +
+        '/ChiTietPhieuNhapThucPhams/' +
+        maPhieuNhapThucPham +
+        '/' +
+        maThucPham,
+      updateChiTietPhieuNhapThucPham
+    );
+  }
+
+  deleteChiTietPhieuNhapThucPham(
+    maPhieuNhapThucPham: number,
+    maThucPham: number
+  ): Observable<ChiTietPhieuNhapThucPham> {
+    return this.httpClient.delete<ChiTietPhieuNhapThucPham>(
+      this.baseApiUrl +
+        '/PhieuNhapThucPhams/' +
+        maPhieuNhapThucPham +
+        '/' +
+        maThucPham
+    );
+  }
+  //#endregion
+
+  //#region Phieu xuat thuc pham
+  newPhieuXuatThucPham: PhieuXuatThucPham = {
+    maPhieuXuatThucPham: 0,
+    ngayXuat: new Date(),
+    maNguoiXuat: '',
+    ghiChu: '',
+    trangThai: '',
+    nguoiXuat: this.newNhanSu,
+  };
+
+  getPhieuXuatThucPhams(): Observable<PhieuXuatThucPham[]> {
+    return this.httpClient.get<PhieuXuatThucPham[]>(
+      this.baseApiUrl + '/PhieuXuatThucPhams'
+    );
+  }
+
+  addPhieuXuatThucPham(
+    phieuXuatThucPhamRequest: PhieuXuatThucPham
+  ): Observable<PhieuXuatThucPham> {
+    const addPhieuXuatThucPham: AddPhieuXuatThucPhamRequest = {
+      ngayXuat: phieuXuatThucPhamRequest.ngayXuat,
+      maNguoiXuat: phieuXuatThucPhamRequest.maNguoiXuat,
+      ghiChu: phieuXuatThucPhamRequest.ghiChu,
+      trangThai: phieuXuatThucPhamRequest.trangThai,
+    };
+    return this.httpClient.post<PhieuXuatThucPham>(
+      this.baseApiUrl + '/PhieuXuatThucPhams',
+      addPhieuXuatThucPham
+    );
+  }
+
+  updatePhieuXuatThucPham(
+    maPhieuXuatThucPham: number,
+    phieuXuatThucPhamRequest: PhieuXuatThucPham
+  ): Observable<PhieuXuatThucPham> {
+    const updatePhieuXuatThucPham: UpdatePhieuXuatThucPhamRequest = {
+      ngayXuat: phieuXuatThucPhamRequest.ngayXuat,
+      maNguoiXuat: phieuXuatThucPhamRequest.maNguoiXuat,
+      ghiChu: phieuXuatThucPhamRequest.ghiChu,
+      trangThai: phieuXuatThucPhamRequest.trangThai,
+    };
+    return this.httpClient.put<PhieuXuatThucPham>(
+      this.baseApiUrl + '/PhieuXuatThucPhams/' + maPhieuXuatThucPham,
+      updatePhieuXuatThucPham
+    );
+  }
+
+  deletePhieuXuatThucPham(
+    maPhieuXuatThucPham: number
+  ): Observable<PhieuXuatThucPham> {
+    return this.httpClient.delete<PhieuXuatThucPham>(
+      this.baseApiUrl + '/PhieuXuatThucPhams/' + maPhieuXuatThucPham
+    );
+  }
+  //#endregion
+
+  //#region Chi tiet phieu xuat thuc pham
+  newChiTietPhieuXuatThucPham: ChiTietPhieuXuatThucPham = {
+    maPhieuXuatThucPham: 0,
+    maThucPham: 0,
+    donGia: 0,
+    soLuong: 0,
+    phieuXuatThucPham: this.newPhieuXuatThucPham,
+    thucPham: this.newThucPham,
+  };
+
+  getChiTietPhieuXuatThucPhamsByMaPhieuXuatThucPham(
+    maPhieuXuatThucPham: number
+  ): Observable<ChiTietPhieuXuatThucPham[]> {
+    return this.httpClient.get<ChiTietPhieuXuatThucPham[]>(
+      this.baseApiUrl + '/ChiTietPhieuXuatThucPhams/' + maPhieuXuatThucPham
+    );
+  }
+
+  addChiTietPhieuXuatThucPham(
+    chiTietPhieuXuatThucPhamRequest: ChiTietPhieuXuatThucPham
+  ): Observable<ChiTietPhieuXuatThucPham> {
+    const addChiTietPhieuXuatThucPham: AddChiTietPhieuXuatThucPhamRequest = {
+      maPhieuXuatThucPham: chiTietPhieuXuatThucPhamRequest.maPhieuXuatThucPham,
+      maThucPham: chiTietPhieuXuatThucPhamRequest.maThucPham,
+      donGia: chiTietPhieuXuatThucPhamRequest.donGia,
+      soLuong: chiTietPhieuXuatThucPhamRequest.soLuong,
+    };
+    return this.httpClient.post<ChiTietPhieuXuatThucPham>(
+      this.baseApiUrl + '/ChiTietPhieuXuatThucPhams',
+      addChiTietPhieuXuatThucPham
+    );
+  }
+
+  updateChiTietPhieuXuatThucPham(
+    maPhieuXuatThucPham: number,
+    maThucPham: number,
+    chiTietPhieuXuatThucPhamRequest: ChiTietPhieuXuatThucPham
+  ): Observable<ChiTietPhieuXuatThucPham> {
+    const updateChiTietPhieuXuatThucPham: UpdateChiTietPhieuXuatThucPhamRequest =
+      {
+        donGia: chiTietPhieuXuatThucPhamRequest.donGia,
+        soLuong: chiTietPhieuXuatThucPhamRequest.soLuong,
+      };
+    return this.httpClient.put<ChiTietPhieuXuatThucPham>(
+      this.baseApiUrl +
+        '/ChiTietPhieuXuatThucPhams/' +
+        maPhieuXuatThucPham +
+        '/' +
+        maThucPham,
+      updateChiTietPhieuXuatThucPham
+    );
+  }
+
+  deleteChiTietPhieuXuatThucPham(
+    maPhieuXuatThucPham: number,
+    maThucPham: number
+  ): Observable<ChiTietPhieuXuatThucPham> {
+    return this.httpClient.delete<ChiTietPhieuXuatThucPham>(
+      this.baseApiUrl +
+        '/PhieuXuatThucPhams/' +
+        maPhieuXuatThucPham +
+        '/' +
+        maThucPham
+    );
+  }
   //#endregion
 }

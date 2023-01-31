@@ -1,5 +1,5 @@
 import { PhieuNhapThucPham } from './phieu-nhap-thuc-pham.model';
-import { ThucPham } from './thuc-pham.mode';
+import { ThucPham } from './thuc-pham.model';
 
 export interface ChiTietPhieuNhapThucPham {
   maPhieuNhapThucPham: number;

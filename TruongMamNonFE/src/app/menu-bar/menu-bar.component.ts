@@ -249,12 +249,18 @@ export class MenuBarComponent implements OnInit {
       {
         label: 'Nhà bếp',
         items: [
-          { label: 'Thực phẩm' },
           {
-            label: ' Nhập thực phẩm' ,
-            routerLink:['/NhapThucPham']
+            label: 'Thực phẩm',
+            routerLink: ['/ThucPham'],
           },
-          { label: 'Xuat thực phẩm' },
+          {
+            label: ' Nhập thực phẩm',
+            routerLink: ['/NhapThucPham'],
+          },
+          {
+            label: 'Xuất thực phẩm',
+            routerLink: ['/XuatThucPham'],
+          },
           {
             label: 'Thực đơn',
             items: [
