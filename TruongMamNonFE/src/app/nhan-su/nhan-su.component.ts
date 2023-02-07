@@ -145,7 +145,7 @@ export class NhanSuComponent implements OnInit {
   public getChucVus(): void {
     if (this.selectedLoaiNhanSu) {
       this.dataService
-        .getChucVus(this.selectedLoaiNhanSu?.maLoaiNhanSu)
+        .getChucVusByLoaiNhanSu(this.selectedLoaiNhanSu?.maLoaiNhanSu)
         .subscribe((data) => {
           this.chucVus = data;
         });
@@ -344,8 +344,7 @@ export class NhanSuComponent implements OnInit {
     this.nhanSu.ngayCapNhat = new Date();
     console.log('saveNhanSu: ', this.nhanSu);
     if (this.checkValid(this.nhanSu)) {
-      if (this.nhanSu.maNhanSu === '') {
-        this.nhanSu.maNhanSu = 'a';
+      if (this.nhanSu.maNhanSu === 0) {
         this.nhanSu.matKhau = 'Admin@123';
         this.nhanSu.maTrangThaiTaiKhoan = '0';
         this.dataService.addNhanSu(this.nhanSu).subscribe(

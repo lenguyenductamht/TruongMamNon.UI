@@ -115,18 +115,6 @@
         <th pSortableColumn="thoiGian" style="min-width: 10rem">
           Thời gian <p-sortIcon field="thoiGian"></p-sortIcon>
         </th>
-        <th pSortableColumn="nangLuong">
-          Năng lượng <p-sortIcon field="nangLuong"></p-sortIcon>
-        </th>
-        <th pSortableColumn="chatDam">
-          Chất đạm <p-sortIcon field="chatDam"></p-sortIcon>
-        </th>
-        <th pSortableColumn="chatBeo">
-          Chất béo <p-sortIcon field="chatBeo"></p-sortIcon>
-        </th>
-        <th pSortableColumn="chatBot">
-          Chất bột <p-sortIcon field="chatBot"></p-sortIcon>
-        </th>
         <th style="min-width: 5rem"></th>
       </tr>
     </ng-template>
@@ -135,10 +123,6 @@
         <td>{{ danhMucThucDon.tenDanhMuc }}</td>
         <td>{{ danhMucThucDon.ghiChu }}</td>
         <td>{{ danhMucThucDon.thoiGian }}</td>
-        <td>{{ danhMucThucDon.nangLuong }}</td>
-        <td>{{ danhMucThucDon.chatDam }}</td>
-        <td>{{ danhMucThucDon.chatBeo }}</td>
-        <td>{{ danhMucThucDon.chatBot }}</td>
         <td>
           <button
             pButton
@@ -211,37 +195,6 @@
         [(ngModel)]="danhMucThucDon.thoiGian"
         required
       />
-    </div>
-    <div class="field">
-      <label for="nangLuong">Năng lượng</label>
-      <p-inputNumber
-        id="nangLuong"
-        [(ngModel)]="danhMucThucDon.nangLuong"
-      ></p-inputNumber>
-    </div>
-
-    <div class="field">
-      <label for="chatDam">Chất đạm</label>
-      <p-inputNumber
-        id="chatDam"
-        [(ngModel)]="danhMucThucDon.chatDam"
-      ></p-inputNumber>
-    </div>
-
-    <div class="field">
-      <label for="chatBeo">Chất béo</label>
-      <p-inputNumber
-        id="chatBeo"
-        [(ngModel)]="danhMucThucDon.chatBeo"
-      ></p-inputNumber>
-    </div>
-
-    <div class="field">
-      <label for="chatBot">Chất bột</label>
-      <p-inputNumber
-        id="chatBot"
-        [(ngModel)]="danhMucThucDon.chatBot"
-      ></p-inputNumber>
     </div>
   </ng-template>
 

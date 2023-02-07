@@ -24,64 +24,66 @@ export class ChucVuComponent implements OnInit {
   public chucVuDialog: boolean = false;
 
   public chucVus: ChucVu[] = [];
-  public loaiNhanSus:LoaiNhanSu[]=[];
-  public filterSelectedLoaiNhanSu:LoaiNhanSu|undefined;
-  public selectedLoaiNhanSu:LoaiNhanSu|undefined;
+  public loaiNhanSus: LoaiNhanSu[] = [];
+  public filterSelectedLoaiNhanSu: LoaiNhanSu | undefined;
+  public selectedLoaiNhanSu: LoaiNhanSu | undefined;
 
-  public chucVu:ChucVu=Object.assign({},this.dataService.newChucVu);
-  public submitted: boolean = false; 
-  public cols: any[]|undefined;
+  public chucVu: ChucVu = Object.assign({}, this.dataService.newChucVu);
+  public submitted: boolean = false;
+  public cols: any[] | undefined;
 
-  public exportColumns: any[]|undefined;
+  public exportColumns: any[] | undefined;
   public ngOnInit(): void {
     this.getLoaiNhanSus();
     this.getChucVus();
   }
 
-  public exportExcel(){
-    const exportData:any[]=[];
-    this.chucVus.forEach((table)=>{
+  public exportExcel() {
+    const exportData: any[] = [];
+    this.chucVus.forEach((table) => {
       exportData.push({
         TenChucVu: table.tenChucVu,
-        GhiChu:table.ghiChu,
+        GhiChu: table.ghiChu,
       });
     });
     this.exportService.exportExcel(exportData, 'ChucVu');
   }
 
-  public exportPdf(){
-    const exportData:any[]=[];
-    this.chucVus.forEach((table)=>{
+  public exportPdf() {
+    const exportData: any[] = [];
+    this.chucVus.forEach((table) => {
       exportData.push({
         TenChucVu: table.tenChucVu,
-        GhiChu:table.ghiChu,
+        GhiChu: table.ghiChu,
       });
     });
     this.exportService.exportPdf(
       {
-        TenChucVu: "Tên ChucVu", 
-        GhiChu: "Ghi Chú", 
+        TenChucVu: 'Tên ChucVu',
+        GhiChu: 'Ghi Chú',
       },
-      exportData, 
+      exportData,
       'ChucVu'
     );
   }
-  public getLoaiNhanSus():void{
+  public getLoaiNhanSus(): void {
     this.dataService.getLoaiNhanSus().subscribe((data) => {
       this.loaiNhanSus = data;
     });
   }
-  public getChucVus():void{
-    this.loading=true;
-    if(this.filterSelectedLoaiNhanSu){
-      this.dataService.getChucVus(this.filterSelectedLoaiNhanSu?.maLoaiNhanSu).subscribe((data) => {
+  public getChucVus(): void {
+    this.loading = true;
+    if (this.filterSelectedLoaiNhanSu) {
+      this.dataService
+        .getChucVusByLoaiNhanSu(this.filterSelectedLoaiNhanSu?.maLoaiNhanSu)
+        .subscribe((data) => {
+          this.chucVus = data;
+          this.loading = false;
+        });
+    } else {
+      this.dataService.getChucVus().subscribe((data) => {
         this.chucVus = data;
-        this.loading=false;
-      });
-    }else{
-      this.dataService.getAllChucVus().subscribe((data) => {
-        this.chucVus = data;
-        this.loading=false;
+        this.loading = false;
       });
     }
   }
@@ -95,7 +97,7 @@ export class ChucVuComponent implements OnInit {
   public editChucVu(chucVu: ChucVu): void {
     console.log('edit chucVu:', chucVu);
     this.chucVu = chucVu;
-    this.selectedLoaiNhanSu=chucVu.loaiNhanSu;
+    this.selectedLoaiNhanSu = chucVu.loaiNhanSu;
     this.chucVuDialog = true;
     this.getLoaiNhanSus();
   }
@@ -107,7 +109,7 @@ export class ChucVuComponent implements OnInit {
       header: 'Xác nhận',
       icon: 'pi pi-exclamation-triangle',
       accept: () => {
-        this.dataService.deleteChucVu(chucVu.maChucVu).subscribe((data)=>{
+        this.dataService.deleteChucVu(chucVu.maChucVu).subscribe((data) => {
           this.getChucVus();
           this.messageService.add({
             severity: 'success',
@@ -115,7 +117,7 @@ export class ChucVuComponent implements OnInit {
             detail: 'Xóa thành công',
             life: 3000,
           });
-        });        
+        });
       },
     });
   }
@@ -151,7 +153,7 @@ export class ChucVuComponent implements OnInit {
   public saveChucVu() {
     this.submitted = true;
     console.log('saveChucVu: ', this.chucVu);
-    if(!this.selectedLoaiNhanSu){
+    if (!this.selectedLoaiNhanSu) {
       this.messageService.add({
         severity: 'error',
         summary: 'Lỗi',
@@ -160,9 +162,9 @@ export class ChucVuComponent implements OnInit {
       });
       return;
     }
-    this.chucVu.maLoaiNhanSu=this.selectedLoaiNhanSu.maLoaiNhanSu;
+    this.chucVu.maLoaiNhanSu = this.selectedLoaiNhanSu.maLoaiNhanSu;
     if (this.chucVu.maChucVu === 0) {
-      this.dataService.postChucVu(this.chucVu).subscribe(
+      this.dataService.addChucVu(this.chucVu).subscribe(
         (data) => {
           console.log('return data = ', data);
           this.getChucVus();
@@ -175,28 +177,30 @@ export class ChucVuComponent implements OnInit {
       );
     } else {
       console.log('ma', this.chucVu.maChucVu);
-      this.dataService.putChucVu(this.chucVu.maChucVu, this.chucVu).subscribe(
-        (data) => {
-          console.log('return data = ', data);
-          this.getChucVus();
-          this.hideDialog(false, true);
-        },
-        (error) => {
-          console.log('error');
-          this.hideDialog(false, false);
-        }
-      );
+      this.dataService
+        .updateChucVu(this.chucVu.maChucVu, this.chucVu)
+        .subscribe(
+          (data) => {
+            console.log('return data = ', data);
+            this.getChucVus();
+            this.hideDialog(false, true);
+          },
+          (error) => {
+            console.log('error');
+            this.hideDialog(false, false);
+          }
+        );
     }
   }
 
-  public onFilterLoaiNhanSuChange(event:any):void{
-    const loaiNhanSu:LoaiNhanSu=event;
-    this.filterSelectedLoaiNhanSu=loaiNhanSu;
+  public onFilterLoaiNhanSuChange(event: any): void {
+    const loaiNhanSu: LoaiNhanSu = event;
+    this.filterSelectedLoaiNhanSu = loaiNhanSu;
     this.getChucVus();
   }
 
-  public onLoaiNhanSuChange(event:any):void{
-    const loaiNhanSu:LoaiNhanSu=event;
-    this.selectedLoaiNhanSu=loaiNhanSu;
+  public onLoaiNhanSuChange(event: any): void {
+    const loaiNhanSu: LoaiNhanSu = event;
+    this.selectedLoaiNhanSu = loaiNhanSu;
   }
 }

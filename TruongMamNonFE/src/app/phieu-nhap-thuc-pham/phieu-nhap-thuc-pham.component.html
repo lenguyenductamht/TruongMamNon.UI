@@ -460,6 +460,7 @@
                     mode="currency"
                     currency="VND"
                     [(ngModel)]="chiTietPhieuNhapThucPham.donGia"
+                    locale="de-DE"
                   ></p-inputNumber>
                 </ng-template>
                 <ng-template pTemplate="output">
@@ -488,7 +489,8 @@
             <td>
               {{
                 chiTietPhieuNhapThucPham.donGia *
-                  chiTietPhieuNhapThucPham.soLuong | currency : "VND"
+                  chiTietPhieuNhapThucPham.soLuong +
+                  " đ"
               }}
             </td>
             <td>

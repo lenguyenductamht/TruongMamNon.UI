@@ -275,8 +275,6 @@ export class PhieuTiemVaccineComponent implements OnInit {
           this.dataService.addPhieuTiemVaccine(this.phieuTiemVaccine).subscribe(
             (data) => {
               console.log('return data = ', data);
-              this.getPhieuTiemVaccinesByNienHoc();
-              this.hideDialog(false, true);
             },
             (error) => {
               console.log(error);
@@ -284,6 +282,8 @@ export class PhieuTiemVaccineComponent implements OnInit {
             }
           );
         });
+        this.getPhieuTiemVaccinesByNienHoc();
+        this.hideDialog(false, true);
       } else {
         this.dataService
           .updatePhieuTiemVaccine(

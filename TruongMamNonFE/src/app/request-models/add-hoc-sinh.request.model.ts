@@ -1,5 +1,4 @@
 export interface AddHocSinhRequest {
-  maHocSinh: string;
   ho: string;
   ten: string;
   maGioiTinh: string;

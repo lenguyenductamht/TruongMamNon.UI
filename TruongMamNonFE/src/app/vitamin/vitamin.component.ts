@@ -24,50 +24,49 @@ export class VitaminComponent implements OnInit {
 
   public vitamins: Vitamin[] = [];
 
-  
-  public vitamin:Vitamin=Object.assign({},this.dataService.newVitamin);
-  public submitted: boolean = false; 
-  public cols: any[]|undefined;
+  public vitamin: Vitamin = Object.assign({}, this.dataService.newVitamin);
+  public submitted: boolean = false;
+  public cols: any[] | undefined;
 
-  public exportColumns: any[]|undefined;
+  public exportColumns: any[] | undefined;
   public ngOnInit(): void {
     this.getVitamins();
   }
 
-  public exportExcel(){
-    const exportData:any[]=[];
-    this.vitamins.forEach((table)=>{
+  public exportExcel() {
+    const exportData: any[] = [];
+    this.vitamins.forEach((table) => {
       exportData.push({
         TenVitamin: table.tenVitamin,
-        GhiChu:table.ghiChu,
+        GhiChu: table.ghiChu,
       });
     });
     this.exportService.exportExcel(exportData, 'Vitamin');
   }
 
-  public exportPdf(){
-    const exportData:any[]=[];
-    this.vitamins.forEach((table)=>{
+  public exportPdf() {
+    const exportData: any[] = [];
+    this.vitamins.forEach((table) => {
       exportData.push({
         TenVitamin: table.tenVitamin,
-        GhiChu:table.ghiChu,
+        GhiChu: table.ghiChu,
       });
     });
     this.exportService.exportPdf(
       {
-        TenVitamin: "Tên Vitamin", 
-        GhiChu: "Ghi Chú", 
+        TenVitamin: 'Tên Vitamin',
+        GhiChu: 'Ghi Chú',
       },
-      exportData, 
+      exportData,
       'Vitamin'
     );
   }
 
-  public getVitamins():void{
-    this.loading=true;
+  public getVitamins(): void {
+    this.loading = true;
     this.dataService.getVitamins().subscribe((data) => {
       this.vitamins = data;
-      this.loading=false;
+      this.loading = false;
     });
   }
 
@@ -90,7 +89,7 @@ export class VitaminComponent implements OnInit {
       header: 'Xác nhận',
       icon: 'pi pi-exclamation-triangle',
       accept: () => {
-        this.dataService.deleteVitamin(vitamin.maVitamin).subscribe((data)=>{
+        this.dataService.deleteVitamin(vitamin.maVitamin).subscribe((data) => {
           this.getVitamins();
           this.messageService.add({
             severity: 'success',
@@ -98,7 +97,7 @@ export class VitaminComponent implements OnInit {
             detail: 'Xóa thành công',
             life: 3000,
           });
-        });        
+        });
       },
     });
   }
@@ -135,7 +134,7 @@ export class VitaminComponent implements OnInit {
     this.submitted = true;
     console.log('saveVitamin: ', this.vitamin);
     if (this.vitamin.maVitamin === 0) {
-      this.dataService.postVitamin(this.vitamin).subscribe(
+      this.dataService.addVitamin(this.vitamin).subscribe(
         (data) => {
           console.log('return data = ', data);
           this.getVitamins();
@@ -148,17 +147,19 @@ export class VitaminComponent implements OnInit {
       );
     } else {
       console.log('ma', this.vitamin.maVitamin);
-      this.dataService.putVitamin(this.vitamin.maVitamin, this.vitamin).subscribe(
-        (data) => {
-          console.log('return data = ', data);
-          this.getVitamins();
-          this.hideDialog(false, true);
-        },
-        (error) => {
-          console.log('error');
-          this.hideDialog(false, false);
-        }
-      );
+      this.dataService
+        .updateVitamin(this.vitamin.maVitamin, this.vitamin)
+        .subscribe(
+          (data) => {
+            console.log('return data = ', data);
+            this.getVitamins();
+            this.hideDialog(false, true);
+          },
+          (error) => {
+            console.log('error');
+            this.hideDialog(false, false);
+          }
+        );
     }
   }
 }

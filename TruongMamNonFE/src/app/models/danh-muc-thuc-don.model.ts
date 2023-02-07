@@ -3,8 +3,4 @@ export interface DanhMucThucDon {
   tenDanhMuc: string;
   ghiChu: string;
   thoiGian: string;
-  nangLuong: number;
-  chatDam: number;
-  chatBeo: number;
-  chatBot: number;
 }

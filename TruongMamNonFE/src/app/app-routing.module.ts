@@ -19,6 +19,14 @@ import { DiemDanhComponent } from './diem-danh/diem-danh.component';
 import { PhieuNhapThucPhamComponent } from './phieu-nhap-thuc-pham/phieu-nhap-thuc-pham.component';
 import { PhieuXuatThucPhamComponent } from './phieu-xuat-thuc-pham/phieu-xuat-thuc-pham.component';
 import { ThucPhamComponent } from './thuc-pham/thuc-pham.component';
+import { DotKhamSucKhoeComponent } from './dot-kham-suc-khoe/dot-kham-suc-khoe.component';
+import { DotUongVitaminComponent } from './dot-uong-vitamin/dot-uong-vitamin.component';
+import { DotSoGiunComponent } from './dot-so-giun/dot-so-giun.component';
+import { PhieuKhamSucKhoeComponent } from './phieu-kham-suc-khoe/phieu-kham-suc-khoe.component';
+import { PhieuSoGiunComponent } from './phieu-so-giun/phieu-so-giun.component';
+import { PhieuUongVitaminComponent } from './phieu-uong-vitamin/phieu-uong-vitamin.component';
+import { MonAnComponent } from './mon-an/mon-an.component';
+import { ThucDonComponent } from './thuc-don/thuc-don.component';
 
 const routes: Routes = [
   { path: 'CauHinhNienHoc', component: NienHocComponent },
@@ -35,10 +43,18 @@ const routes: Routes = [
   { path: 'NhapThucPham', component: PhieuNhapThucPhamComponent },
   { path: 'XuatThucPham', component: PhieuXuatThucPhamComponent },
   { path: 'ThucPham', component: ThucPhamComponent },
-
   { path: 'DanhMucThuocSoGiun', component: ThuocSoGiunComponent },
   { path: 'DanhMucVitamin', component: VitaminComponent },
+  { path: 'DotKhamSucKhoe', component: DotKhamSucKhoeComponent },
+  { path: 'DotSoGiun', component: DotSoGiunComponent },
+  { path: 'DotUongVitamin', component: DotUongVitaminComponent },
+  { path: 'PhieuKhamSucKhoe', component: PhieuKhamSucKhoeComponent },
+  { path: 'PhieuSoGiun', component: PhieuSoGiunComponent },
+  { path: 'PhieuUongVitamin', component: PhieuUongVitaminComponent },
   { path: 'DanhMucThucDon', component: DanhMucThucDonComponent },
+  { path: 'MonAn', component: MonAnComponent },
+  { path: 'ThucDon', component: ThucDonComponent },
+
   { path: '', component: HomeComponent },
   { path: 'home', component: HomeComponent },
   { path: '**', component: PageNotFoundComponent },

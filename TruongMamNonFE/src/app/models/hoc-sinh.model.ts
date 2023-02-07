@@ -8,7 +8,7 @@ import { TrangThaiHoc } from './trang-thai-hoc.model';
 import { TrangThaiTaiKhoan } from './trang-thai-tai-khoan.model';
 
 export interface HocSinh {
-  maHocSinh: string;
+  maHocSinh: number;
   ho: string;
   ten: string;
   maGioiTinh: string;

@@ -52,6 +52,14 @@ import { DiemDanhComponent } from './diem-danh/diem-danh.component';
 import { PhieuNhapThucPhamComponent } from './phieu-nhap-thuc-pham/phieu-nhap-thuc-pham.component';
 import { PhieuXuatThucPhamComponent } from './phieu-xuat-thuc-pham/phieu-xuat-thuc-pham.component';
 import { ThucPhamComponent } from './thuc-pham/thuc-pham.component';
+import { DotSoGiunComponent } from './dot-so-giun/dot-so-giun.component';
+import { DotUongVitaminComponent } from './dot-uong-vitamin/dot-uong-vitamin.component';
+import { DotKhamSucKhoeComponent } from './dot-kham-suc-khoe/dot-kham-suc-khoe.component';
+import { PhieuKhamSucKhoeComponent } from './phieu-kham-suc-khoe/phieu-kham-suc-khoe.component';
+import { PhieuSoGiunComponent } from './phieu-so-giun/phieu-so-giun.component';
+import { PhieuUongVitaminComponent } from './phieu-uong-vitamin/phieu-uong-vitamin.component';
+import { MonAnComponent } from './mon-an/mon-an.component';
+import { ThucDonComponent } from './thuc-don/thuc-don.component';
 
 @NgModule({
   declarations: [
@@ -76,6 +84,14 @@ import { ThucPhamComponent } from './thuc-pham/thuc-pham.component';
     PhieuNhapThucPhamComponent,
     PhieuXuatThucPhamComponent,
     ThucPhamComponent,
+    DotSoGiunComponent,
+    DotUongVitaminComponent,
+    DotKhamSucKhoeComponent,
+    PhieuKhamSucKhoeComponent,
+    PhieuSoGiunComponent,
+    PhieuUongVitaminComponent,
+    MonAnComponent,
+    ThucDonComponent,
   ],
   imports: [
     BrowserModule,

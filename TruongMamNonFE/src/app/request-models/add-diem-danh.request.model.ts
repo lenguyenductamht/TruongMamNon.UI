@@ -1,5 +1,5 @@
 export interface AddDiemDanhRequest {
   ngayDiemDanh: Date;
-  maHocSinh: string;
+  maHocSinh: number;
   maTrangThaiDiemDanh: string;
 }

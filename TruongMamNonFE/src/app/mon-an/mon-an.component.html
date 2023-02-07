@@ -1,0 +1,427 @@
+<p-toast></p-toast>
+<p-progressBar
+  *ngIf="loading"
+  mode="indeterminate"
+  [style]="{ height: '6px' }"
+></p-progressBar>
+<p style="font-size: 200%" *ngIf="loading">Đang tải dữ liệu...</p>
+<div class="card" *ngIf="!loading">
+  <p-toolbar styleClass="mb-1 gap-2">
+    <ng-template pTemplate="left">
+      <button
+        pButton
+        pRipple
+        label="Thêm"
+        icon="pi pi-plus"
+        class="p-button-success mr-2"
+        pTooltip="Thêm"
+        tooltipPosition="bottom"
+        (click)="openNew()"
+      ></button>
+      <button
+        pButton
+        pRipple
+        label="Tải lại"
+        icon="pi pi-refresh"
+        class="p-button-primary mr-2"
+        pTooltip="Tải lại"
+        tooltipPosition="bottom"
+        (click)="getMonAns()"
+      ></button>
+    </ng-template>
+
+    <ng-template pTemplate="right">
+      <p-fileUpload
+        mode="basic"
+        accept="image/*"
+        [maxFileSize]="1000000"
+        chooseLabel="Nhập file"
+        pTooltip="Nhập file"
+        tooltipPosition="bottom"
+        class="p-mr-2 p-d-inline-block mr-2"
+      ></p-fileUpload>
+
+      <button
+        type="button"
+        pButton
+        pRipple
+        icon="pi pi-file-excel"
+        (click)="exportExcel()"
+        class="p-button-success mr-2"
+        label="Xuất Excel"
+        pTooltip="Xuất Excel"
+        tooltipPosition="bottom"
+      ></button>
+
+      <button
+        type="button"
+        pButton
+        pRipple
+        icon="pi pi-file-pdf"
+        (click)="exportPdf()"
+        class="p-button-warning"
+        label="Xuất PDF"
+        pTooltip="Xuất PDF"
+        tooltipPosition="bottom"
+      ></button>
+    </ng-template>
+  </p-toolbar>
+
+  <p-table
+    #dt
+    [value]="monAns"
+    [rows]="10"
+    [paginator]="true"
+    [globalFilterFields]="['vaccine.tenVaccine', 'hocSinh.ho', 'hocSinh.ten']"
+    [tableStyle]="{ 'min-width': '75rem' }"
+    [rowHover]="true"
+    dataKey="['maMonAn']"
+    currentPageReportTemplate="Hiển thị {first} đến {last} trong {totalRecords} mục"
+    [showCurrentPageReport]="true"
+    [rowsPerPageOptions]="[10, 25, 50]"
+    styleClass="p-datatable-sm p-datatable-striped p-datatable-gridlines"
+  >
+    <ng-template pTemplate="caption">
+      <div class="flex align-items-center justify-content-between mt-3">
+        <h3 class="m-0">Danh sách món ăn</h3>
+        <div class="flex">
+          <!-- <span class="p-float-label mr-2">
+            <p-dropdown
+              inputId="filterLoaiNhanSu"
+              [options]="loaiNhanSus"
+              [(ngModel)]="filterSelectedLoaiNhanSu"
+              optionLabel="tenLoaiNhanSu"
+              placeholder="Chọn loại nhân sự"
+              [showClear]="true"
+              (onChange)="onFilterLoaiNhanSuChange($event.value)"
+            ></p-dropdown>
+            <label for="filterLoaiNhanSu">Loại nhân sự</label>
+          </span> -->
+          <span class="p-input-icon-left">
+            <i class="pi pi-search"></i>
+            <input
+              pInputText
+              type="text"
+              (input)="dt.filterGlobal($any($event.target).value, 'contains')"
+              placeholder="Tìm kiếm..."
+            />
+          </span>
+        </div>
+      </div>
+    </ng-template>
+    <ng-template pTemplate="header">
+      <tr>
+        <th pSortableColumn="tenMonAn" style="min-width: 10rem">
+          Tên món ăn
+          <p-sortIcon field="tenMonAn"></p-sortIcon>
+        </th>
+        <th pSortableColumn="ghiChu" style="min-width: 10rem">
+          Ghi chú <p-sortIcon field="ghiChu"></p-sortIcon>
+        </th>
+        <th style="width: 8rem"></th>
+      </tr>
+    </ng-template>
+    <ng-template pTemplate="body" let-monAn>
+      <tr>
+        <td>{{ monAn.tenMonAn }}</td>
+        <td>{{ monAn.ghiChu }}</td>
+        <td>
+          <button
+            pButton
+            pRipple
+            icon="pi pi-pencil"
+            class="p-button-rounded p-button-success mr-2"
+            pTooltip="Sửa"
+            tooltipPosition="top"
+            (click)="editMonAn(monAn)"
+          ></button>
+          <button
+            pButton
+            pRipple
+            icon="pi pi-trash"
+            class="p-button-rounded p-button-warning"
+            pTooltip="Xóa"
+            tooltipPosition="top"
+            (click)="deleteMonAn(monAn)"
+          ></button>
+        </td>
+      </tr>
+    </ng-template>
+    <ng-template pTemplate="summary">
+      <div class="flex align-items-center justify-content-between">
+        Tổng cộng có
+        {{ monAns ? monAns.length : 0 }} mục.
+      </div>
+    </ng-template>
+  </p-table>
+</div>
+
+<p-dialog
+  [(visible)]="monAnDialog"
+  [style]="{ width: '75%' }"
+  header="Chi tiết món ăn"
+  [modal]="true"
+  styleClass="p-fluid"
+>
+  <ng-template pTemplate="content">
+    <div class="p-fluid grid mt-4">
+      <div class="field col-12 md:col-4">
+        <span class="p-float-label">
+          <input
+            type="text"
+            id="tenMonAn"
+            pInputText
+            [(ngModel)]="monAn.tenMonAn"
+          />
+          <label for="ghiChu">Tên món ăn</label>
+          <small class="p-error" *ngIf="submitted && !monAn.tenMonAn"
+            >Tên món ăn không được để trống</small
+          >
+        </span>
+      </div>
+
+      <div class="field col-12 md:col-3">
+        <span class="p-float-label">
+          <input
+            type="text"
+            id="ghiChu"
+            pInputText
+            [(ngModel)]="monAn.ghiChu"
+          />
+          <label for="ghiChu">Ghi chú</label>
+        </span>
+      </div>
+    </div>
+
+    <div class="card">
+      <!-- <p-table
+        #dt
+        [value]="monAnThucPhams"
+        [rows]="10"
+        [paginator]="true"
+        [globalFilterFields]="['maHocSinh', 'ho', 'ten']"
+        [tableStyle]="{ 'min-width': '75%' }"
+        [rowHover]="true"
+        dataKey="maThucPham"
+        currentPageReportTemplate="Hiển thị {first} đến {last} trong {totalRecords} mục"
+        [showCurrentPageReport]="true"
+        [rowsPerPageOptions]="[10, 25, 50]"
+        styleClass="p-datatable-sm p-datatable-striped p-datatable-gridlines"
+      >
+        <ng-template pTemplate="caption">
+          <div class="flex align-items-center justify-content-between">
+            <h3 class="m-0">Chi tiết phiếu nhập thực phẩm</h3>
+            <div class="field col-12 md:col-3">
+              <span class="p-float-label">
+                <p-dropdown
+                  [options]="thucPhams"
+                  [(ngModel)]="selectedThucPham"
+                  [filter]="true"
+                  filterBy="tenThucPham"
+                  dataKey="maThucPham"
+                  placeholder="Chọn thực phẩm"
+                  (onChange)="onThucPhamChange($event.value)"
+                  appendTo="body"
+                >
+                  <ng-template pTemplate="selectedItem">
+                    <div *ngIf="selectedThucPham">
+                      <div>
+                        {{ selectedThucPham.tenThucPham }}
+                      </div>
+                    </div>
+                  </ng-template>
+                  <ng-template let-thucPham pTemplate="item">
+                    <div>
+                      <div>{{ thucPham.tenThucPham }}</div>
+                    </div>
+                  </ng-template>
+                </p-dropdown>
+
+                <label for="thucPham" class="required-field"> Thực phẩm</label>
+              </span>
+            </div>
+          </div>
+        </ng-template>
+        <ng-template pTemplate="header">
+          <tr>
+            <th pSortableColumn="tenThucPham" style="min-width: 5rem">
+              Tên thực phẩm <p-sortIcon field="tenThucPham"></p-sortIcon>
+            </th>
+            <th pSortableColumn="donViTinh" style="min-width: 5rem">
+              Đơn vị tính <p-sortIcon field="donViTinh"></p-sortIcon>
+            </th>
+            <th pSortableColumn="donGia" style="min-width: 5rem">
+              Đơn giá <p-sortIcon field="donGia"></p-sortIcon>
+            </th>
+            <th pSortableColumn="soLuong" style="min-width: 5rem">
+              Số lượng <p-sortIcon field="soLuong"></p-sortIcon>
+            </th>
+            <th pSortableColumn="thanhTien" style="min-width: 5rem">
+              Thành tiền<p-sortIcon field="thanhTien"></p-sortIcon>
+            </th>
+            <th style="width: 4rem"></th>
+          </tr>
+        </ng-template>
+        <ng-template pTemplate="body" let-monAnThucPham>
+          <tr>
+            <td>{{ monAnThucPham.thucPham.tenThucPham }}</td>
+            <td>{{ monAnThucPham.thucPham.donViTinh }}</td>
+            <td
+              [pEditableColumn]="monAnThucPham.donGia"
+              pEditableColumnField="donGia"
+            >
+              <p-cellEditor>
+                <ng-template pTemplate="input">
+                  <input
+                    pInputText
+                    type="text"
+                    [(ngModel)]="monAnThucPham.donGia"
+                  />
+                </ng-template>
+                <ng-tamplate pTemplate="output">
+                  {{ monAnThucPham.donGia }}
+                </ng-tamplate>
+              </p-cellEditor>
+            </td>
+            <td>{{ monAnThucPham.soLuong }}</td>
+            <td>
+              {{
+                monAnThucPham.donGia *
+                  monAnThucPham.soLuong
+              }}
+            </td>
+            <td>
+              <button
+                pButton
+                pRipple
+                icon="pi pi-trash"
+                class="p-button-rounded p-button-warning"
+                pTooltip="Xóa"
+                tooltipPosition="top"
+                (click)="deleteMonAn(monAn)"
+              ></button>
+            </td>
+          </tr>
+        </ng-template>
+        <ng-template pTemplate="summary">
+          <div class="flex align-items-center justify-content-between">
+            Tổng cộng có
+            {{
+              monAnThucPhams ? monAnThucPhams.length : 0
+            }}
+            mục.
+          </div>
+        </ng-template>
+      </p-table> -->
+
+      <p-table
+        [value]="monAnThucPhams"
+        dataKey="maMonAn, maThucPham"
+        [tableStyle]="{ 'min-width': '50rem' }"
+      >
+        <ng-template pTemplate="caption">
+          <div class="flex align-items-center justify-content-between">
+            <h3 class="m-0">Thành phần món ăn</h3>
+            <div class="field col-12 md:col-3">
+              <span class="p-float-label">
+                <p-dropdown
+                  [options]="thucPhams"
+                  [(ngModel)]="selectedThucPham"
+                  [filter]="true"
+                  filterBy="tenThucPham"
+                  dataKey="maThucPham"
+                  placeholder="Chọn thực phẩm"
+                  (onChange)="onThucPhamChange($event.value)"
+                  appendTo="body"
+                >
+                  <ng-template pTemplate="selectedItem">
+                    <div *ngIf="selectedThucPham">
+                      <div>
+                        {{ selectedThucPham.tenThucPham }}
+                      </div>
+                    </div>
+                  </ng-template>
+                  <ng-template let-thucPham pTemplate="item">
+                    <div>
+                      <div>{{ thucPham.tenThucPham }}</div>
+                    </div>
+                  </ng-template>
+                </p-dropdown>
+
+                <label for="thucPham" class="required-field"> Thực phẩm</label>
+              </span>
+            </div>
+          </div>
+        </ng-template>
+        <ng-template pTemplate="header">
+          <tr>
+            <th>Tên thực phẩm</th>
+            <th>Đơn vị tính</th>
+            <th>Số lượng</th>
+            <th style="width: 4rem"></th>
+          </tr>
+        </ng-template>
+        <ng-template pTemplate="body" let-monAnThucPham let-editing="editing">
+          <tr>
+            <td>{{ monAnThucPham.thucPham.tenThucPham }}</td>
+            <td>{{ monAnThucPham.thucPham.donViTinh }}</td>
+            <td
+              [pEditableColumn]="monAnThucPham.soLuong"
+              pEditableColumnField="soLuong"
+            >
+              <p-cellEditor>
+                <ng-template pTemplate="input">
+                  <p-inputNumber
+                    mode="decimal"
+                    [minFractionDigits]="2"
+                    [(ngModel)]="monAnThucPham.soLuong"
+                  >
+                  </p-inputNumber>
+                </ng-template>
+                <ng-template pTemplate="output">
+                  {{ monAnThucPham.soLuong }}
+                </ng-template>
+              </p-cellEditor>
+            </td>
+            <td>
+              <button
+                pButton
+                pRipple
+                icon="pi pi-delete-left"
+                class="p-button-rounded p-button-danger"
+                pTooltip="Xóa"
+                tooltipPosition="top"
+                (click)="deleteMonAnThucPham(monAnThucPham)"
+              ></button>
+            </td>
+          </tr>
+        </ng-template>
+      </p-table>
+    </div>
+  </ng-template>
+
+  <ng-template pTemplate="footer">
+    <button
+      pButton
+      pRipple
+      label="Hủy"
+      icon="pi pi-times"
+      class="p-button-text"
+      (click)="hideDialog()"
+      pTooltip="Hủy"
+      tooltipPosition="top"
+    ></button>
+    <button
+      pButton
+      pRipple
+      label="Lưu"
+      icon="pi pi-check"
+      class="p-button-text"
+      (click)="saveMonAn()"
+      pTooltip="Lưu"
+      tooltipPosition="top"
+    ></button>
+  </ng-template>
+</p-dialog>
+
+<p-confirmDialog [style]="{ width: '450px' }"></p-confirmDialog>

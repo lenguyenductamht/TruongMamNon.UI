@@ -5,7 +5,7 @@ import { Vaccine } from './vaccine.model';
 export interface PhieuTiemVaccine {
   maPhieuTiemVaccine: number;
   maDotTiemVaccine: number;
-  maHocSinh: string;
+  maHocSinh: number;
   trangThai: string;
 
   dotTiemVaccine: DotTiemVaccine;

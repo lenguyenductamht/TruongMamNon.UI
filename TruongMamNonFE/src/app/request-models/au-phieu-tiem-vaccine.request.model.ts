@@ -1,5 +1,5 @@
 export interface AUPhieuTiemVaccineRequest {
   maDotTiemVaccine: number;
-  maHocSinh: string;
+  maHocSinh: number;
   trangThai: string;
 }

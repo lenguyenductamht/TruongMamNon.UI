@@ -1,6 +1,6 @@
 export interface AddPhieuNhapThucPhamRequest {
   ngayNhap: Date;
-  maNguoiNhap: string;
+  maNguoiNhap: number;
   ghiChu: string;
   trangThai: string;
 }

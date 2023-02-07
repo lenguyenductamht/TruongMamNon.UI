@@ -3,8 +3,4 @@ export interface AUThucPhamRequest {
   donViTinh: string;
   tonKho: number;
   maDanhMuc: number;
-  nangLuong: number;
-  chatDam: number;
-  chatBeo: number;
-  chatBot: number;
 }

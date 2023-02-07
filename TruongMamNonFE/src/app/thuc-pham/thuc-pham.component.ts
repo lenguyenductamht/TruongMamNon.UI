@@ -192,10 +192,6 @@ export class ThucPhamComponent implements OnInit {
     if (!thucPham.donViTinh) return false;
     if (thucPham.maDanhMuc === 0) return false;
     if (thucPham.tonKho < 0) return false;
-    if (thucPham.nangLuong < 0) return false;
-    if (thucPham.chatDam < 0) return false;
-    if (thucPham.chatBeo < 0) return false;
-    if (thucPham.chatBot < 0) return false;
     return true;
   }
 }

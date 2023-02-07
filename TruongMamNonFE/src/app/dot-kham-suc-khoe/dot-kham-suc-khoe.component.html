@@ -1,0 +1,203 @@
+<p-toast></p-toast>
+<p-progressBar
+  *ngIf="loading"
+  mode="indeterminate"
+  [style]="{ height: '6px' }"
+></p-progressBar>
+<p style="font-size: 200%" *ngIf="loading">Đang tải dữ liệu...</p>
+<div class="card" *ngIf="!loading">
+  <p-toolbar styleClass="mb-1 gap-2">
+    <ng-template pTemplate="left">
+      <button
+        pButton
+        pRipple
+        label="Thêm"
+        icon="pi pi-plus"
+        class="p-button-success mr-2"
+        pTooltip="Thêm"
+        tooltipPosition="bottom"
+        (click)="openNew()"
+      ></button>
+      <button
+        pButton
+        pRipple
+        label="Tải lại"
+        icon="pi pi-refresh"
+        class="p-button-primary mr-2"
+        pTooltip="Tải lại"
+        tooltipPosition="bottom"
+        (click)="getDotKhamSucKhoesByNienHoc()"
+      ></button>
+    </ng-template>
+
+    <ng-template pTemplate="right">
+      <button
+        type="button"
+        pButton
+        pRipple
+        icon="pi pi-file-excel"
+        (click)="exportExcel()"
+        class="p-button-success mr-2"
+        label="Xuất Excel"
+        pTooltip="Xuất Excel"
+        tooltipPosition="bottom"
+      ></button>
+
+      <button
+        type="button"
+        pButton
+        pRipple
+        icon="pi pi-file-pdf"
+        (click)="exportPdf()"
+        class="p-button-warning"
+        label="Xuất PDF"
+        pTooltip="Xuất PDF"
+        tooltipPosition="bottom"
+      ></button>
+    </ng-template>
+  </p-toolbar>
+
+  <p-table
+    #dt
+    [value]="dotKhamSucKhoes"
+    [rows]="10"
+    [paginator]="true"
+    [globalFilterFields]="['tenDotKhamSucKhoe']"
+    [tableStyle]="{ 'min-width': '75rem' }"
+    [rowHover]="true"
+    dataKey="maDotKhamSucKhoe"
+    currentPageReportTemplate="Hiển thị {first} đến {last} trong {totalRecords} mục"
+    [showCurrentPageReport]="true"
+    [rowsPerPageOptions]="[10, 25, 50]"
+    styleClass="p-datatable-sm p-datatable-striped p-datatable-gridlines"
+  >
+    <ng-template pTemplate="caption">
+      <div class="flex align-items-center justify-content-between">
+        <h3 class="m-0">Danh sách đợt tiêm vaccine</h3>
+        <span class="p-input-icon-left">
+          <i class="pi pi-search"></i>
+          <input
+            pInputText
+            type="text"
+            (input)="dt.filterGlobal($any($event.target).value, 'contains')"
+            placeholder="Tìm kiếm..."
+          />
+        </span>
+      </div>
+    </ng-template>
+    <ng-template pTemplate="header">
+      <tr>
+        <th pSortableColumn="tenDotKhamSucKhoe" style="min-width: 15rem">
+          Tên đợt khám sức khỏe
+          <p-sortIcon field="tenDotKhamSucKhoe"></p-sortIcon>
+        </th>
+        <th pSortableColumn="ngayKhamSucKhoe" style="min-width: 10rem">
+          Ngày khám sức khỏe <p-sortIcon field="ngayKhamSucKhoe"></p-sortIcon>
+        </th>
+        <th pSortableColumn="nienHoc" style="min-width: 10rem">
+          Niên học <p-sortIcon field="nienHoc"></p-sortIcon>
+        </th>
+        <th style="width: 8rem"></th>
+      </tr>
+    </ng-template>
+    <ng-template pTemplate="body" let-dotKhamSucKhoe>
+      <tr>
+        <td>{{ dotKhamSucKhoe.tenDotKhamSucKhoe }}</td>
+        <td>{{ dotKhamSucKhoe.ngayKhamSucKhoe | date : "dd/MM/yyyy" }}</td>
+        <td>{{ dotKhamSucKhoe.nienHoc?.tenNienHoc }}</td>
+        <td>
+          <button
+            pButton
+            pRipple
+            icon="pi pi-pencil"
+            class="p-button-rounded p-button-success mr-2"
+            pTooltip="Sửa"
+            tooltipPosition="top"
+            (click)="editDotKhamSucKhoe(dotKhamSucKhoe)"
+          ></button>
+          <button
+            pButton
+            pRipple
+            icon="pi pi-trash"
+            class="p-button-rounded p-button-warning"
+            pTooltip="Xóa"
+            tooltipPosition="top"
+            (click)="deleteDotKhamSucKhoe(dotKhamSucKhoe)"
+          ></button>
+        </td>
+      </tr>
+    </ng-template>
+    <ng-template pTemplate="summary">
+      <div class="flex align-items-center justify-content-between">
+        Tổng cộng có {{ dotKhamSucKhoes ? dotKhamSucKhoes.length : 0 }} mục.
+      </div>
+    </ng-template>
+  </p-table>
+</div>
+
+<p-dialog
+  [(visible)]="dotKhamSucKhoeDialog"
+  [style]="{ width: '55%' }"
+  header="Chi tiết dotKhamSucKhoe"
+  [modal]="true"
+  styleClass="p-fluid"
+>
+  <ng-template pTemplate="content">
+    <div class="field">
+      <label for="tenDotKhamSucKhoe" class="required-field"
+        >Tên đợt khám sức khỏe</label
+      >
+      <input
+        type="text"
+        pInputText
+        id="tenDotKhamSucKhoe"
+        [(ngModel)]="dotKhamSucKhoe.tenDotKhamSucKhoe"
+        required
+        autofocus
+      />
+      <small
+        class="p-error"
+        *ngIf="submitted && !dotKhamSucKhoe.tenDotKhamSucKhoe"
+        >Tên đợt khám sức khỏe không được để trống</small
+      >
+    </div>
+
+    <div class="field">
+      <label for="ngayKhamSucKhoe">Ngày khám sức khỏe</label>
+      <p-calendar
+        [(ngModel)]="_ngayKhamSucKhoe"
+        [showIcon]="true"
+        dateFormat="dd/mm/yy"
+        appendTo="body"
+      ></p-calendar>
+      <small class="p-error" *ngIf="submitted && !_ngayKhamSucKhoe"
+        >Ngày khám sức khỏe không được để trống</small
+      >
+    </div>
+  </ng-template>
+
+  <ng-template pTemplate="footer">
+    <button
+      pButton
+      pRipple
+      label="Hủy"
+      icon="pi pi-times"
+      class="p-button-text"
+      (click)="hideDialog()"
+      pTooltip="Hủy"
+      tooltipPosition="top"
+    ></button>
+    <button
+      pButton
+      pRipple
+      label="Lưu"
+      icon="pi pi-check"
+      class="p-button-text"
+      (click)="saveDotKhamSucKhoe()"
+      pTooltip="Lưu"
+      tooltipPosition="top"
+    ></button>
+  </ng-template>
+</p-dialog>
+
+<p-confirmDialog [style]="{ width: '450px' }"></p-confirmDialog>

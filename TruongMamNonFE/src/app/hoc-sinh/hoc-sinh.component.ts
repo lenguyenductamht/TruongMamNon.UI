@@ -270,8 +270,7 @@ export class HocSinhComponent implements OnInit {
 
     console.log('saveHocSinh: ', this.hocSinh);
     if (this.checkValid(this.hocSinh)) {
-      if (this.hocSinh.maHocSinh === '') {
-        this.hocSinh.maHocSinh = 'a';
+      if (this.hocSinh.maHocSinh === 0) {
         this.hocSinh.matKhau = 'Student@123';
         this.hocSinh.maTrangThaiTaiKhoan = '0';
         console.log('saveHocSinh: ', this.hocSinh);

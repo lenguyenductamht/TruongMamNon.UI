@@ -1,0 +1,927 @@
+<p-toast></p-toast>
+<p-progressBar
+  *ngIf="loading"
+  mode="indeterminate"
+  [style]="{ height: '6px' }"
+></p-progressBar>
+<p style="font-size: 200%" *ngIf="loading">Đang tải dữ liệu...</p>
+<div class="card" *ngIf="!loading">
+  <p-toolbar styleClass="mb-1 gap-2">
+    <ng-template pTemplate="left">
+      <button
+        pButton
+        pRipple
+        label="Thêm"
+        icon="pi pi-plus"
+        class="p-button-success mr-2"
+        pTooltip="Thêm"
+        tooltipPosition="bottom"
+        (click)="openNew()"
+      ></button>
+      <button
+        pButton
+        pRipple
+        label="Tải lại"
+        icon="pi pi-refresh"
+        class="p-button-primary mr-2"
+        pTooltip="Tải lại"
+        tooltipPosition="bottom"
+        *ngIf="selectedNienHoc"
+        (click)="getPhieuKhamSucKhoesByNienHoc()"
+      ></button>
+    </ng-template>
+
+    <ng-template pTemplate="right">
+      <p-fileUpload
+        mode="basic"
+        accept="image/*"
+        [maxFileSize]="1000000"
+        chooseLabel="Nhập file"
+        pTooltip="Nhập file"
+        tooltipPosition="bottom"
+        class="p-mr-2 p-d-inline-block mr-2"
+      ></p-fileUpload>
+
+      <button
+        type="button"
+        pButton
+        pRipple
+        icon="pi pi-file-excel"
+        (click)="exportExcel()"
+        class="p-button-success mr-2"
+        label="Xuất Excel"
+        pTooltip="Xuất Excel"
+        tooltipPosition="bottom"
+      ></button>
+
+      <button
+        type="button"
+        pButton
+        pRipple
+        icon="pi pi-file-pdf"
+        (click)="exportPdf()"
+        class="p-button-warning"
+        label="Xuất PDF"
+        pTooltip="Xuất PDF"
+        tooltipPosition="bottom"
+      ></button>
+    </ng-template>
+  </p-toolbar>
+
+  <p-table
+    #dt
+    [value]="phieuKhamSucKhoes"
+    [rows]="10"
+    [paginator]="true"
+    [globalFilterFields]="['vaccine.tenVaccine', 'hocSinh.ho', 'hocSinh.ten']"
+    [tableStyle]="{ 'min-width': '75rem' }"
+    [rowHover]="true"
+    dataKey="['maVaccine', 'maHocSinh', ngayTiem]"
+    currentPageReportTemplate="Hiển thị {first} đến {last} trong {totalRecords} mục"
+    [showCurrentPageReport]="true"
+    [rowsPerPageOptions]="[10, 25, 50]"
+    styleClass="p-datatable-sm p-datatable-striped p-datatable-gridlines"
+  >
+    <ng-template pTemplate="caption">
+      <div class="flex align-items-center justify-content-between mt-3">
+        <h3 class="m-0">Danh sách chức vụ</h3>
+        <div class="flex">
+          <!-- <span class="p-float-label mr-2">
+            <p-dropdown
+              inputId="filterLoaiNhanSu"
+              [options]="loaiNhanSus"
+              [(ngModel)]="filterSelectedLoaiNhanSu"
+              optionLabel="tenLoaiNhanSu"
+              placeholder="Chọn loại nhân sự"
+              [showClear]="true"
+              (onChange)="onFilterLoaiNhanSuChange($event.value)"
+            ></p-dropdown>
+            <label for="filterLoaiNhanSu">Loại nhân sự</label>
+          </span> -->
+          <span class="p-input-icon-left">
+            <i class="pi pi-search"></i>
+            <input
+              pInputText
+              type="text"
+              (input)="dt.filterGlobal($any($event.target).value, 'contains')"
+              placeholder="Tìm kiếm..."
+            />
+          </span>
+        </div>
+      </div>
+    </ng-template>
+    <ng-template pTemplate="header">
+      <tr>
+        <th pSortableColumn="dotKhamSucKhoe" style="min-width: 10rem">
+          Đợt khám sức khỏe <p-sortIcon field="dotKhamSucKhoe"></p-sortIcon>
+        </th>
+        <th pSortableColumn="maHocSinh" style="min-width: 10rem">
+          Mã học sinh <p-sortIcon field="maHocSinh"></p-sortIcon>
+        </th>
+        <th pSortableColumn="hocSinh.ho" style="min-width: 10rem">
+          Họ đệm
+          <p-sortIcon field="hocSinh.ho"></p-sortIcon>
+        </th>
+        <th pSortableColumn="hocSinh.ten" style="min-width: 5rem">
+          Tên <p-sortIcon field="hocSinh.ten"></p-sortIcon>
+        </th>
+        <th pSortableColumn="hocSinh.gioiTinh" style="min-width: 10rem">
+          Giới tính <p-sortIcon field="hocSinh.gioiTinh"></p-sortIcon>
+        </th>
+        <th pSortableColumn="hocSinh.ngaySinh" style="min-width: 10rem">
+          Ngày sinh <p-sortIcon field="hocSinh.ngaySinh"></p-sortIcon>
+        </th>
+        <th pSortableColumn="hocSinh.lopHoc.tenLopHoc" style="min-width: 10rem">
+          Lớp học <p-sortIcon field="hocSinh.lopHoc.tenLopHoc"></p-sortIcon>
+        </th>
+        <th style="width: 8rem"></th>
+      </tr>
+    </ng-template>
+    <ng-template pTemplate="body" let-phieuKhamSucKhoe>
+      <tr>
+        <td>{{ phieuKhamSucKhoe.dotKhamSucKhoe?.tenDotKhamSucKhoe }}</td>
+        <td>{{ phieuKhamSucKhoe.maHocSinh }}</td>
+        <td>{{ phieuKhamSucKhoe.hocSinh?.ho }}</td>
+        <td>{{ phieuKhamSucKhoe.hocSinh?.ten }}</td>
+        <td>{{ phieuKhamSucKhoe.hocSinh?.gioiTinh?.tenGioiTinh }}</td>
+        <td>{{ phieuKhamSucKhoe.hocSinh?.ngaySinh | date : "dd/MM/yyyy" }}</td>
+        <td>
+          {{
+            phieuKhamSucKhoe.hocSinh?.lopHoc
+              ? phieuKhamSucKhoe.hocSinh.lopHoc.tenLop
+              : ""
+          }}
+        </td>
+        <td>
+          <button
+            pButton
+            pRipple
+            icon="pi pi-pencil"
+            class="p-button-rounded p-button-success mr-2"
+            pTooltip="Sửa"
+            tooltipPosition="top"
+            (click)="editPhieuKhamSucKhoe(phieuKhamSucKhoe)"
+          ></button>
+          <button
+            pButton
+            pRipple
+            icon="pi pi-trash"
+            class="p-button-rounded p-button-warning"
+            pTooltip="Xóa"
+            tooltipPosition="top"
+            (click)="deletePhieuKhamSucKhoe(phieuKhamSucKhoe)"
+          ></button>
+        </td>
+      </tr>
+    </ng-template>
+    <ng-template pTemplate="summary">
+      <div class="flex align-items-center justify-content-between">
+        Tổng cộng có {{ phieuKhamSucKhoes ? phieuKhamSucKhoes.length : 0 }} mục.
+      </div>
+    </ng-template>
+  </p-table>
+</div>
+
+<p-dialog
+  [(visible)]="phieuKhamSucKhoeDialog"
+  [style]="{ width: '75%' }"
+  header="Chi tiết khám sức khỏe"
+  [modal]="true"
+  styleClass="p-fluid"
+>
+  <ng-template pTemplate="content">
+    <div class="p-fluid grid mt-4">
+      <div class="field col-12 md:col-3">
+        <span class="p-float-label">
+          <p-dropdown
+            [options]="dotKhamSucKhoes"
+            [(ngModel)]="selectedDotKhamSucKhoe"
+            optionLabel="tenDotKhamSucKhoe"
+            [filter]="true"
+            filterBy="tenDotKhamSucKhoe"
+            dataKey="maDotKhamSucKhoe"
+            placeholder="Chọn đợt tiêm"
+            (onChange)="onDotKhamSucKhoeChange($event.value)"
+            appendTo="body"
+            inputId="dotKhamSucKhoe"
+          >
+            <ng-template pTemplate="selectedItem">
+              <div
+                class="dotKhamSucKhoe-item dotKhamSucKhoe-item-value"
+                *ngIf="selectedDotKhamSucKhoe"
+              >
+                <div>{{ selectedDotKhamSucKhoe.tenDotKhamSucKhoe }}</div>
+              </div>
+            </ng-template>
+            <ng-template let-dotKhamSucKhoe pTemplate="item">
+              <div class="dotKhamSucKhoe-item">
+                <div>{{ dotKhamSucKhoe?.tenDotKhamSucKhoe }}</div>
+              </div>
+            </ng-template>
+          </p-dropdown>
+
+          <label for="dotKhamSucKhoe" class="required-field">
+            Đợt khám sức khỏe
+          </label>
+          <small
+            class="p-error"
+            *ngIf="submitted && !phieuKhamSucKhoe.maDotKhamSucKhoe"
+            >Chưa chọn đợt khám sức khỏe</small
+          >
+        </span>
+      </div>
+
+      <div class="field col-12 md:col-3">
+        <span class="p-float-label">
+          <p-dropdown
+            [options]="khoiLops"
+            [(ngModel)]="selectedKhoiLop"
+            optionLabel="tenKhoiLop"
+            [filter]="true"
+            filterBy="tenKhoiLop"
+            dataKey="maKhoiLop"
+            placeholder="Chọn khối lớp"
+            (onChange)="onKhoiLopChange($event.value)"
+            appendTo="body"
+            [showClear]="true"
+          >
+            <ng-template pTemplate="selectedItem">
+              <div
+                class="khoiLop-item khoiLop-item-value"
+                *ngIf="selectedKhoiLop"
+              >
+                <div>{{ selectedKhoiLop.tenKhoiLop }}</div>
+              </div>
+            </ng-template>
+            <ng-template let-khoiLop pTemplate="item">
+              <div class="khoiLop-item">
+                <div>{{ khoiLop?.tenKhoiLop }}</div>
+              </div>
+            </ng-template>
+          </p-dropdown>
+          <label for="khoiLop">Khối lớp</label>
+        </span>
+      </div>
+
+      <div class="field col-12 md:col-3">
+        <span class="p-float-label">
+          <p-dropdown
+            [options]="lopHocs"
+            [(ngModel)]="selectedLopHoc"
+            optionLabel="tenLop"
+            [filter]="true"
+            filterBy="tenLop"
+            dataKey="maLop"
+            (onChange)="onLopHocChange($event.value)"
+            appendTo="body"
+            [showClear]="true"
+            placeholder="Chọn lớp học"
+          >
+            <ng-template pTemplate="selectedItem">
+              <div class="lopHoc-item lopHoc-item-value" *ngIf="selectedLopHoc">
+                <div>{{ selectedLopHoc.tenLop }}</div>
+              </div>
+            </ng-template>
+            <ng-template let-lopHoc pTemplate="item">
+              <div class="lopHoc-item">
+                <div>{{ lopHoc?.tenLop }}</div>
+              </div>
+            </ng-template>
+          </p-dropdown>
+          <label for="lopHoc">Lớp học</label>
+        </span>
+      </div>
+
+      <div class="field col-12 md:col-3">
+        <span class="p-float-label">
+          <p-dropdown
+            [options]="hocSinhs"
+            [(ngModel)]="selectedHocSinh"
+            optionLabel="ten"
+            [filter]="true"
+            filterBy="ho,ten,maHocSinh"
+            dataKey="maHocSinh"
+            (onChange)="onHocSinhChange($event.value)"
+            appendTo="body"
+            placeholder="Chọn học sinh"
+          >
+            <ng-template pTemplate="selectedItem">
+              <div
+                class="hocSinh-item hocSinh-item-value"
+                *ngIf="selectedHocSinh"
+              >
+                <div>{{ selectedHocSinh.ho + " " + selectedHocSinh.ten }}</div>
+              </div>
+            </ng-template>
+            <ng-template let-hocSinh pTemplate="item">
+              <div class="hocSinh-item">
+                <div>{{ hocSinh.maHocSinh }}</div>
+                <div>{{ hocSinh.ho + " " + hocSinh.ten }}</div>
+                <div>{{ hocSinh.ngaySinh | date : "dd/MM/yyyy" }}</div>
+              </div>
+            </ng-template>
+          </p-dropdown>
+          <label for="hocSinh" class="required-field">Học sinh</label>
+          <small
+            class="p-error"
+            *ngIf="submitted && !phieuKhamSucKhoe.maHocSinh"
+            >Chưa chọn học sinh</small
+          >
+        </span>
+      </div>
+
+      <div class="field col-12 md:col-2">
+        <span class="p-float-label"
+          ><p-inputNumber
+            [(ngModel)]="phieuKhamSucKhoe.chieuCao"
+            inputId="chieuCao"
+            suffix=" cm"
+          >
+          </p-inputNumber>
+          <label for="chieuCao">Chiều cao</label>
+          <small
+            class="p-error"
+            *ngIf="
+              submitted &&
+              (phieuKhamSucKhoe.chieuCao === null ||
+                phieuKhamSucKhoe.chieuCao === 0)
+            "
+            >Chưa nhập chiều cao</small
+          >
+          <small
+            class="p-error"
+            *ngIf="submitted && phieuKhamSucKhoe.chieuCao < 0"
+            >Chiều cao không hợp lệ</small
+          >
+        </span>
+      </div>
+
+      <div class="field col-12 md:col-2">
+        <span class="p-float-label"
+          ><p-inputNumber
+            [(ngModel)]="phieuKhamSucKhoe.canNang"
+            inputId="canNang"
+            suffix=" Kg"
+          >
+          </p-inputNumber>
+          <label for="canNang" class="required-field">Cân nặng</label>
+          <small
+            class="p-error"
+            *ngIf="
+              submitted &&
+              (phieuKhamSucKhoe.canNang === null ||
+                phieuKhamSucKhoe.canNang === 0)
+            "
+            >Chưa nhập cân nặng</small
+          >
+          <small
+            class="p-error"
+            *ngIf="submitted && phieuKhamSucKhoe.canNang < 0"
+            >Cân nặng không hợp lệ</small
+          >
+        </span>
+      </div>
+
+      <div class="field col-12 md:col-2">
+        <span class="p-float-label"
+          ><p-inputNumber
+            [(ngModel)]="phieuKhamSucKhoe.BMI"
+            inputId="BMI"
+            mode="decimal"
+            [minFractionDigits]="2"
+          >
+          </p-inputNumber>
+          <label for="BMI">Chỉ số BMI</label>
+          <small
+            class="p-error"
+            *ngIf="
+              submitted &&
+              (phieuKhamSucKhoe.BMI === null || phieuKhamSucKhoe.BMI === 0)
+            "
+            >Chưa nhập BMI</small
+          >
+          <small class="p-error" *ngIf="submitted && phieuKhamSucKhoe.BMI < 0"
+            >BMI không hợp lệ</small
+          >
+        </span>
+      </div>
+
+      <div class="field col-12 md:col-2">
+        <span class="p-float-label"
+          ><p-inputNumber
+            [(ngModel)]="phieuKhamSucKhoe.nhipTim"
+            inputId="nhipTim"
+            suffix=" lần/phút"
+          >
+          </p-inputNumber>
+          <label for="nhipTim" class="required-field">Nhịp tim</label>
+          <small
+            class="p-error"
+            *ngIf="
+              submitted &&
+              (phieuKhamSucKhoe.nhipTim === null ||
+                phieuKhamSucKhoe.nhipTim === 0)
+            "
+            >Chưa nhập nhịp tim</small
+          >
+          <small
+            class="p-error"
+            *ngIf="submitted && phieuKhamSucKhoe.nhipTim < 0"
+            >Nhịp tim không hợp lệ</small
+          >
+        </span>
+      </div>
+
+      <div class="field col-12 md:col-2">
+        <span class="p-float-label"
+          ><p-inputNumber
+            [(ngModel)]="phieuKhamSucKhoe.tamThu"
+            inputId="tamThu"
+            suffix=" mmHg"
+          >
+          </p-inputNumber>
+          <label for="tamThu" class="required-field">Tâm thu</label>
+          <small
+            class="p-error"
+            *ngIf="
+              submitted &&
+              (phieuKhamSucKhoe.tamThu === null ||
+                phieuKhamSucKhoe.tamThu === 0)
+            "
+            >Chưa nhập tâm thu</small
+          >
+          <small
+            class="p-error"
+            *ngIf="submitted && phieuKhamSucKhoe.tamThu < 0"
+            >Tâm thu không hợp lệ</small
+          >
+        </span>
+      </div>
+
+      <div class="field col-12 md:col-2">
+        <span class="p-float-label"
+          ><p-inputNumber
+            [(ngModel)]="phieuKhamSucKhoe.tamTruong"
+            inputId="tamTruong"
+            suffix=" mmHg"
+          >
+          </p-inputNumber>
+          <label for="tamTruong" class="required-field">Tâm trương</label>
+          <small
+            class="p-error"
+            *ngIf="
+              submitted &&
+              (phieuKhamSucKhoe.tamTruong === null ||
+                phieuKhamSucKhoe.tamTruong === 0)
+            "
+            >Chưa nhập tâm trương</small
+          >
+          <small
+            class="p-error"
+            *ngIf="submitted && phieuKhamSucKhoe.tamTruong < 0"
+            >Tâm trương không hợp lệ</small
+          >
+        </span>
+      </div>
+
+      <div class="field col-12 md:col-2">
+        <span class="p-float-label">
+          <input
+            type="text"
+            id="loaiTheLuc"
+            pInputText
+            [(ngModel)]="phieuKhamSucKhoe.loaiTheLuc"
+          />
+          <label for="loaiTheLuc">Loại thể lực</label>
+          <small
+            class="p-error"
+            *ngIf="submitted && !phieuKhamSucKhoe.loaiTheLuc"
+            >Chưa nhập loại thể lực</small
+          >
+        </span>
+      </div>
+
+      <div class="field col-12 md:col-2">
+        <span class="p-float-label">
+          <input
+            type="text"
+            id="tuanHoan"
+            pInputText
+            [(ngModel)]="phieuKhamSucKhoe.tuanHoan"
+          />
+          <label for="tuanHoan">Tuần hoàn</label>
+          <small class="p-error" *ngIf="submitted && !phieuKhamSucKhoe.tuanHoan"
+            >Chưa nhập tuần hoàn</small
+          >
+        </span>
+      </div>
+
+      <div class="field col-12 md:col-2">
+        <span class="p-float-label">
+          <input
+            type="text"
+            id="hoHap"
+            pInputText
+            [(ngModel)]="phieuKhamSucKhoe.hoHap"
+          />
+          <label for="hoHap">Hô hấp</label>
+          <small class="p-error" *ngIf="submitted && !phieuKhamSucKhoe.hoHap"
+            >Chưa nhập hô hấp</small
+          >
+        </span>
+      </div>
+
+      <div class="field col-12 md:col-2">
+        <span class="p-float-label">
+          <input
+            type="text"
+            id="tieuHoa"
+            pInputText
+            [(ngModel)]="phieuKhamSucKhoe.tieuHoa"
+          />
+          <label for="tieuHoa">Tiêu hóa</label>
+          <small class="p-error" *ngIf="submitted && !phieuKhamSucKhoe.tieuHoa"
+            >Chưa nhập tiêu hóa</small
+          >
+        </span>
+      </div>
+
+      <div class="field col-12 md:col-2">
+        <span class="p-float-label">
+          <input
+            type="text"
+            id="thanTietNieu"
+            pInputText
+            [(ngModel)]="phieuKhamSucKhoe.thanTietNieu"
+          />
+          <label for="thanTietNieu">Thận tiết niệu</label>
+          <small
+            class="p-error"
+            *ngIf="submitted && !phieuKhamSucKhoe.thanTietNieu"
+            >Chưa nhập thận tiết niệu</small
+          >
+        </span>
+      </div>
+
+      <div class="field col-12 md:col-2">
+        <span class="p-float-label">
+          <input
+            type="text"
+            id="thanKinhTamThan"
+            pInputText
+            [(ngModel)]="phieuKhamSucKhoe.thanKinhTamThan"
+          />
+          <label for="thanKinhTamThan">Thần kinh tâm thần</label>
+          <small
+            class="p-error"
+            *ngIf="submitted && !phieuKhamSucKhoe.thanKinhTamThan"
+            >Chưa nhập thần kinh tâm thần</small
+          >
+        </span>
+      </div>
+
+      <div class="field col-12 md:col-2">
+        <span class="p-float-label">
+          <input
+            type="text"
+            id="lamSangKhac"
+            pInputText
+            [(ngModel)]="phieuKhamSucKhoe.lamSangKhac"
+          />
+          <label for="lamSangKhac">Lâm sàng khác</label>
+          <small
+            class="p-error"
+            *ngIf="submitted && !phieuKhamSucKhoe.lamSangKhac"
+            >Chưa nhập lâm sàng khác</small
+          >
+        </span>
+      </div>
+
+      <div class="field col-12 md:col-2">
+        <span class="p-float-label"
+          ><p-inputNumber
+            [(ngModel)]="phieuKhamSucKhoe.matPhaiKhongKinh"
+            inputId="matPhaiKhongKinh"
+          >
+          </p-inputNumber>
+          <label for="matPhaiKhongKinh" class="required-field"
+            >Mắt phải không kính</label
+          >
+          <small
+            class="p-error"
+            *ngIf="
+              submitted &&
+              (phieuKhamSucKhoe.matPhaiKhongKinh === null ||
+                phieuKhamSucKhoe.matPhaiKhongKinh === 0)
+            "
+            >Chưa nhập mắt phải không kính</small
+          >
+          <small
+            class="p-error"
+            *ngIf="submitted && phieuKhamSucKhoe.matPhaiKhongKinh < 0"
+            >Mắt phải không kính không hợp lệ</small
+          >
+        </span>
+      </div>
+
+      <div class="field col-12 md:col-2">
+        <span class="p-float-label"
+          ><p-inputNumber
+            [(ngModel)]="phieuKhamSucKhoe.matTraiKhongKinh"
+            inputId="matTraiKhongKinh"
+          >
+          </p-inputNumber>
+          <label for="matTraiKhongKinh" class="required-field"
+            >Mắt trái không kính</label
+          >
+          <small
+            class="p-error"
+            *ngIf="
+              submitted &&
+              (phieuKhamSucKhoe.matTraiKhongKinh === null ||
+                phieuKhamSucKhoe.matTraiKhongKinh === 0)
+            "
+            >Chưa nhập mắt trái không kính</small
+          >
+          <small
+            class="p-error"
+            *ngIf="submitted && phieuKhamSucKhoe.matTraiKhongKinh < 0"
+            >Mắt trái không kính không hợp lệ</small
+          >
+        </span>
+      </div>
+
+      <div class="field col-12 md:col-2">
+        <span class="p-float-label"
+          ><p-inputNumber
+            [(ngModel)]="phieuKhamSucKhoe.matPhaiCoKinh"
+            inputId="matPhaiCoKinh"
+          >
+          </p-inputNumber>
+          <label for="matPhaiCoKinh" class="required-field"
+            >Mắt phải có kính</label
+          >
+          <small
+            class="p-error"
+            *ngIf="
+              submitted &&
+              (phieuKhamSucKhoe.matPhaiCoKinh === null ||
+                phieuKhamSucKhoe.matPhaiCoKinh === 0)
+            "
+            >Chưa nhập mắt phải có kính</small
+          >
+          <small
+            class="p-error"
+            *ngIf="submitted && phieuKhamSucKhoe.matPhaiCoKinh < 0"
+            >Mắt phải có kính không hợp lệ</small
+          >
+        </span>
+      </div>
+
+      <div class="field col-12 md:col-2">
+        <span class="p-float-label"
+          ><p-inputNumber
+            [(ngModel)]="phieuKhamSucKhoe.matTraiCoKinh"
+            inputId="matTraiCoKinh"
+          >
+          </p-inputNumber>
+          <label for="matTraiCoKinh" class="required-field"
+            >Mắt trái có kính</label
+          >
+          <small
+            class="p-error"
+            *ngIf="
+              submitted &&
+              (phieuKhamSucKhoe.matTraiCoKinh === null ||
+                phieuKhamSucKhoe.matTraiCoKinh === 0)
+            "
+            >Chưa nhập mắt trái có kính</small
+          >
+          <small
+            class="p-error"
+            *ngIf="submitted && phieuKhamSucKhoe.matTraiCoKinh < 0"
+            >Mắt trái có kính không hợp lệ</small
+          >
+        </span>
+      </div>
+
+      <div class="field col-12 md:col-2">
+        <span class="p-float-label">
+          <input
+            type="text"
+            id="cacBenhVeMat"
+            pInputText
+            [(ngModel)]="phieuKhamSucKhoe.cacBenhVeMat"
+          />
+          <label for="cacBenhVeMat">Các bệnh về mắt</label>
+        </span>
+      </div>
+
+      <div class="field col-12 md:col-2">
+        <span class="p-float-label"
+          ><p-inputNumber
+            [(ngModel)]="phieuKhamSucKhoe.taiTraiNoiThuong"
+            inputId="taiTraiNoiThuong"
+            suffix=" m"
+          >
+          </p-inputNumber>
+          <label for="taiTraiNoiThuong" class="required-field"
+            >Tai trái nói thường</label
+          >
+          <small
+            class="p-error"
+            *ngIf="
+              submitted &&
+              (phieuKhamSucKhoe.taiTraiNoiThuong === null ||
+                phieuKhamSucKhoe.taiTraiNoiThuong === 0)
+            "
+            >Chưa nhập tai trái nói thường</small
+          >
+          <small
+            class="p-error"
+            *ngIf="submitted && phieuKhamSucKhoe.taiTraiNoiThuong < 0"
+            >Tai trái nói thường không hợp lệ</small
+          >
+        </span>
+      </div>
+
+      <div class="field col-12 md:col-2">
+        <span class="p-float-label"
+          ><p-inputNumber
+            [(ngModel)]="phieuKhamSucKhoe.taiTraiNoiTham"
+            inputId="taiTraiNoiTham"
+            suffix=" m"
+          >
+          </p-inputNumber>
+          <label for="taiTraiNoiTham" class="required-field"
+            >Tai trái nói thầm</label
+          >
+          <small
+            class="p-error"
+            *ngIf="
+              submitted &&
+              (phieuKhamSucKhoe.taiTraiNoiTham === null ||
+                phieuKhamSucKhoe.taiTraiNoiTham === 0)
+            "
+            >Chưa nhập tai trái nói thầm</small
+          >
+          <small
+            class="p-error"
+            *ngIf="submitted && phieuKhamSucKhoe.taiTraiNoiTham < 0"
+            >Tai trái nói thầm không hợp lệ</small
+          >
+        </span>
+      </div>
+
+      <div class="field col-12 md:col-2">
+        <span class="p-float-label"
+          ><p-inputNumber
+            [(ngModel)]="phieuKhamSucKhoe.taiPhaiNoiThuong"
+            inputId="taiPhaiNoiThuong"
+            suffix=" m"
+          >
+          </p-inputNumber>
+          <label for="taiPhaiNoiThuong" class="required-field"
+            >Tai phải nói thường</label
+          >
+          <small
+            class="p-error"
+            *ngIf="
+              submitted &&
+              (phieuKhamSucKhoe.taiPhaiNoiThuong === null ||
+                phieuKhamSucKhoe.taiPhaiNoiThuong === 0)
+            "
+            >Chưa nhập tai phải nói thường</small
+          >
+          <small
+            class="p-error"
+            *ngIf="submitted && phieuKhamSucKhoe.taiPhaiNoiThuong < 0"
+            >Tai phải nói thường không hợp lệ</small
+          >
+        </span>
+      </div>
+
+      <div class="field col-12 md:col-2">
+        <span class="p-float-label"
+          ><p-inputNumber
+            [(ngModel)]="phieuKhamSucKhoe.taiPhaiNoiTham"
+            inputId="taiPhaiNoiTham"
+            suffix=" m"
+          >
+          </p-inputNumber>
+          <label for="taiPhaiNoiTham" class="required-field"
+            >Tai phải nói thầm</label
+          >
+          <small
+            class="p-error"
+            *ngIf="
+              submitted &&
+              (phieuKhamSucKhoe.taiPhaiNoiTham === null ||
+                phieuKhamSucKhoe.taiPhaiNoiTham === 0)
+            "
+            >Chưa nhập tai phải nói thầm</small
+          >
+          <small
+            class="p-error"
+            *ngIf="submitted && phieuKhamSucKhoe.taiPhaiNoiTham < 0"
+            >Tai phải nói thầm không hợp lệ</small
+          >
+        </span>
+      </div>
+
+      <div class="field col-12 md:col-2">
+        <span class="p-float-label">
+          <input
+            type="text"
+            id="cacBenhTaiMuiHong"
+            pInputText
+            [(ngModel)]="phieuKhamSucKhoe.cacBenhTaiMuiHong"
+          />
+          <label for="cacBenhTaiMuiHong">Các bệnh tai mũi họng</label>
+        </span>
+      </div>
+
+      <div class="field col-12 md:col-2">
+        <span class="p-float-label">
+          <input
+            type="text"
+            id="hamTren"
+            pInputText
+            [(ngModel)]="phieuKhamSucKhoe.hamTren"
+          />
+          <label for="hamTren">Hàm trên</label>
+          <small class="p-error" *ngIf="submitted && !phieuKhamSucKhoe.hamTren"
+            >Chưa nhập hàm trên</small
+          >
+        </span>
+      </div>
+
+      <div class="field col-12 md:col-2">
+        <span class="p-float-label">
+          <input
+            type="text"
+            id="hamDuoi"
+            pInputText
+            [(ngModel)]="phieuKhamSucKhoe.hamDuoi"
+          />
+          <label for="hamDuoi">Hàm dưới</label>
+          <small class="p-error" *ngIf="submitted && !phieuKhamSucKhoe.hamDuoi"
+            >Chưa nhập hàm dưới</small
+          >
+        </span>
+      </div>
+
+      <div class="field col-12 md:col-2">
+        <span class="p-float-label">
+          <input
+            type="text"
+            id="cacBenhRangHamMat"
+            pInputText
+            [(ngModel)]="phieuKhamSucKhoe.cacBenhRangHamMat"
+          />
+          <label for="cacBenhRangHamMat">Các bệnh răng hàm mặt</label>
+        </span>
+      </div>
+
+      <div class="field col-12 md:col-2">
+        <span class="p-float-label">
+          <input
+            type="text"
+            id="ketLuan"
+            pInputText
+            [(ngModel)]="phieuKhamSucKhoe.ketLuan"
+          />
+          <label for="ketLuan">Kết luận</label>
+          <small class="p-error" *ngIf="submitted && !phieuKhamSucKhoe.ketLuan"
+            >Chưa nhập kết luận</small
+          >
+        </span>
+      </div>
+    </div>
+  </ng-template>
+
+  <ng-template pTemplate="footer">
+    <button
+      pButton
+      pRipple
+      label="Hủy"
+      icon="pi pi-times"
+      class="p-button-text"
+      (click)="hideDialog()"
+      pTooltip="Hủy"
+      tooltipPosition="top"
+    ></button>
+    <button
+      pButton
+      pRipple
+      label="Lưu"
+      icon="pi pi-check"
+      class="p-button-text"
+      (click)="savePhieuKhamSucKhoe()"
+      pTooltip="Lưu"
+      tooltipPosition="top"
+    ></button>
+  </ng-template>
+</p-dialog>
+
+<p-confirmDialog [style]="{ width: '450px' }"></p-confirmDialog>

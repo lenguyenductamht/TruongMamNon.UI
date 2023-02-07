@@ -1,0 +1,341 @@
+<p-toast></p-toast>
+<p-progressBar
+  *ngIf="loading"
+  mode="indeterminate"
+  [style]="{ height: '6px' }"
+></p-progressBar>
+<p style="font-size: 200%" *ngIf="loading">Đang tải dữ liệu...</p>
+<div class="card" *ngIf="!loading">
+  <p-toolbar styleClass="mb-1 gap-2">
+    <ng-template pTemplate="left">
+      <button
+        pButton
+        pRipple
+        label="Thêm"
+        icon="pi pi-plus"
+        class="p-button-success mr-2"
+        pTooltip="Thêm"
+        tooltipPosition="bottom"
+        (click)="openNew()"
+      ></button>
+      <button
+        pButton
+        pRipple
+        label="Tải lại"
+        icon="pi pi-refresh"
+        class="p-button-primary mr-2"
+        pTooltip="Tải lại"
+        tooltipPosition="bottom"
+        (click)="getThucDons()"
+      ></button>
+    </ng-template>
+
+    <ng-template pTemplate="right">
+      <p-fileUpload
+        mode="basic"
+        accept="image/*"
+        [maxFileSize]="1000000"
+        chooseLabel="Nhập file"
+        pTooltip="Nhập file"
+        tooltipPosition="bottom"
+        class="p-mr-2 p-d-inline-block mr-2"
+      ></p-fileUpload>
+
+      <button
+        type="button"
+        pButton
+        pRipple
+        icon="pi pi-file-excel"
+        (click)="exportExcel()"
+        class="p-button-success mr-2"
+        label="Xuất Excel"
+        pTooltip="Xuất Excel"
+        tooltipPosition="bottom"
+      ></button>
+
+      <button
+        type="button"
+        pButton
+        pRipple
+        icon="pi pi-file-pdf"
+        (click)="exportPdf()"
+        class="p-button-warning"
+        label="Xuất PDF"
+        pTooltip="Xuất PDF"
+        tooltipPosition="bottom"
+      ></button>
+    </ng-template>
+  </p-toolbar>
+
+  <p-table
+    #dt
+    [value]="thucDons"
+    [rows]="10"
+    [paginator]="true"
+    [globalFilterFields]="['vaccine.tenVaccine', 'hocSinh.ho', 'hocSinh.ten']"
+    [tableStyle]="{ 'min-width': '75rem' }"
+    [rowHover]="true"
+    dataKey="['maThucDon']"
+    currentPageReportTemplate="Hiển thị {first} đến {last} trong {totalRecords} mục"
+    [showCurrentPageReport]="true"
+    [rowsPerPageOptions]="[10, 25, 50]"
+    styleClass="p-datatable-sm p-datatable-striped p-datatable-gridlines"
+  >
+    <ng-template pTemplate="caption">
+      <div class="flex align-items-center justify-content-between mt-3">
+        <h3 class="m-0">Danh sách thực đơn</h3>
+        <div class="flex">
+          <span class="p-input-icon-left">
+            <i class="pi pi-search"></i>
+            <input
+              pInputText
+              type="text"
+              (input)="dt.filterGlobal($any($event.target).value, 'contains')"
+              placeholder="Tìm kiếm..."
+            />
+          </span>
+        </div>
+      </div>
+    </ng-template>
+    <ng-template pTemplate="header">
+      <tr>
+        <th pSortableColumn="ngayTao" style="min-width: 10rem">
+          Ngày tạo
+          <p-sortIcon field="ngayTao"></p-sortIcon>
+        </th>
+        <th pSortableColumn="ngayApDung" style="min-width: 10rem">
+          Ngày áp dụng
+          <p-sortIcon field="ngayApDung"></p-sortIcon>
+        </th>
+        <th
+          pSortableColumn="danhMucThucDon.tenDanhMuc"
+          style="min-width: 10rem"
+        >
+          Danh mục thực đơn
+          <p-sortIcon field="danhMucThucDon.tenDanhMuc"></p-sortIcon>
+        </th>
+        <th style="width: 8rem"></th>
+      </tr>
+    </ng-template>
+    <ng-template pTemplate="body" let-thucDon>
+      <tr>
+        <td>{{ thucDon.ngayTao | date : "dd/MM/yyyy" }}</td>
+        <td>{{ thucDon.ngayApDung | date : "dd/MM/yyyy" }}</td>
+        <td>{{ thucDon.danhMucThucDon?.tenDanhMuc }}</td>
+        <td>
+          <button
+            pButton
+            pRipple
+            icon="pi pi-pencil"
+            class="p-button-rounded p-button-success mr-2"
+            pTooltip="Sửa"
+            tooltipPosition="top"
+            (click)="editThucDon(thucDon)"
+          ></button>
+          <button
+            pButton
+            pRipple
+            icon="pi pi-trash"
+            class="p-button-rounded p-button-warning"
+            pTooltip="Xóa"
+            tooltipPosition="top"
+            (click)="deleteThucDon(thucDon)"
+          ></button>
+        </td>
+      </tr>
+    </ng-template>
+    <ng-template pTemplate="summary">
+      <div class="flex align-items-center justify-content-between">
+        Tổng cộng có
+        {{ thucDons ? thucDons.length : 0 }} mục.
+      </div>
+    </ng-template>
+  </p-table>
+</div>
+
+<p-dialog
+  [(visible)]="thucDonDialog"
+  [style]="{ width: '75%' }"
+  header="Chi tiết thực đơn"
+  [modal]="true"
+  styleClass="p-fluid"
+>
+  <ng-template pTemplate="content">
+    <div class="p-fluid grid mt-4">
+      <div class="field col-12 md:col-6">
+        <span class="p-float-label">
+          <p-dropdown
+            [options]="danhMucThucDons"
+            [(ngModel)]="selectedDanhMucThucDon"
+            [filter]="true"
+            filterBy="tenDanhMuc"
+            dataKey="maDanhMuc"
+            placeholder="Chọn danh mục thực đơn"
+            (onChange)="onDanhMucThucDonChange($event.value)"
+            appendTo="body"
+          >
+            <ng-template pTemplate="selectedItem">
+              <div *ngIf="selectedDanhMucThucDon">
+                <div>
+                  {{ selectedDanhMucThucDon.tenDanhMuc }}
+                </div>
+              </div>
+            </ng-template>
+            <ng-template let-danhMucThucDon pTemplate="item">
+              <div>
+                <div>{{ danhMucThucDon.tenDanhMuc }}</div>
+              </div>
+            </ng-template>
+          </p-dropdown>
+
+          <label for="danhMucThucDon" class="required-field">
+            Danh mục thực đơn</label
+          >
+          <small class="p-error" *ngIf="submitted && thucDon.maDanhMuc === 0"
+            >Chưa chọn danh mục</small
+          >
+        </span>
+      </div>
+
+      <div class="field col-12 md:col-3">
+        <span class="p-float-label">
+          <p-calendar
+            inputId="ngayTao"
+            dateFormat="dd-mm-yy"
+            [(ngModel)]="_ngayTao"
+            [showIcon]="true"
+            disabled="true"
+          ></p-calendar>
+          <label for="ngayTao" class="required-field">Ngày tạo</label>
+          <small class="p-error" *ngIf="submitted && !thucDon.ngayTao"
+            >Ngày tạo không hợp lệ</small
+          >
+        </span>
+      </div>
+
+      <div class="field col-12 md:col-3">
+        <span class="p-float-label">
+          <p-calendar
+            inputId="ngayApDung"
+            dateFormat="dd-mm-yy"
+            [(ngModel)]="_ngayApDung"
+            [showIcon]="true"
+          ></p-calendar>
+          <label for="ngayApDung" class="required-field">Ngày áp dụng</label>
+          <small class="p-error" *ngIf="submitted && !thucDon.ngayApDung"
+            >Ngày áp dụng không hợp lệ</small
+          >
+        </span>
+      </div>
+
+      <div class="card">
+        <p-table
+          [value]="thucDonMonAns"
+          dataKey="maThucDon, maMonAn"
+          [tableStyle]="{ 'min-width': '65rem' }"
+        >
+          <ng-template pTemplate="caption">
+            <div class="flex align-items-center justify-content-between">
+              <h3 class="m-0">Thành phần thực đơn</h3>
+              <div class="field col-12 md:col-3">
+                <span class="p-float-label">
+                  <p-dropdown
+                    [options]="monAns"
+                    [(ngModel)]="selectedMonAn"
+                    [filter]="true"
+                    filterBy="tenMonAn"
+                    dataKey="maMonAn"
+                    placeholder="Chọn món ăn"
+                    (onChange)="onMonAnChange($event.value)"
+                    appendTo="body"
+                  >
+                    <ng-template pTemplate="selectedItem">
+                      <div *ngIf="selectedMonAn">
+                        <div>
+                          {{ selectedMonAn.tenMonAn }}
+                        </div>
+                      </div>
+                    </ng-template>
+                    <ng-template let-monAn pTemplate="item">
+                      <div>
+                        <div>{{ monAn.tenMonAn }}</div>
+                      </div>
+                    </ng-template>
+                  </p-dropdown>
+
+                  <label for="monAn" class="required-field"> Món ăn</label>
+                </span>
+              </div>
+            </div>
+          </ng-template>
+          <ng-template pTemplate="header">
+            <tr>
+              <th>Tên món ăn</th>
+              <th>Số lượng</th>
+              <th style="width: 4rem"></th>
+            </tr>
+          </ng-template>
+          <ng-template pTemplate="body" let-thucDonMonAn let-editing="editing">
+            <tr>
+              <td>{{ thucDonMonAn.monAn.tenMonAn }}</td>
+              <td
+                [pEditableColumn]="thucDonMonAn.soLuong"
+                pEditableColumnField="soLuong"
+              >
+                <p-cellEditor>
+                  <ng-template pTemplate="input">
+                    <p-inputNumber
+                      mode="decimal"
+                      [minFractionDigits]="2"
+                      [(ngModel)]="thucDonMonAn.soLuong"
+                    >
+                    </p-inputNumber>
+                  </ng-template>
+                  <ng-template pTemplate="output">
+                    {{ thucDonMonAn.soLuong }}
+                  </ng-template>
+                </p-cellEditor>
+              </td>
+              <td>
+                <button
+                  pButton
+                  pRipple
+                  icon="pi pi-delete-left"
+                  class="p-button-rounded p-button-danger"
+                  pTooltip="Xóa"
+                  tooltipPosition="top"
+                  (click)="deleteThucDonMonAn(thucDonMonAn)"
+                ></button>
+              </td>
+            </tr>
+          </ng-template>
+        </p-table>
+      </div>
+    </div>
+  </ng-template>
+
+  <ng-template pTemplate="footer">
+    <button
+      pButton
+      pRipple
+      label="Hủy"
+      icon="pi pi-times"
+      class="p-button-text"
+      (click)="hideDialog()"
+      pTooltip="Hủy"
+      tooltipPosition="top"
+    ></button>
+    <button
+      pButton
+      pRipple
+      label="Lưu"
+      icon="pi pi-check"
+      class="p-button-text"
+      (click)="saveThucDon()"
+      pTooltip="Lưu"
+      tooltipPosition="top"
+    ></button>
+  </ng-template>
+</p-dialog>
+
+<p-confirmDialog [style]="{ width: '450px' }"></p-confirmDialog>

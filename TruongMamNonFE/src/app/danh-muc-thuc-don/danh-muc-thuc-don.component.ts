@@ -43,10 +43,6 @@ export class DanhMucThucDonComponent implements OnInit {
         tenDanhMuc: table.tenDanhMuc,
         ghiChu: table.ghiChu,
         thoiGian: table.thoiGian,
-        nangLuong: table.nangLuong,
-        chatDam: table.chatDam,
-        chatBeo: table.chatBeo,
-        chatBot: table.chatBot,
       });
     });
     this.exportService.exportExcel(exportData, 'DanhMucThucDon');
@@ -59,10 +55,6 @@ export class DanhMucThucDonComponent implements OnInit {
         tenDanhMuc: table.tenDanhMuc,
         ghiChu: table.ghiChu,
         thoiGian: table.thoiGian,
-        nangLuong: table.nangLuong,
-        chatDam: table.chatDam,
-        chatBeo: table.chatBeo,
-        chatBot: table.chatBot,
       });
     });
     this.exportService.exportPdf(
@@ -153,7 +145,7 @@ export class DanhMucThucDonComponent implements OnInit {
     this.submitted = true;
     console.log('saveDanhMucThucDon: ', this.danhMucThucDon);
     if (this.danhMucThucDon.maDanhMuc === 0) {
-      this.dataService.postDanhMucThucDon(this.danhMucThucDon).subscribe(
+      this.dataService.addDanhMucThucDon(this.danhMucThucDon).subscribe(
         (data) => {
           console.log('return data = ', data);
           this.danhMucThucDons.push(data);
@@ -167,7 +159,10 @@ export class DanhMucThucDonComponent implements OnInit {
     } else {
       console.log('ma', this.danhMucThucDon.maDanhMuc);
       this.dataService
-        .putDanhMucThucDon(this.danhMucThucDon.maDanhMuc, this.danhMucThucDon)
+        .updateDanhMucThucDon(
+          this.danhMucThucDon.maDanhMuc,
+          this.danhMucThucDon
+        )
         .subscribe(
           (data) => {
             console.log('return data = ', data);

@@ -10,7 +10,7 @@ import { TrangThaiLamViec } from './trang-thai-lam-viec.model';
 import { TrangThaiTaiKhoan } from './trang-thai-tai-khoan.model';
 
 export interface NhanSu {
-  maNhanSu: string;
+  maNhanSu: number;
   ho: string;
   ten: string;
   maGioiTinh: string;

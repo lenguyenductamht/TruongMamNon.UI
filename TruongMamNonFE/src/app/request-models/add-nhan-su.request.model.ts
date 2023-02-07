@@ -1,5 +1,4 @@
 export interface AddNhanSuRequest {
-  maNhanSu: string;
   ho: string;
   ten: string;
   maGioiTinh: string;

@@ -6,9 +6,5 @@ export interface ThucPham {
   donViTinh: string;
   tonKho: number;
   maDanhMuc: number;
-  nangLuong: number;
-  chatDam: number;
-  chatBeo: number;
-  chatBot: number;
   danhMucThucPham: DanhMucThucPham;
 }

@@ -154,6 +154,14 @@ export class MenuBarComponent implements OnInit {
           {
             label: 'Sức khỏe',
             items: [
+              {
+                label: 'Đợt khám sức khỏe',
+                routerLink: ['/DotKhamSucKhoe'],
+              },
+              {
+                label: 'Phiếu khám sức khỏe',
+                routerLink: ['/PhieuKhamSucKhoe'],
+              },
               { label: 'Theo dõi sức khỏe mầm non' },
               { label: 'Nhật ký sức khỏe' },
               { label: 'Thống kê theo dõi sức khỏe mầm non' },
@@ -210,7 +218,7 @@ export class MenuBarComponent implements OnInit {
                 routerLink: ['/DotUongVitamin'],
               },
               {
-                label: 'Phiếu sổ giun',
+                label: 'Phiếu uống vitamin',
                 routerLink: ['/PhieuUongVitamin'],
               },
             ],
@@ -269,8 +277,14 @@ export class MenuBarComponent implements OnInit {
                 // command:()=>this.router.navigate(['/DanhMucThucDon']),
                 routerLink: ['/DanhMucThucDon'],
               },
-              { label: 'Danh mục món ăn' },
-              { label: 'Thực đơn mầm non' },
+              {
+                label: 'Danh mục món ăn',
+                routerLink: ['/MonAn'],
+              },
+              {
+                label: 'Thực đơn mầm non',
+                routerLink: ['/ThucDon'],
+              },
             ],
           },
         ],

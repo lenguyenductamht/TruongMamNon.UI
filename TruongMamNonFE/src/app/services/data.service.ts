@@ -51,6 +51,34 @@ import { ChiTietPhieuXuatThucPham } from '../models/chi-tiet-phieu-xuat-thuc-pha
 import { AddChiTietPhieuXuatThucPhamRequest } from '../request-models/add-chi-tiet-phieu-xuat-thuc-pham.request.model';
 import { UpdateChiTietPhieuXuatThucPhamRequest } from '../request-models/update-chi-tiet-phieu-xuat-thuc-pham.request.model';
 import { AUThucPhamRequest } from '../request-models/au-thuc-pham.request.model';
+import { AUChucVuRequest } from '../request-models/au-chuc-vu.request.model';
+import { AUThuocSoGiunRequest } from '../request-models/au-thuoc-so-giun.request.model';
+import { AUVitaminRequest } from '../request-models/au-vitamin.request.model';
+import { DotSoGiun } from '../models/dot-so-giun.model';
+import { AUDotSoGiunRequest } from '../request-models/au-dot-so-giun.request.model';
+import { DotUongVitamin } from '../models/dot-uong-vitamin.model';
+import { AUDotUongVitaminRequest } from '../request-models/au-dot-uong-vitamin.request.model';
+import { DotKhamSucKhoe } from '../models/dot-kham-suc-khoe.model';
+import { AUDotKhamSucKhoeRequest } from '../request-models/au-dot-kham-suc-khoe.request.model';
+import { PhieuSoGiun } from '../models/phieu-so-giun.model';
+import { AUPhieuSoGiunRequest } from '../request-models/au-phieu-so-giun.request.model';
+import { PhieuUongVitamin } from '../models/phieu-uong-vitamin.model';
+import { AUPhieuUongVitaminRequest } from '../request-models/au-phieu-uong-vitamin.request.model';
+import { PhieuKhamSucKhoe } from '../models/phieu-kham-suc-khoe.model';
+import { AUPhieuKhamSucKhoeRequest } from '../request-models/au-phieu-kham-suc-khoe.request.model';
+import { AUDanhMucThucDonRequest } from '../request-models/au-danh-muc-thuc-don.request.model';
+import { MonAn } from '../models/mon-an.model';
+import { AddMonAnRequest } from '../request-models/add-mon-an.request.model';
+import { UpdateMonAnRequest } from '../request-models/update-mon-an.request.model';
+import { MonAnThucPham } from '../models/mon-an-thuc-pham.model';
+import { AddMonAnThucPhamRequest } from '../request-models/add-mon-an-thuc-pham.request.model';
+import { UpdateMonAnThucPhamRequest } from '../request-models/update-mon-an-thuc-pham.request.model';
+import { ThucDon } from '../models/thuc-don.model';
+import { AddThucDonRequest } from '../request-models/add-thuc-don.request.model';
+import { UpdateThucDonRequest } from '../request-models/update-thuc-don.request.model';
+import { ThucDonMonAn } from '../models/thuc-don-mon-an.model';
+import { AddThucDonMonAnRequest } from '../request-models/add-thuc-don-mon-an.request.model';
+import { UpdateThucDonMonAnRequest } from '../request-models/update-thuc-don-mon-an.request.model';
 
 @Injectable({
   providedIn: 'root',
@@ -275,42 +303,6 @@ export class DataService {
 
   //#endregion
 
-  //#region Danh mục thực đơn
-  public newDanhMucThucDon: DanhMucThucDon = {
-    maDanhMuc: 0,
-    tenDanhMuc: '',
-    ghiChu: '',
-    thoiGian: '',
-    nangLuong: 0,
-    chatDam: 0,
-    chatBeo: 0,
-    chatBot: 0,
-  };
-
-  public getDanhMucThucDons(): Observable<DanhMucThucDon[]> {
-    const url = `${this.REST_API_SERVER}/DanhMucThucDons`;
-    return this.httpClient.get<DanhMucThucDon[]>(url, this.httpOptions);
-  }
-
-  public postDanhMucThucDon(data: DanhMucThucDon): Observable<DanhMucThucDon> {
-    const url = `${this.REST_API_SERVER}/DanhMucThucDons`;
-    return this.httpClient.post<DanhMucThucDon>(url, data, this.httpOptions);
-  }
-
-  public putDanhMucThucDon(
-    ma: number,
-    data: DanhMucThucDon
-  ): Observable<DanhMucThucDon> {
-    const url = `${this.REST_API_SERVER}/DanhMucThucDons/${ma}`;
-    return this.httpClient.put<DanhMucThucDon>(url, data, this.httpOptions);
-  }
-
-  public deleteDanhMucThucDon(ma: number): Observable<DanhMucThucDon> {
-    const url = `${this.REST_API_SERVER}/DanhMucThucDons/${ma}`;
-    return this.httpClient.delete<DanhMucThucDon>(url, this.httpOptions);
-  }
-  //#endregion
-
   //#region Niên học
   getNienHocs(): Observable<NienHoc[]> {
     return this.httpClient.get<NienHoc[]>(this.baseApiUrl + '/NienHocs');
@@ -440,9 +432,9 @@ export class DataService {
   }
   //#endregion
 
-  //#region hoc sinh
+  //#region Hoc sinh
   public newHocSinh: HocSinh = {
-    maHocSinh: '',
+    maHocSinh: 0,
     ho: '',
     ten: '',
     maGioiTinh: '',
@@ -497,7 +489,6 @@ export class DataService {
 
   addHocSinh(hocSinhRequest: HocSinh): Observable<HocSinh> {
     const addHocSinhRequest: AddHocSinhRequest = {
-      maHocSinh: hocSinhRequest.maHocSinh,
       ho: hocSinhRequest.ho,
       ten: hocSinhRequest.ten,
       maGioiTinh: hocSinhRequest.maGioiTinh,
@@ -533,7 +524,7 @@ export class DataService {
     );
   }
   updateHocSinh(
-    maHocSinh: string,
+    maHocSinh: number,
     hocSinhRequest: HocSinh
   ): Observable<HocSinh> {
     const updatetHocSinhRequest: UpdateHocSinhRequest = {
@@ -570,69 +561,42 @@ export class DataService {
     );
   }
 
-  deleteHocSinh(maHocSinh: string): Observable<HocSinh> {
+  deleteHocSinh(maHocSinh: number): Observable<HocSinh> {
     return this.httpClient.delete<HocSinh>(
       this.baseApiUrl + '/HocSinhs/' + maHocSinh
     );
   }
   //#endregion
 
-  //#region Thuoc so giun
-  public newThuocSoGiun: ThuocSoGiun = {
-    maThuocSoGiun: 0,
-    tenThuocSoGiun: '',
-    ghiChu: '',
-  };
-  public getThuocSoGiuns(): Observable<ThuocSoGiun[]> {
-    const url = `${this.REST_API_SERVER}/ThuocSoGiuns`;
-    return this.httpClient.get<ThuocSoGiun[]>(url, this.httpOptions);
-  }
+  // //#region Thuoc so giun
+  // public newThuocSoGiun: ThuocSoGiun = {
+  //   maThuocSoGiun: 0,
+  //   tenThuocSoGiun: '',
+  //   ghiChu: '',
+  // };
+  // public getThuocSoGiuns(): Observable<ThuocSoGiun[]> {
+  //   const url = `${this.REST_API_SERVER}/ThuocSoGiuns`;
+  //   return this.httpClient.get<ThuocSoGiun[]>(url, this.httpOptions);
+  // }
 
-  public postThuocSoGiun(data: ThuocSoGiun): Observable<ThuocSoGiun> {
-    const url = `${this.REST_API_SERVER}/ThuocSoGiuns`;
-    return this.httpClient.post<ThuocSoGiun>(url, data, this.httpOptions);
-  }
+  // public postThuocSoGiun(data: ThuocSoGiun): Observable<ThuocSoGiun> {
+  //   const url = `${this.REST_API_SERVER}/ThuocSoGiuns`;
+  //   return this.httpClient.post<ThuocSoGiun>(url, data, this.httpOptions);
+  // }
 
-  public putThuocSoGiun(
-    ma: number,
-    data: ThuocSoGiun
-  ): Observable<ThuocSoGiun> {
-    const url = `${this.REST_API_SERVER}/ThuocSoGiuns/${ma}`;
-    return this.httpClient.put<ThuocSoGiun>(url, data, this.httpOptions);
-  }
+  // public putThuocSoGiun(
+  //   ma: number,
+  //   data: ThuocSoGiun
+  // ): Observable<ThuocSoGiun> {
+  //   const url = `${this.REST_API_SERVER}/ThuocSoGiuns/${ma}`;
+  //   return this.httpClient.put<ThuocSoGiun>(url, data, this.httpOptions);
+  // }
 
-  public deleteThuocSoGiun(ma: number): Observable<ThuocSoGiun> {
-    const url = `${this.REST_API_SERVER}/ThuocSoGiuns/${ma}`;
-    return this.httpClient.delete<ThuocSoGiun>(url, this.httpOptions);
-  }
-  //#endregion
-
-  //#region Vitamin
-  public newVitamin: Vitamin = {
-    maVitamin: 0,
-    tenVitamin: '',
-    ghiChu: '',
-  };
-  public getVitamins(): Observable<Vitamin[]> {
-    const url = `${this.REST_API_SERVER}/Vitamins`;
-    return this.httpClient.get<Vitamin[]>(url, this.httpOptions);
-  }
-
-  public postVitamin(data: Vitamin): Observable<Vitamin> {
-    const url = `${this.REST_API_SERVER}/Vitamins`;
-    return this.httpClient.post<Vitamin>(url, data, this.httpOptions);
-  }
-
-  public putVitamin(ma: number, data: Vitamin): Observable<Vitamin> {
-    const url = `${this.REST_API_SERVER}/Vitamins/${ma}`;
-    return this.httpClient.put<Vitamin>(url, data, this.httpOptions);
-  }
-
-  public deleteVitamin(ma: number): Observable<Vitamin> {
-    const url = `${this.REST_API_SERVER}/Vitamins/${ma}`;
-    return this.httpClient.delete<Vitamin>(url, this.httpOptions);
-  }
-  //#endregion
+  // public deleteThuocSoGiun(ma: number): Observable<ThuocSoGiun> {
+  //   const url = `${this.REST_API_SERVER}/ThuocSoGiuns/${ma}`;
+  //   return this.httpClient.delete<ThuocSoGiun>(url, this.httpOptions);
+  // }
+  // //#endregion
 
   //#region Loai nhan su
   public newLoaiNhanSu: LoaiNhanSu = {
@@ -669,35 +633,53 @@ export class DataService {
     maLoaiNhanSu: 0,
     loaiNhanSu: this.newLoaiNhanSu,
   };
-  public getChucVus(maLoaiNhanSu: number): Observable<ChucVu[]> {
-    const url = `${this.REST_API_SERVER}/ChucVus/LoaiNhanSu/${maLoaiNhanSu}`;
-    return this.httpClient.get<ChucVu[]>(url, this.httpOptions);
+  getChucVus(): Observable<ChucVu[]> {
+    return this.httpClient.get<ChucVu[]>(this.baseApiUrl + '/ChucVus');
   }
 
-  public getAllChucVus(): Observable<ChucVu[]> {
-    const url = `${this.REST_API_SERVER}/ChucVus`;
-    return this.httpClient.get<ChucVu[]>(url, this.httpOptions);
+  getChucVusByLoaiNhanSu(maLoaiNhanSu: number): Observable<ChucVu[]> {
+    return this.httpClient.get<ChucVu[]>(
+      this.baseApiUrl + '/ChucVus/LoaiNhanSu/' + maLoaiNhanSu
+    );
   }
 
-  public postChucVu(data: ChucVu): Observable<ChucVu> {
-    const url = `${this.REST_API_SERVER}/ChucVus`;
-    return this.httpClient.post<ChucVu>(url, data, this.httpOptions);
+  updateChucVu(maChucVu: number, chucVuRequest: ChucVu): Observable<ChucVu> {
+    const updateChucVutRequest: AUChucVuRequest = {
+      tenChucVu: chucVuRequest.tenChucVu,
+      ghiChu: chucVuRequest.ghiChu,
+      maLoaiNhanSu: chucVuRequest.maLoaiNhanSu,
+    };
+
+    return this.httpClient.put<ChucVu>(
+      this.baseApiUrl + '/ChucVus/' + maChucVu,
+      updateChucVutRequest
+    );
   }
 
-  public putChucVu(ma: number, data: ChucVu): Observable<ChucVu> {
-    const url = `${this.REST_API_SERVER}/ChucVus/${ma}`;
-    return this.httpClient.put<ChucVu>(url, data, this.httpOptions);
+  deleteChucVu(maChucVu: number): Observable<ChucVu> {
+    return this.httpClient.delete<ChucVu>(
+      this.baseApiUrl + '/ChucVus/' + maChucVu
+    );
   }
 
-  public deleteChucVu(ma: number): Observable<ChucVu> {
-    const url = `${this.REST_API_SERVER}/ChucVus/${ma}`;
-    return this.httpClient.delete<ChucVu>(url, this.httpOptions);
+  addChucVu(chucVuRequest: ChucVu): Observable<ChucVu> {
+    const addChucVuRequest: AUChucVuRequest = {
+      tenChucVu: chucVuRequest.tenChucVu,
+      ghiChu: chucVuRequest.ghiChu,
+      maLoaiNhanSu: chucVuRequest.maLoaiNhanSu,
+    };
+
+    return this.httpClient.post<ChucVu>(
+      this.baseApiUrl + '/ChucVus',
+      addChucVuRequest
+    );
   }
+
   //#endregion
 
   //#region Nhan su
   public newNhanSu: NhanSu = {
-    maNhanSu: '',
+    maNhanSu: 0,
     ho: '',
     ten: '',
     maGioiTinh: '',
@@ -740,7 +722,6 @@ export class DataService {
 
   addNhanSu(nhanSuRequest: NhanSu): Observable<NhanSu> {
     const addNhanSuRequest: AddNhanSuRequest = {
-      maNhanSu: nhanSuRequest.maNhanSu,
       ho: nhanSuRequest.ho,
       ten: nhanSuRequest.ten,
       maGioiTinh: nhanSuRequest.maGioiTinh,
@@ -772,7 +753,7 @@ export class DataService {
       addNhanSuRequest
     );
   }
-  updateNhanSu(maNhanSu: string, nhanSuRequest: NhanSu): Observable<NhanSu> {
+  updateNhanSu(maNhanSu: number, nhanSuRequest: NhanSu): Observable<NhanSu> {
     const updateNhanSuRequest: UpdateNhanSuRequest = {
       ho: nhanSuRequest.ho,
       ten: nhanSuRequest.ten,
@@ -804,7 +785,7 @@ export class DataService {
     );
   }
 
-  deleteNhanSu(maNhanSu: string): Observable<NhanSu> {
+  deleteNhanSu(maNhanSu: number): Observable<NhanSu> {
     return this.httpClient.delete<NhanSu>(
       this.baseApiUrl + '/NhanSus/' + maNhanSu
     );
@@ -812,7 +793,7 @@ export class DataService {
   //#endregion
 
   //#region Vaccine
-  public newVaccine: Vaccine = {
+  newVaccine: Vaccine = {
     maVaccine: 0,
     tenVaccine: '',
     ghiChu: '',
@@ -851,6 +832,96 @@ export class DataService {
     return this.httpClient.post<Vaccine>(
       this.baseApiUrl + '/Vaccines',
       addVaccineRequest
+    );
+  }
+  //#endregion
+
+  //#region Thuoc so giun
+  newThuocSoGiun: ThuocSoGiun = {
+    maThuocSoGiun: 0,
+    tenThuocSoGiun: '',
+    ghiChu: '',
+  };
+  getThuocSoGiuns(): Observable<ThuocSoGiun[]> {
+    return this.httpClient.get<ThuocSoGiun[]>(
+      this.baseApiUrl + '/ThuocSoGiuns'
+    );
+  }
+
+  updateThuocSoGiun(
+    maThuocSoGiun: number,
+    thuocSoGiunRequest: ThuocSoGiun
+  ): Observable<ThuocSoGiun> {
+    const updateThuocSoGiunRequest: AUThuocSoGiunRequest = {
+      tenThuocSoGiun: thuocSoGiunRequest.tenThuocSoGiun,
+      ghiChu: thuocSoGiunRequest.ghiChu,
+    };
+
+    return this.httpClient.put<ThuocSoGiun>(
+      this.baseApiUrl + '/ThuocSoGiuns/' + maThuocSoGiun,
+      updateThuocSoGiunRequest
+    );
+  }
+
+  deleteThuocSoGiun(maThuocSoGiun: number): Observable<ThuocSoGiun> {
+    return this.httpClient.delete<ThuocSoGiun>(
+      this.baseApiUrl + '/ThuocSoGiuns/' + maThuocSoGiun
+    );
+  }
+
+  addThuocSoGiun(thuocSoGiunRequest: ThuocSoGiun): Observable<ThuocSoGiun> {
+    const addThuocSoGiunRequest: AUThuocSoGiunRequest = {
+      tenThuocSoGiun: thuocSoGiunRequest.tenThuocSoGiun,
+      ghiChu: thuocSoGiunRequest.ghiChu,
+    };
+
+    return this.httpClient.post<ThuocSoGiun>(
+      this.baseApiUrl + '/ThuocSoGiuns',
+      addThuocSoGiunRequest
+    );
+  }
+  //#endregion
+
+  //#region Vitamin
+  newVitamin: Vitamin = {
+    maVitamin: 0,
+    tenVitamin: '',
+    ghiChu: '',
+  };
+  getVitamins(): Observable<Vitamin[]> {
+    return this.httpClient.get<Vitamin[]>(this.baseApiUrl + '/Vitamins');
+  }
+
+  updateVitamin(
+    maVitamin: number,
+    vitaminRequest: Vitamin
+  ): Observable<Vitamin> {
+    const updateVitaminRequest: AUVitaminRequest = {
+      tenVitamin: vitaminRequest.tenVitamin,
+      ghiChu: vitaminRequest.ghiChu,
+    };
+
+    return this.httpClient.put<Vitamin>(
+      this.baseApiUrl + '/Vitamins/' + maVitamin,
+      updateVitaminRequest
+    );
+  }
+
+  deleteVitamin(maVitamin: number): Observable<Vitamin> {
+    return this.httpClient.delete<Vitamin>(
+      this.baseApiUrl + '/Vitamins/' + maVitamin
+    );
+  }
+
+  addVitamin(vitaminRequest: Vitamin): Observable<Vitamin> {
+    const addVitaminRequest: AUVitaminRequest = {
+      tenVitamin: vitaminRequest.tenVitamin,
+      ghiChu: vitaminRequest.ghiChu,
+    };
+
+    return this.httpClient.post<Vitamin>(
+      this.baseApiUrl + '/Vitamins',
+      addVitaminRequest
     );
   }
   //#endregion
@@ -917,11 +988,189 @@ export class DataService {
   }
   //#endregion
 
-  //#region phieu tiem vaccine
+  //#region Dot so giun
+  public newDotSoGiun: DotSoGiun = {
+    maDotSoGiun: 0,
+    tenDotSoGiun: '',
+    ngaySoGiun: new Date(),
+    maThuocSoGiun: 0,
+    maNienHoc: 0,
+    thuocSoGiun: this.newThuocSoGiun,
+    nienHoc: this.newNienHoc,
+  };
+  getDotSoGiuns(): Observable<DotSoGiun[]> {
+    return this.httpClient.get<DotSoGiun[]>(this.baseApiUrl + '/DotSoGiuns');
+  }
+
+  getDotSoGiunsByNienHoc(maNienHoc: number): Observable<DotSoGiun[]> {
+    return this.httpClient.get<DotSoGiun[]>(
+      this.baseApiUrl + '/DotSoGiuns/NienHoc/' + maNienHoc
+    );
+  }
+
+  updateDotSoGiun(
+    maDotSoGiun: number,
+    dotSoGiunRequest: DotSoGiun
+  ): Observable<DotSoGiun> {
+    const updateDotSoGiunRequest: AUDotSoGiunRequest = {
+      tenDotSoGiun: dotSoGiunRequest.tenDotSoGiun,
+      ngaySoGiun: dotSoGiunRequest.ngaySoGiun,
+      maThuocSoGiun: dotSoGiunRequest.maThuocSoGiun,
+      maNienHoc: dotSoGiunRequest.maNienHoc,
+    };
+
+    return this.httpClient.put<DotSoGiun>(
+      this.baseApiUrl + '/DotSoGiuns/' + maDotSoGiun,
+      updateDotSoGiunRequest
+    );
+  }
+
+  deleteDotSoGiun(maDotSoGiun: number): Observable<DotSoGiun> {
+    return this.httpClient.delete<DotSoGiun>(
+      this.baseApiUrl + '/DotSoGiuns/' + maDotSoGiun
+    );
+  }
+
+  addDotSoGiun(dotSoGiunRequest: DotSoGiun): Observable<DotSoGiun> {
+    const addDotSoGiunRequest: AUDotSoGiunRequest = {
+      tenDotSoGiun: dotSoGiunRequest.tenDotSoGiun,
+      ngaySoGiun: dotSoGiunRequest.ngaySoGiun,
+      maThuocSoGiun: dotSoGiunRequest.maThuocSoGiun,
+      maNienHoc: dotSoGiunRequest.maNienHoc,
+    };
+
+    return this.httpClient.post<DotSoGiun>(
+      this.baseApiUrl + '/DotSoGiuns',
+      addDotSoGiunRequest
+    );
+  }
+  //#endregion
+
+  //#region Dot uong vitamin
+  public newDotUongVitamin: DotUongVitamin = {
+    maDotUongVitamin: 0,
+    tenDotUongVitamin: '',
+    ngayUongVitamin: new Date(),
+    maVitamin: 0,
+    maNienHoc: 0,
+    vitamin: this.newVitamin,
+    nienHoc: this.newNienHoc,
+  };
+  getDotUongVitamins(): Observable<DotUongVitamin[]> {
+    return this.httpClient.get<DotUongVitamin[]>(
+      this.baseApiUrl + '/DotUongVitamins'
+    );
+  }
+
+  getDotUongVitaminsByNienHoc(maNienHoc: number): Observable<DotUongVitamin[]> {
+    return this.httpClient.get<DotUongVitamin[]>(
+      this.baseApiUrl + '/DotUongVitamins/NienHoc/' + maNienHoc
+    );
+  }
+
+  updateDotUongVitamin(
+    maDotUongVitamin: number,
+    dotUongVitaminRequest: DotUongVitamin
+  ): Observable<DotUongVitamin> {
+    const updateDotUongVitaminRequest: AUDotUongVitaminRequest = {
+      tenDotUongVitamin: dotUongVitaminRequest.tenDotUongVitamin,
+      ngayUongVitamin: dotUongVitaminRequest.ngayUongVitamin,
+      maVitamin: dotUongVitaminRequest.maVitamin,
+      maNienHoc: dotUongVitaminRequest.maNienHoc,
+    };
+
+    return this.httpClient.put<DotUongVitamin>(
+      this.baseApiUrl + '/DotUongVitamins/' + maDotUongVitamin,
+      updateDotUongVitaminRequest
+    );
+  }
+
+  deleteDotUongVitamin(maDotUongVitamin: number): Observable<DotUongVitamin> {
+    return this.httpClient.delete<DotUongVitamin>(
+      this.baseApiUrl + '/DotUongVitamins/' + maDotUongVitamin
+    );
+  }
+
+  addDotUongVitamin(
+    dotUongVitaminRequest: DotUongVitamin
+  ): Observable<DotUongVitamin> {
+    const addDotUongVitaminRequest: AUDotUongVitaminRequest = {
+      tenDotUongVitamin: dotUongVitaminRequest.tenDotUongVitamin,
+      ngayUongVitamin: dotUongVitaminRequest.ngayUongVitamin,
+      maVitamin: dotUongVitaminRequest.maVitamin,
+      maNienHoc: dotUongVitaminRequest.maNienHoc,
+    };
+
+    return this.httpClient.post<DotUongVitamin>(
+      this.baseApiUrl + '/DotUongVitamins',
+      addDotUongVitaminRequest
+    );
+  }
+  //#endregion
+
+  //#region Dot kham suc khoe
+  public newDotKhamSucKhoe: DotKhamSucKhoe = {
+    maDotKhamSucKhoe: 0,
+    tenDotKhamSucKhoe: '',
+    ngayKhamSucKhoe: new Date(),
+    maNienHoc: 0,
+    nienHoc: this.newNienHoc,
+  };
+  getDotKhamSucKhoes(): Observable<DotKhamSucKhoe[]> {
+    return this.httpClient.get<DotKhamSucKhoe[]>(
+      this.baseApiUrl + '/DotKhamSucKhoes'
+    );
+  }
+
+  getDotKhamSucKhoesByNienHoc(maNienHoc: number): Observable<DotKhamSucKhoe[]> {
+    return this.httpClient.get<DotKhamSucKhoe[]>(
+      this.baseApiUrl + '/DotKhamSucKhoes/NienHoc/' + maNienHoc
+    );
+  }
+
+  updateDotKhamSucKhoe(
+    maDotKhamSucKhoe: number,
+    dotKhamSucKhoeRequest: DotKhamSucKhoe
+  ): Observable<DotKhamSucKhoe> {
+    const updateDotKhamSucKhoeRequest: AUDotKhamSucKhoeRequest = {
+      tenDotKhamSucKhoe: dotKhamSucKhoeRequest.tenDotKhamSucKhoe,
+      ngayKhamSucKhoe: dotKhamSucKhoeRequest.ngayKhamSucKhoe,
+      maNienHoc: dotKhamSucKhoeRequest.maNienHoc,
+    };
+
+    return this.httpClient.put<DotKhamSucKhoe>(
+      this.baseApiUrl + '/DotKhamSucKhoes/' + maDotKhamSucKhoe,
+      updateDotKhamSucKhoeRequest
+    );
+  }
+
+  deleteDotKhamSucKhoe(maDotKhamSucKhoe: number): Observable<DotKhamSucKhoe> {
+    return this.httpClient.delete<DotKhamSucKhoe>(
+      this.baseApiUrl + '/DotKhamSucKhoes/' + maDotKhamSucKhoe
+    );
+  }
+
+  addDotKhamSucKhoe(
+    dotKhamSucKhoeRequest: DotKhamSucKhoe
+  ): Observable<DotKhamSucKhoe> {
+    const addDotKhamSucKhoeRequest: AUDotKhamSucKhoeRequest = {
+      tenDotKhamSucKhoe: dotKhamSucKhoeRequest.tenDotKhamSucKhoe,
+      ngayKhamSucKhoe: dotKhamSucKhoeRequest.ngayKhamSucKhoe,
+      maNienHoc: dotKhamSucKhoeRequest.maNienHoc,
+    };
+
+    return this.httpClient.post<DotKhamSucKhoe>(
+      this.baseApiUrl + '/DotKhamSucKhoes',
+      addDotKhamSucKhoeRequest
+    );
+  }
+  //#endregion
+
+  //#region Phieu tiem vaccine
   public newPhieuTiemVaccine: PhieuTiemVaccine = {
     maPhieuTiemVaccine: 0,
     maDotTiemVaccine: 0,
-    maHocSinh: '',
+    maHocSinh: 0,
     trangThai: '',
     dotTiemVaccine: this.newDotTiemVaccine,
     hocSinh: this.newHocSinh,
@@ -980,11 +1229,272 @@ export class DataService {
   }
   //#endregion
 
+  //#region Phieu so giun
+  public newPhieuSoGiun: PhieuSoGiun = {
+    maPhieuSoGiun: 0,
+    maDotSoGiun: 0,
+    maHocSinh: 0,
+    trangThai: '',
+    dotSoGiun: this.newDotSoGiun,
+    hocSinh: this.newHocSinh,
+  };
+  getPhieuSoGiuns(): Observable<PhieuSoGiun[]> {
+    return this.httpClient.get<PhieuSoGiun[]>(
+      this.baseApiUrl + '/PhieuSoGiuns'
+    );
+  }
+
+  getPhieuSoGiunsByNienHoc(maNienHoc: number): Observable<PhieuSoGiun[]> {
+    return this.httpClient.get<PhieuSoGiun[]>(
+      this.baseApiUrl + '/PhieuSoGiuns/NienHoc/' + maNienHoc
+    );
+  }
+
+  updatePhieuSoGiun(
+    maPhieuSoGiun: number,
+    phieuSoGiunRequest: PhieuSoGiun
+  ): Observable<PhieuSoGiun> {
+    const updatePhieuSoGiunRequest: AUPhieuSoGiunRequest = {
+      maDotSoGiun: phieuSoGiunRequest.maDotSoGiun,
+      maHocSinh: phieuSoGiunRequest.maHocSinh,
+      trangThai: phieuSoGiunRequest.trangThai,
+    };
+
+    return this.httpClient.put<PhieuSoGiun>(
+      this.baseApiUrl + '/PhieuSoGiuns/' + maPhieuSoGiun,
+      updatePhieuSoGiunRequest
+    );
+  }
+
+  deletePhieuSoGiun(maPhieuSoGiun: number): Observable<PhieuSoGiun> {
+    return this.httpClient.delete<PhieuSoGiun>(
+      this.baseApiUrl + '/PhieuSoGiuns/' + maPhieuSoGiun
+    );
+  }
+
+  addPhieuSoGiun(phieuSoGiunRequest: PhieuSoGiun): Observable<PhieuSoGiun> {
+    const addPhieuSoGiunRequest: AUPhieuSoGiunRequest = {
+      maDotSoGiun: phieuSoGiunRequest.maDotSoGiun,
+      maHocSinh: phieuSoGiunRequest.maHocSinh,
+      trangThai: phieuSoGiunRequest.trangThai,
+    };
+
+    return this.httpClient.post<PhieuSoGiun>(
+      this.baseApiUrl + '/PhieuSoGiuns',
+      addPhieuSoGiunRequest
+    );
+  }
+  //#endregion
+
+  //#region Phieu uong vitamin
+  public newPhieuUongVitamin: PhieuUongVitamin = {
+    maPhieuUongVitamin: 0,
+    maDotUongVitamin: 0,
+    maHocSinh: 0,
+    trangThai: '',
+    dotUongVitamin: this.newDotUongVitamin,
+    hocSinh: this.newHocSinh,
+  };
+  getPhieuUongVitamins(): Observable<PhieuUongVitamin[]> {
+    return this.httpClient.get<PhieuUongVitamin[]>(
+      this.baseApiUrl + '/PhieuUongVitamins'
+    );
+  }
+
+  getPhieuUongVitaminsByNienHoc(
+    maNienHoc: number
+  ): Observable<PhieuUongVitamin[]> {
+    return this.httpClient.get<PhieuUongVitamin[]>(
+      this.baseApiUrl + '/PhieuUongVitamins/NienHoc/' + maNienHoc
+    );
+  }
+
+  updatePhieuUongVitamin(
+    maPhieuUongVitamin: number,
+    phieuUongVitaminRequest: PhieuUongVitamin
+  ): Observable<PhieuUongVitamin> {
+    const updatePhieuUongVitaminRequest: AUPhieuUongVitaminRequest = {
+      maDotUongVitamin: phieuUongVitaminRequest.maDotUongVitamin,
+      maHocSinh: phieuUongVitaminRequest.maHocSinh,
+      trangThai: phieuUongVitaminRequest.trangThai,
+    };
+
+    return this.httpClient.put<PhieuUongVitamin>(
+      this.baseApiUrl + '/PhieuUongVitamins/' + maPhieuUongVitamin,
+      updatePhieuUongVitaminRequest
+    );
+  }
+
+  deletePhieuUongVitamin(
+    maPhieuUongVitamin: number
+  ): Observable<PhieuUongVitamin> {
+    return this.httpClient.delete<PhieuUongVitamin>(
+      this.baseApiUrl + '/PhieuUongVitamins/' + maPhieuUongVitamin
+    );
+  }
+
+  addPhieuUongVitamin(
+    phieuUongVitaminRequest: PhieuUongVitamin
+  ): Observable<PhieuUongVitamin> {
+    const addPhieuUongVitaminRequest: AUPhieuUongVitaminRequest = {
+      maDotUongVitamin: phieuUongVitaminRequest.maDotUongVitamin,
+      maHocSinh: phieuUongVitaminRequest.maHocSinh,
+      trangThai: phieuUongVitaminRequest.trangThai,
+    };
+
+    return this.httpClient.post<PhieuUongVitamin>(
+      this.baseApiUrl + '/PhieuUongVitamins',
+      addPhieuUongVitaminRequest
+    );
+  }
+  //#endregion
+
+  //#region Phieu kham suc khoe
+  public newPhieuKhamSucKhoe: PhieuKhamSucKhoe = {
+    maPhieuKhamSucKhoe: 0,
+    maDotKhamSucKhoe: 0,
+    ketLuan: '',
+    maHocSinh: 0,
+    chieuCao: 0,
+    canNang: 0,
+    BMI: 0,
+    nhipTim: 0,
+    tamThu: 0,
+    tamTruong: 0,
+    loaiTheLuc: '',
+    tuanHoan: '',
+    hoHap: '',
+    tieuHoa: '',
+    thanTietNieu: '',
+    thanKinhTamThan: '',
+    lamSangKhac: '',
+    matPhaiKhongKinh: 0,
+    matTraiKhongKinh: 0,
+    matPhaiCoKinh: 0,
+    matTraiCoKinh: 0,
+    cacBenhVeMat: '',
+    taiTraiNoiThuong: 0,
+    taiTraiNoiTham: 0,
+    taiPhaiNoiThuong: 0,
+    taiPhaiNoiTham: 0,
+    cacBenhTaiMuiHong: '',
+    hamTren: '',
+    hamDuoi: '',
+    cacBenhRangHamMat: '',
+    dotKhamSucKhoe: this.newDotKhamSucKhoe,
+    hocSinh: this.newHocSinh,
+  };
+  getPhieuKhamSucKhoes(): Observable<PhieuKhamSucKhoe[]> {
+    return this.httpClient.get<PhieuKhamSucKhoe[]>(
+      this.baseApiUrl + '/PhieuKhamSucKhoes'
+    );
+  }
+
+  getPhieuKhamSucKhoesByNienHoc(
+    maNienHoc: number
+  ): Observable<PhieuKhamSucKhoe[]> {
+    return this.httpClient.get<PhieuKhamSucKhoe[]>(
+      this.baseApiUrl + '/PhieuKhamSucKhoes/NienHoc/' + maNienHoc
+    );
+  }
+
+  updatePhieuKhamSucKhoe(
+    maPhieuKhamSucKhoe: number,
+    phieuKhamSucKhoeRequest: PhieuKhamSucKhoe
+  ): Observable<PhieuKhamSucKhoe> {
+    const updatePhieuKhamSucKhoeRequest: AUPhieuKhamSucKhoeRequest = {
+      maDotKhamSucKhoe: phieuKhamSucKhoeRequest.maDotKhamSucKhoe,
+      ketLuan: phieuKhamSucKhoeRequest.ketLuan,
+      maHocSinh: phieuKhamSucKhoeRequest.maHocSinh,
+      chieuCao: phieuKhamSucKhoeRequest.chieuCao,
+      canNang: phieuKhamSucKhoeRequest.canNang,
+      BMI: phieuKhamSucKhoeRequest.BMI,
+      nhipTim: phieuKhamSucKhoeRequest.nhipTim,
+      tamThu: phieuKhamSucKhoeRequest.tamThu,
+      tamTruong: phieuKhamSucKhoeRequest.tamTruong,
+      loaiTheLuc: phieuKhamSucKhoeRequest.loaiTheLuc,
+      tuanHoan: phieuKhamSucKhoeRequest.tuanHoan,
+      hoHap: phieuKhamSucKhoeRequest.hoHap,
+      tieuHoa: phieuKhamSucKhoeRequest.tieuHoa,
+      thanTietNieu: phieuKhamSucKhoeRequest.thanTietNieu,
+      thanKinhTamThan: phieuKhamSucKhoeRequest.thanKinhTamThan,
+      lamSangKhac: phieuKhamSucKhoeRequest.lamSangKhac,
+      matPhaiKhongKinh: phieuKhamSucKhoeRequest.matPhaiKhongKinh,
+      matTraiKhongKinh: phieuKhamSucKhoeRequest.matTraiKhongKinh,
+      matPhaiCoKinh: phieuKhamSucKhoeRequest.matPhaiCoKinh,
+      matTraiCoKinh: phieuKhamSucKhoeRequest.matTraiCoKinh,
+      cacBenhVeMat: phieuKhamSucKhoeRequest.cacBenhVeMat,
+      taiTraiNoiThuong: phieuKhamSucKhoeRequest.taiTraiNoiThuong,
+      taiTraiNoiTham: phieuKhamSucKhoeRequest.taiTraiNoiTham,
+      taiPhaiNoiThuong: phieuKhamSucKhoeRequest.taiPhaiNoiThuong,
+      taiPhaiNoiTham: phieuKhamSucKhoeRequest.taiPhaiNoiTham,
+      cacBenhTaiMuiHong: phieuKhamSucKhoeRequest.cacBenhTaiMuiHong,
+      hamTren: phieuKhamSucKhoeRequest.hamTren,
+      hamDuoi: phieuKhamSucKhoeRequest.hamDuoi,
+      cacBenhRangHamMat: phieuKhamSucKhoeRequest.cacBenhRangHamMat,
+    };
+
+    return this.httpClient.put<PhieuKhamSucKhoe>(
+      this.baseApiUrl + '/PhieuKhamSucKhoes/' + maPhieuKhamSucKhoe,
+      updatePhieuKhamSucKhoeRequest
+    );
+  }
+
+  deletePhieuKhamSucKhoe(
+    maPhieuKhamSucKhoe: number
+  ): Observable<PhieuKhamSucKhoe> {
+    return this.httpClient.delete<PhieuKhamSucKhoe>(
+      this.baseApiUrl + '/PhieuKhamSucKhoes/' + maPhieuKhamSucKhoe
+    );
+  }
+
+  addPhieuKhamSucKhoe(
+    phieuKhamSucKhoeRequest: PhieuKhamSucKhoe
+  ): Observable<PhieuKhamSucKhoe> {
+    const addPhieuKhamSucKhoeRequest: AUPhieuKhamSucKhoeRequest = {
+      maDotKhamSucKhoe: phieuKhamSucKhoeRequest.maDotKhamSucKhoe,
+      ketLuan: phieuKhamSucKhoeRequest.ketLuan,
+      maHocSinh: phieuKhamSucKhoeRequest.maHocSinh,
+      chieuCao: phieuKhamSucKhoeRequest.chieuCao,
+      canNang: phieuKhamSucKhoeRequest.canNang,
+      BMI: phieuKhamSucKhoeRequest.BMI,
+      nhipTim: phieuKhamSucKhoeRequest.nhipTim,
+      tamThu: phieuKhamSucKhoeRequest.tamThu,
+      tamTruong: phieuKhamSucKhoeRequest.tamTruong,
+      loaiTheLuc: phieuKhamSucKhoeRequest.loaiTheLuc,
+      tuanHoan: phieuKhamSucKhoeRequest.tuanHoan,
+      hoHap: phieuKhamSucKhoeRequest.hoHap,
+      tieuHoa: phieuKhamSucKhoeRequest.tieuHoa,
+      thanTietNieu: phieuKhamSucKhoeRequest.thanTietNieu,
+      thanKinhTamThan: phieuKhamSucKhoeRequest.thanKinhTamThan,
+      lamSangKhac: phieuKhamSucKhoeRequest.lamSangKhac,
+      matPhaiKhongKinh: phieuKhamSucKhoeRequest.matPhaiKhongKinh,
+      matTraiKhongKinh: phieuKhamSucKhoeRequest.matTraiKhongKinh,
+      matPhaiCoKinh: phieuKhamSucKhoeRequest.matPhaiCoKinh,
+      matTraiCoKinh: phieuKhamSucKhoeRequest.matTraiCoKinh,
+      cacBenhVeMat: phieuKhamSucKhoeRequest.cacBenhVeMat,
+      taiTraiNoiThuong: phieuKhamSucKhoeRequest.taiTraiNoiThuong,
+      taiTraiNoiTham: phieuKhamSucKhoeRequest.taiTraiNoiTham,
+      taiPhaiNoiThuong: phieuKhamSucKhoeRequest.taiPhaiNoiThuong,
+      taiPhaiNoiTham: phieuKhamSucKhoeRequest.taiPhaiNoiTham,
+      cacBenhTaiMuiHong: phieuKhamSucKhoeRequest.cacBenhTaiMuiHong,
+      hamTren: phieuKhamSucKhoeRequest.hamTren,
+      hamDuoi: phieuKhamSucKhoeRequest.hamDuoi,
+      cacBenhRangHamMat: phieuKhamSucKhoeRequest.cacBenhRangHamMat,
+    };
+
+    return this.httpClient.post<PhieuKhamSucKhoe>(
+      this.baseApiUrl + '/PhieuKhamSucKhoes',
+      addPhieuKhamSucKhoeRequest
+    );
+  }
+  //#endregion
+
   //#region Diem danh
   newDiemDanh: DiemDanh = {
     maDiemDanh: 0,
     ngayDiemDanh: new Date(),
-    maHocSinh: '',
+    maHocSinh: 0,
     maTrangThaiDiemDanh: '',
     hocSinh: this.newHocSinh,
     trangThaiDiemDanh: this.newTrangThaiDiemDanh,
@@ -1072,10 +1582,6 @@ export class DataService {
     donViTinh: '',
     tonKho: 0,
     maDanhMuc: 0,
-    nangLuong: 0,
-    chatDam: 0,
-    chatBeo: 0,
-    chatBot: 0,
     danhMucThucPham: this.newDanhMucThucPham,
   };
 
@@ -1092,10 +1598,6 @@ export class DataService {
       donViTinh: thucPhamRequest.donViTinh,
       tonKho: thucPhamRequest.tonKho,
       maDanhMuc: thucPhamRequest.maDanhMuc,
-      nangLuong: thucPhamRequest.nangLuong,
-      chatDam: thucPhamRequest.chatDam,
-      chatBeo: thucPhamRequest.chatBeo,
-      chatBot: thucPhamRequest.chatBot,
     };
 
     return this.httpClient.put<ThucPham>(
@@ -1116,10 +1618,6 @@ export class DataService {
       donViTinh: thucPhamRequest.donViTinh,
       tonKho: thucPhamRequest.tonKho,
       maDanhMuc: thucPhamRequest.maDanhMuc,
-      nangLuong: thucPhamRequest.nangLuong,
-      chatDam: thucPhamRequest.chatDam,
-      chatBeo: thucPhamRequest.chatBeo,
-      chatBot: thucPhamRequest.chatBot,
     };
 
     return this.httpClient.post<ThucPham>(
@@ -1155,7 +1653,7 @@ export class DataService {
   newPhieuNhapThucPham: PhieuNhapThucPham = {
     maPhieuNhapThucPham: 0,
     ngayNhap: new Date(),
-    maNguoiNhap: '',
+    maNguoiNhap: 0,
     ghiChu: '',
     trangThai: '',
     nguoiNhap: this.newNhanSu,
@@ -1168,13 +1666,13 @@ export class DataService {
   }
 
   addPhieuNhapThucPham(
-    phieuNhapThucPhamRequest: PhieuNhapThucPham
+    thucDonRequest: PhieuNhapThucPham
   ): Observable<PhieuNhapThucPham> {
     const addPhieuNhapThucPham: AddPhieuNhapThucPhamRequest = {
-      ngayNhap: phieuNhapThucPhamRequest.ngayNhap,
-      maNguoiNhap: phieuNhapThucPhamRequest.maNguoiNhap,
-      ghiChu: phieuNhapThucPhamRequest.ghiChu,
-      trangThai: phieuNhapThucPhamRequest.trangThai,
+      ngayNhap: thucDonRequest.ngayNhap,
+      maNguoiNhap: thucDonRequest.maNguoiNhap,
+      ghiChu: thucDonRequest.ghiChu,
+      trangThai: thucDonRequest.trangThai,
     };
     return this.httpClient.post<PhieuNhapThucPham>(
       this.baseApiUrl + '/PhieuNhapThucPhams',
@@ -1184,13 +1682,13 @@ export class DataService {
 
   updatePhieuNhapThucPham(
     maPhieuNhapThucPham: number,
-    phieuNhapThucPhamRequest: PhieuNhapThucPham
+    thucDonRequest: PhieuNhapThucPham
   ): Observable<PhieuNhapThucPham> {
     const updatePhieuNhapThucPham: UpdatePhieuNhapThucPhamRequest = {
-      ngayNhap: phieuNhapThucPhamRequest.ngayNhap,
-      maNguoiNhap: phieuNhapThucPhamRequest.maNguoiNhap,
-      ghiChu: phieuNhapThucPhamRequest.ghiChu,
-      trangThai: phieuNhapThucPhamRequest.trangThai,
+      ngayNhap: thucDonRequest.ngayNhap,
+      maNguoiNhap: thucDonRequest.maNguoiNhap,
+      ghiChu: thucDonRequest.ghiChu,
+      trangThai: thucDonRequest.trangThai,
     };
     return this.httpClient.put<PhieuNhapThucPham>(
       this.baseApiUrl + '/PhieuNhapThucPhams/' + maPhieuNhapThucPham,
@@ -1278,7 +1776,7 @@ export class DataService {
   newPhieuXuatThucPham: PhieuXuatThucPham = {
     maPhieuXuatThucPham: 0,
     ngayXuat: new Date(),
-    maNguoiXuat: '',
+    maNguoiXuat: 0,
     ghiChu: '',
     trangThai: '',
     nguoiXuat: this.newNhanSu,
@@ -1393,6 +1891,244 @@ export class DataService {
         maPhieuXuatThucPham +
         '/' +
         maThucPham
+    );
+  }
+  //#endregion
+
+  //#region Danh muc thuc don
+  newDanhMucThucDon: DanhMucThucDon = {
+    maDanhMuc: 0,
+    tenDanhMuc: '',
+    ghiChu: '',
+    thoiGian: '',
+  };
+  getDanhMucThucDons(): Observable<DanhMucThucDon[]> {
+    return this.httpClient.get<DanhMucThucDon[]>(
+      this.baseApiUrl + '/DanhMucThucDons'
+    );
+  }
+
+  updateDanhMucThucDon(
+    maDanhMuc: number,
+    danhMucThucDonRequest: DanhMucThucDon
+  ): Observable<DanhMucThucDon> {
+    const updateDanhMucThucDonRequest: AUDanhMucThucDonRequest = {
+      tenDanhMuc: danhMucThucDonRequest.tenDanhMuc,
+      ghiChu: danhMucThucDonRequest.ghiChu,
+      thoiGian: danhMucThucDonRequest.thoiGian,
+    };
+
+    return this.httpClient.put<DanhMucThucDon>(
+      this.baseApiUrl + '/DanhMucThucDons/' + maDanhMuc,
+      updateDanhMucThucDonRequest
+    );
+  }
+
+  deleteDanhMucThucDon(maDanhMuc: number): Observable<DanhMucThucDon> {
+    return this.httpClient.delete<DanhMucThucDon>(
+      this.baseApiUrl + '/DanhMucThucDons/' + maDanhMuc
+    );
+  }
+
+  addDanhMucThucDon(
+    danhMucThucDonRequest: DanhMucThucDon
+  ): Observable<DanhMucThucDon> {
+    const addDanhMucThucDonRequest: AUDanhMucThucDonRequest = {
+      tenDanhMuc: danhMucThucDonRequest.tenDanhMuc,
+      ghiChu: danhMucThucDonRequest.ghiChu,
+      thoiGian: danhMucThucDonRequest.thoiGian,
+    };
+
+    return this.httpClient.post<DanhMucThucDon>(
+      this.baseApiUrl + '/DanhMucThucDons',
+      addDanhMucThucDonRequest
+    );
+  }
+  //#endregion
+
+  //#region Mon an
+  newMonAn: MonAn = {
+    maMonAn: 0,
+    tenMonAn: '',
+    ghiChu: '',
+  };
+
+  getMonAns(): Observable<MonAn[]> {
+    return this.httpClient.get<MonAn[]>(this.baseApiUrl + '/MonAns');
+  }
+
+  addMonAn(monAnRequest: MonAn): Observable<MonAn> {
+    const addMonAn: AddMonAnRequest = {
+      tenMonAn: monAnRequest.tenMonAn,
+      ghiChu: monAnRequest.ghiChu,
+    };
+    return this.httpClient.post<MonAn>(this.baseApiUrl + '/MonAns', addMonAn);
+  }
+
+  updateMonAn(maMonAn: number, monAnRequest: MonAn): Observable<MonAn> {
+    const updateMonAn: UpdateMonAnRequest = {
+      tenMonAn: monAnRequest.tenMonAn,
+      ghiChu: monAnRequest.ghiChu,
+    };
+    return this.httpClient.put<MonAn>(
+      this.baseApiUrl + '/MonAns/' + maMonAn,
+      updateMonAn
+    );
+  }
+
+  deleteMonAn(maMonAn: number): Observable<MonAn> {
+    return this.httpClient.delete<MonAn>(
+      this.baseApiUrl + '/MonAns/' + maMonAn
+    );
+  }
+  //#endregion
+
+  //#region Mon an thuc pham
+  newMonAnThucPham: MonAnThucPham = {
+    maMonAn: 0,
+    maThucPham: 0,
+    soLuong: 0,
+    monAn: this.newMonAn,
+    thucPham: this.newThucPham,
+  };
+
+  getMonAnThucPhamsByMonAn(maMonAn: number): Observable<MonAnThucPham[]> {
+    return this.httpClient.get<MonAnThucPham[]>(
+      this.baseApiUrl + '/MonAnThucPhams/' + maMonAn
+    );
+  }
+
+  addMonAnThucPham(
+    monAnThucPhamRequest: MonAnThucPham
+  ): Observable<MonAnThucPham> {
+    const addMonAnThucPham: AddMonAnThucPhamRequest = {
+      maMonAn: monAnThucPhamRequest.maMonAn,
+      maThucPham: monAnThucPhamRequest.maThucPham,
+      soLuong: monAnThucPhamRequest.soLuong,
+    };
+    return this.httpClient.post<MonAnThucPham>(
+      this.baseApiUrl + '/MonAnThucPhams',
+      addMonAnThucPham
+    );
+  }
+
+  updateMonAnThucPham(
+    maMonAn: number,
+    maThucPham: number,
+    monAnThucPhamRequest: MonAnThucPham
+  ): Observable<MonAnThucPham> {
+    const updateMonAnThucPham: UpdateMonAnThucPhamRequest = {
+      soLuong: monAnThucPhamRequest.soLuong,
+    };
+    return this.httpClient.put<MonAnThucPham>(
+      this.baseApiUrl + '/MonAnThucPhams/' + maMonAn + '/' + maThucPham,
+      updateMonAnThucPham
+    );
+  }
+
+  deleteMonAnThucPham(
+    maMonAn: number,
+    maThucPham: number
+  ): Observable<MonAnThucPham> {
+    return this.httpClient.delete<MonAnThucPham>(
+      this.baseApiUrl + '/MonAnThucPhams/' + maMonAn + '/' + maThucPham
+    );
+  }
+  //#endregion
+
+  //#region Thuc don
+  newThucDon: ThucDon = {
+    maThucDon: 0,
+    ngayTao: new Date(),
+    ngayApDung: new Date(),
+    maDanhMuc: 0,
+    danhMucThucDon: this.newDanhMucThucDon,
+  };
+
+  getThucDons(): Observable<ThucDon[]> {
+    return this.httpClient.get<ThucDon[]>(this.baseApiUrl + '/ThucDons');
+  }
+
+  addThucDon(thucDonRequest: ThucDon): Observable<ThucDon> {
+    const addThucDon: AddThucDonRequest = {
+      ngayTao: thucDonRequest.ngayTao,
+      ngayApDung: thucDonRequest.ngayApDung,
+      maDanhMuc: thucDonRequest.maDanhMuc,
+    };
+    return this.httpClient.post<ThucDon>(
+      this.baseApiUrl + '/ThucDons',
+      addThucDon
+    );
+  }
+
+  updateThucDon(
+    maThucDon: number,
+    thucDonRequest: ThucDon
+  ): Observable<ThucDon> {
+    const updateThucDon: UpdateThucDonRequest = {
+      ngayApDung: thucDonRequest.ngayApDung,
+      maDanhMuc: thucDonRequest.maDanhMuc,
+    };
+    return this.httpClient.put<ThucDon>(
+      this.baseApiUrl + '/ThucDons/' + maThucDon,
+      updateThucDon
+    );
+  }
+
+  deleteThucDon(maThucDon: number): Observable<ThucDon> {
+    return this.httpClient.delete<ThucDon>(
+      this.baseApiUrl + '/ThucDons/' + maThucDon
+    );
+  }
+  //#endregion
+
+  //#region Thuc don mon an
+  newThucDonMonAn: ThucDonMonAn = {
+    maThucDon: 0,
+    maMonAn: 0,
+    soLuong: 0,
+    thucDon: this.newThucDon,
+    monAn: this.newMonAn,
+  };
+
+  getThucDonMonAnsByThucDon(maThucDon: number): Observable<ThucDonMonAn[]> {
+    return this.httpClient.get<ThucDonMonAn[]>(
+      this.baseApiUrl + '/ThucDonMonAns/' + maThucDon
+    );
+  }
+
+  addThucDonMonAn(thucDonMonAnRequest: ThucDonMonAn): Observable<ThucDonMonAn> {
+    const addThucDonMonAn: AddThucDonMonAnRequest = {
+      maThucDon: thucDonMonAnRequest.maThucDon,
+      maMonAn: thucDonMonAnRequest.maMonAn,
+      soLuong: thucDonMonAnRequest.soLuong,
+    };
+    return this.httpClient.post<ThucDonMonAn>(
+      this.baseApiUrl + '/ThucDonMonAns',
+      addThucDonMonAn
+    );
+  }
+
+  updateThucDonMonAn(
+    maThucDon: number,
+    maMonAn: number,
+    thucDonMonAnRequest: ThucDonMonAn
+  ): Observable<ThucDonMonAn> {
+    const updateThucDonMonAn: UpdateThucDonMonAnRequest = {
+      soLuong: thucDonMonAnRequest.soLuong,
+    };
+    return this.httpClient.put<ThucDonMonAn>(
+      this.baseApiUrl + '/ThucDonMonAns/' + maThucDon + '/' + maMonAn,
+      updateThucDonMonAn
+    );
+  }
+
+  deleteThucDonMonAn(
+    maThucDon: number,
+    maMonAn: number,
+  ): Observable<ThucDonMonAn> {
+    return this.httpClient.delete<ThucDonMonAn>(
+      this.baseApiUrl + '/ThucDonMonAns/' + maThucDon + '/' + maMonAn
     );
   }
   //#endregion

@@ -116,18 +116,6 @@
         >
           Danh mục <p-sortIcon field="danhMucThucPham.tenDanhMuc"></p-sortIcon>
         </th>
-        <th pSortableColumn="nangLuong" style="min-width: 5rem">
-          Năng lượng <p-sortIcon field="nangLuong"></p-sortIcon>
-        </th>
-        <th pSortableColumn="chatDam" style="min-width: 5rem">
-          Chất đạm <p-sortIcon field="chatDam"></p-sortIcon>
-        </th>
-        <th pSortableColumn="chatBeo" style="min-width: 5rem">
-          Chất béo <p-sortIcon field="chatBeo"></p-sortIcon>
-        </th>
-        <th pSortableColumn="chatBot" style="min-width: 5rem">
-          Chất bột <p-sortIcon field="chatBot"></p-sortIcon>
-        </th>
         <th style="width: 8rem"></th>
       </tr>
     </ng-template>
@@ -137,10 +125,6 @@
         <td>{{ thucPham.donViTinh }}</td>
         <td>{{ thucPham.tonKho }}</td>
         <td>{{ thucPham.danhMucThucPham.tenDanhMuc }}</td>
-        <td>{{ thucPham.nangLuong }}</td>
-        <td>{{ thucPham.chatDam }}</td>
-        <td>{{ thucPham.chatBeo }}</td>
-        <td>{{ thucPham.chatBot }}</td>
         <td>
           <button
             pButton
@@ -257,65 +241,6 @@
           >
           <small class="p-error" *ngIf="submitted && thucPham.maDanhMuc === 0"
             >Chưa chọn danh mục thực phẩm</small
-          >
-        </span>
-      </div>
-
-      <div class="field col-12 md:col-6">
-        <span class="p-float-label">
-          <p-inputNumber
-            mode="decimal"
-            [minFractionDigits]="2"
-            [(ngModel)]="thucPham.nangLuong"
-          ></p-inputNumber>
-
-          <label for="nangLuong" class="required-field">Năng lượng</label>
-          <small class="p-error" *ngIf="submitted && thucPham.tonKho < 0"
-            >Năng lượng không hợp lệ</small
-          >
-        </span>
-      </div>
-
-      <div class="field col-12 md:col-6">
-        <span class="p-float-label">
-          <p-inputNumber
-            mode="decimal"
-            [minFractionDigits]="2"
-            [(ngModel)]="thucPham.chatDam"
-          ></p-inputNumber>
-
-          <label for="chatDam" class="required-field">Chất đạm</label>
-          <small class="p-error" *ngIf="submitted && thucPham.chatDam < 0"
-            >Chất đạm không hợp lệ</small
-          >
-        </span>
-      </div>
-
-      <div class="field col-12 md:col-6">
-        <span class="p-float-label">
-          <p-inputNumber
-            mode="decimal"
-            [minFractionDigits]="2"
-            [(ngModel)]="thucPham.chatBeo"
-          ></p-inputNumber>
-
-          <label for="chatBeo" class="required-field">Chất béo</label>
-          <small class="p-error" *ngIf="submitted && thucPham.chatBeo < 0"
-            >Chất béo không hợp lệ</small
-          >
-        </span>
-      </div>
-
-      <div class="field col-12 md:col-6">
-        <span class="p-float-label">
-          <p-inputNumber
-            mode="decimal"
-            [minFractionDigits]="2"
-            [(ngModel)]="thucPham.chatBot"
-          ></p-inputNumber>
-          <label for="chatBot" class="required-field">Chất bột</label>
-          <small class="p-error" *ngIf="submitted && thucPham.chatBot < 0"
-            >Chất bột không hợp lệ</small
           >
         </span>
       </div>
