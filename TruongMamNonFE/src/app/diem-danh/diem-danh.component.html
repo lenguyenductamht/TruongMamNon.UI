@@ -32,16 +32,6 @@
     </ng-template>
 
     <ng-template pTemplate="right">
-      <p-fileUpload
-        mode="basic"
-        accept="image/*"
-        [maxFileSize]="1000000"
-        chooseLabel="Nhập file"
-        pTooltip="Nhập file"
-        tooltipPosition="bottom"
-        class="p-mr-2 p-d-inline-block mr-2"
-      ></p-fileUpload>
-
       <button
         type="button"
         pButton
@@ -185,14 +175,8 @@
         <th pSortableColumn="hocSinh.ten" style="min-width: 5rem">
           Tên <p-sortIcon field="hocSinh.ten"></p-sortIcon>
         </th>
-        <th pSortableColumn="hocSinh.gioiTinh" style="min-width: 10rem">
-          Giới tính <p-sortIcon field="hocSinh.gioiTinh"></p-sortIcon>
-        </th>
         <th pSortableColumn="hocSinh.ngaySinh" style="min-width: 10rem">
           Ngày sinh <p-sortIcon field="hocSinh.ngaySinh"></p-sortIcon>
-        </th>
-        <th pSortableColumn="hocSinh.lopHoc.tenLopHoc" style="min-width: 10rem">
-          Lớp học <p-sortIcon field="hocSinh.lopHoc.tenLopHoc"></p-sortIcon>
         </th>
         <th pSortableColumn="ngayDiemDanh" style="min-width: 10rem">
           Ngày nghỉ <p-sortIcon field="ngayDiemDanh"></p-sortIcon>
@@ -212,11 +196,7 @@
         <td>{{ diemDanh.maHocSinh }}</td>
         <td>{{ diemDanh.hocSinh?.ho }}</td>
         <td>{{ diemDanh.hocSinh?.ten }}</td>
-        <td>{{ diemDanh.hocSinh?.gioiTinh?.tenGioiTinh }}</td>
         <td>{{ diemDanh.hocSinh?.ngaySinh | date : "dd/MM/yyyy" }}</td>
-        <td>
-          {{ diemDanh.hocSinh?.lopHoc ? diemDanh.hocSinh.lopHoc.tenLop : "" }}
-        </td>
         <td>
           {{ diemDanh.ngayDiemDanh | date : "dd/MM/yyyy" }}
         </td>

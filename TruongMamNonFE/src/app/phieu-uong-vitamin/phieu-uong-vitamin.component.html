@@ -32,16 +32,6 @@
     </ng-template>
 
     <ng-template pTemplate="right">
-      <p-fileUpload
-        mode="basic"
-        accept="image/*"
-        [maxFileSize]="1000000"
-        chooseLabel="Nhập file"
-        pTooltip="Nhập file"
-        tooltipPosition="bottom"
-        class="p-mr-2 p-d-inline-block mr-2"
-      ></p-fileUpload>
-
       <button
         type="button"
         pButton
@@ -86,18 +76,6 @@
       <div class="flex align-items-center justify-content-between mt-3">
         <h3 class="m-0">Danh sách phiếu uống vitamin</h3>
         <div class="flex">
-          <!-- <span class="p-float-label mr-2">
-            <p-dropdown
-              inputId="filterLoaiNhanSu"
-              [options]="loaiNhanSus"
-              [(ngModel)]="filterSelectedLoaiNhanSu"
-              optionLabel="tenLoaiNhanSu"
-              placeholder="Chọn loại nhân sự"
-              [showClear]="true"
-              (onChange)="onFilterLoaiNhanSuChange($event.value)"
-            ></p-dropdown>
-            <label for="filterLoaiNhanSu">Loại nhân sự</label>
-          </span> -->
           <span class="p-input-icon-left">
             <i class="pi pi-search"></i>
             <input
@@ -125,9 +103,6 @@
         <th pSortableColumn="hocSinh.ten" style="min-width: 5rem">
           Tên <p-sortIcon field="hocSinh.ten"></p-sortIcon>
         </th>
-        <th pSortableColumn="hocSinh.gioiTinh" style="min-width: 10rem">
-          Giới tính <p-sortIcon field="hocSinh.gioiTinh"></p-sortIcon>
-        </th>
         <th pSortableColumn="hocSinh.ngaySinh" style="min-width: 10rem">
           Ngày sinh <p-sortIcon field="hocSinh.ngaySinh"></p-sortIcon>
         </th>
@@ -145,13 +120,6 @@
         <td>{{ phieuUongVitamin.hocSinh?.ten }}</td>
         <td>{{ phieuUongVitamin.hocSinh.gioiTinh?.tenGioiTinh }}</td>
         <td>{{ phieuUongVitamin.hocSinh?.ngaySinh | date : "dd/MM/yyyy" }}</td>
-        <td>
-          {{
-            phieuUongVitamin.hocSinh?.lopHoc
-              ? phieuUongVitamin.hocSinh.lopHoc.tenLop
-              : ""
-          }}
-        </td>
         <td>
           <button
             pButton

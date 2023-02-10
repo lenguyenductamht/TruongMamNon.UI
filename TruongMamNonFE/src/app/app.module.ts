@@ -60,6 +60,8 @@ import { PhieuSoGiunComponent } from './phieu-so-giun/phieu-so-giun.component';
 import { PhieuUongVitaminComponent } from './phieu-uong-vitamin/phieu-uong-vitamin.component';
 import { MonAnComponent } from './mon-an/mon-an.component';
 import { ThucDonComponent } from './thuc-don/thuc-don.component';
+import { DangNhapComponent } from './dang-nhap/dang-nhap.component';
+import { PasswordModule } from 'primeng/password';
 
 @NgModule({
   declarations: [
@@ -92,6 +94,7 @@ import { ThucDonComponent } from './thuc-don/thuc-don.component';
     PhieuUongVitaminComponent,
     MonAnComponent,
     ThucDonComponent,
+    DangNhapComponent,
   ],
   imports: [
     BrowserModule,
@@ -120,8 +123,14 @@ import { ThucDonComponent } from './thuc-don/thuc-don.component';
     ScrollerModule,
     CardModule,
     TreeModule,
+    PasswordModule,
   ],
-  providers: [DataService, MessageService, ConfirmationService],
+  providers: [
+    DataService,
+    MessageService,
+    ConfirmationService,
+    MenuBarComponent,
+  ],
   bootstrap: [AppComponent],
 })
 export class AppModule {}

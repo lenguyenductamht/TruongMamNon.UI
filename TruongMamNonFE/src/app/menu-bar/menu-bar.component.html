@@ -1,27 +1,39 @@
-<p-toolbar styleClass="mb-1 gap-2">
-  <ng-template pTemplate="left">
-    <p-dropdown
-      [options]="nienHocs"
-      [(ngModel)]="selectedNienHoc"
-      optionLabel="tenNienHoc"
-      [filter]="true"
-      filterBy="tenNienHoc"
-      placeholder="Chọn niên học"
-      (onChange)="onNienHocChange($event.value)"
-    >
-      <ng-template pTemplate="selectedItem">
-        <div class="nienHoc-item nienHoc-item-value" *ngIf="selectedNienHoc">
-          <div>{{ selectedNienHoc.tenNienHoc }}</div>
-        </div>
-      </ng-template>
-      <ng-template let-nienHoc pTemplate="item">
-        <div class="nienHoc-item">
-          <div>{{ nienHoc?.tenNienHoc }}</div>
-        </div>
-      </ng-template>
-    </p-dropdown>
-  </ng-template>
-  <ng-template pTemplate="right"> Tên tài khoản </ng-template>
-</p-toolbar>
+<div *ngIf="isLoggedIn$ | async as isLoggedIn">
+  <p-toolbar styleClass="mb-1 gap-2">
+    <ng-template pTemplate="left">
+      <p-dropdown
+        [options]="nienHocs"
+        [(ngModel)]="selectedNienHoc"
+        optionLabel="tenNienHoc"
+        [filter]="true"
+        filterBy="tenNienHoc"
+        placeholder="Chọn niên học"
+        (onChange)="onNienHocChange($event.value)"
+      >
+        <ng-template pTemplate="selectedItem">
+          <div class="nienHoc-item nienHoc-item-value" *ngIf="selectedNienHoc">
+            <div>{{ selectedNienHoc.tenNienHoc }}</div>
+          </div>
+        </ng-template>
+        <ng-template let-nienHoc pTemplate="item">
+          <div class="nienHoc-item">
+            <div>{{ nienHoc?.tenNienHoc }}</div>
+          </div>
+        </ng-template>
+      </p-dropdown>
+    </ng-template>
+    <ng-template pTemplate="right">
+      <!-- <input type="text" [ngModel]="ten" />
+      &nbsp; -->
+      <!-- <p-button label="Đổi mật khẩu"></p-button>
+      &nbsp; -->
+      <p-button
+        (click)="dangXuat()"
+        *ngIf="isLoggedIn"
+        label="Đăng xuất"
+      ></p-button>
+    </ng-template>
+  </p-toolbar>
 
-<p-menubar [model]="items"></p-menubar>
+  <p-menubar [model]="items"></p-menubar>
+</div>

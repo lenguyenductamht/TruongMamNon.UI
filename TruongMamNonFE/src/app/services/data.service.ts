@@ -720,6 +720,12 @@ export class DataService {
     return this.httpClient.get<NhanSu[]>(this.baseApiUrl + '/NhanSus');
   }
 
+  getNhanSu(maNhanSu: number): Observable<NhanSu> {
+    return this.httpClient.get<NhanSu>(
+      this.baseApiUrl + '/NhanSus/' + maNhanSu
+    );
+  }
+
   addNhanSu(nhanSuRequest: NhanSu): Observable<NhanSu> {
     const addNhanSuRequest: AddNhanSuRequest = {
       ho: nhanSuRequest.ho,
@@ -788,6 +794,13 @@ export class DataService {
   deleteNhanSu(maNhanSu: number): Observable<NhanSu> {
     return this.httpClient.delete<NhanSu>(
       this.baseApiUrl + '/NhanSus/' + maNhanSu
+    );
+  }
+
+  nhanSuDangNhap(val: any): Observable<number> {
+    return this.httpClient.post<number>(
+      this.baseApiUrl + '/NhanSus/DangNhap',
+      val
     );
   }
   //#endregion
@@ -2125,7 +2138,7 @@ export class DataService {
 
   deleteThucDonMonAn(
     maThucDon: number,
-    maMonAn: number,
+    maMonAn: number
   ): Observable<ThucDonMonAn> {
     return this.httpClient.delete<ThucDonMonAn>(
       this.baseApiUrl + '/ThucDonMonAns/' + maThucDon + '/' + maMonAn

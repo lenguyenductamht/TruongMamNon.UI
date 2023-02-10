@@ -1,0 +1,24 @@
+<p-card
+  header="Đăng nhập"
+  styleClass="p-fluid"
+  [style]="{ width: '25rem', margin: '16px auto' }"
+>
+  <ng-template pTemplate="content"
+    ><div class="field">
+      <label for="maNhanSu">Mã nhân sự</label>
+      <p-inputNumber id="maNhanSu" type="text" [(ngModel)]="noiDung.maNhanSu">
+      </p-inputNumber>
+      <small class="p-error" *ngIf="submitted && !noiDung.maNhanSu"
+        >Mã nhân sự không hợp lệ</small
+      >
+    </div>
+    <div class="field">
+      <label for="matKhau">Mật khẩu</label>
+      <p-password [feedback]="false" [(ngModel)]="noiDung.matKhau"></p-password>
+      <small class="p-error" *ngIf="submitted && !noiDung.matKhau"
+        >Chưa nhập mật khẩu</small
+      >
+    </div>
+    <p-button (click)="dangNhap()" label="Đăng nhập"></p-button>
+  </ng-template>
+</p-card>

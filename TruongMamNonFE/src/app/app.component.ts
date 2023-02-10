@@ -3,6 +3,8 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { MenuItem } from 'primeng/api';
 import { DataService } from './services/data.service';
 import { NienHoc } from './models/nien-hoc.model';
+import { BehaviorSubject, Observable } from 'rxjs';
+import { AuthService } from './services/auth.service';
 
 @Component({
   selector: 'app-root',

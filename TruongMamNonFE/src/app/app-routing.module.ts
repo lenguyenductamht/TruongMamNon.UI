@@ -27,36 +27,116 @@ import { PhieuSoGiunComponent } from './phieu-so-giun/phieu-so-giun.component';
 import { PhieuUongVitaminComponent } from './phieu-uong-vitamin/phieu-uong-vitamin.component';
 import { MonAnComponent } from './mon-an/mon-an.component';
 import { ThucDonComponent } from './thuc-don/thuc-don.component';
+import { DangNhapComponent } from './dang-nhap/dang-nhap.component';
+import { AuthGuard } from './auth.guard';
 
 const routes: Routes = [
-  { path: 'CauHinhNienHoc', component: NienHocComponent },
-  { path: 'PhongBan', component: PhongBanComponent },
-  { path: 'ChucVu', component: ChucVuComponent },
-  { path: 'LoaiNhanSu', component: LoaiNhanSuComponent },
-  { path: 'TraCuuNhanSu', component: NhanSuComponent },
-  { path: 'DanhSachLopHoc', component: LopHocComponent },
-  { path: 'HoSoHocSinh', component: HocSinhComponent },
-  { path: 'DanhMucVaccine', component: VaccineComponent },
-  { path: 'DotTiemVaccine', component: DotTiemVaccineComponent },
-  { path: 'PhieuTiemVaccine', component: PhieuTiemVaccineComponent },
-  { path: 'DiemDanh', component: DiemDanhComponent },
-  { path: 'NhapThucPham', component: PhieuNhapThucPhamComponent },
-  { path: 'XuatThucPham', component: PhieuXuatThucPhamComponent },
-  { path: 'ThucPham', component: ThucPhamComponent },
-  { path: 'DanhMucThuocSoGiun', component: ThuocSoGiunComponent },
-  { path: 'DanhMucVitamin', component: VitaminComponent },
-  { path: 'DotKhamSucKhoe', component: DotKhamSucKhoeComponent },
-  { path: 'DotSoGiun', component: DotSoGiunComponent },
-  { path: 'DotUongVitamin', component: DotUongVitaminComponent },
-  { path: 'PhieuKhamSucKhoe', component: PhieuKhamSucKhoeComponent },
-  { path: 'PhieuSoGiun', component: PhieuSoGiunComponent },
-  { path: 'PhieuUongVitamin', component: PhieuUongVitaminComponent },
-  { path: 'DanhMucThucDon', component: DanhMucThucDonComponent },
-  { path: 'MonAn', component: MonAnComponent },
-  { path: 'ThucDon', component: ThucDonComponent },
+  {
+    path: 'CauHinhNienHoc',
+    component: NienHocComponent,
+    canActivate: [AuthGuard],
+  },
+  { path: 'PhongBan', component: PhongBanComponent, canActivate: [AuthGuard] },
+  { path: 'ChucVu', component: ChucVuComponent, canActivate: [AuthGuard] },
+  {
+    path: 'LoaiNhanSu',
+    component: LoaiNhanSuComponent,
+    canActivate: [AuthGuard],
+  },
+  {
+    path: 'TraCuuNhanSu',
+    component: NhanSuComponent,
+    canActivate: [AuthGuard],
+  },
+  {
+    path: 'DanhSachLopHoc',
+    component: LopHocComponent,
+    canActivate: [AuthGuard],
+  },
+  {
+    path: 'HoSoHocSinh',
+    component: HocSinhComponent,
+    canActivate: [AuthGuard],
+  },
+  {
+    path: 'DanhMucVaccine',
+    component: VaccineComponent,
+    canActivate: [AuthGuard],
+  },
+  {
+    path: 'DotTiemVaccine',
+    component: DotTiemVaccineComponent,
+    canActivate: [AuthGuard],
+  },
+  {
+    path: 'PhieuTiemVaccine',
+    component: PhieuTiemVaccineComponent,
+    canActivate: [AuthGuard],
+  },
+  { path: 'DiemDanh', component: DiemDanhComponent, canActivate: [AuthGuard] },
+  {
+    path: 'NhapThucPham',
+    component: PhieuNhapThucPhamComponent,
+    canActivate: [AuthGuard],
+  },
+  {
+    path: 'XuatThucPham',
+    component: PhieuXuatThucPhamComponent,
+    canActivate: [AuthGuard],
+  },
+  { path: 'ThucPham', component: ThucPhamComponent, canActivate: [AuthGuard] },
+  {
+    path: 'DanhMucThuocSoGiun',
+    component: ThuocSoGiunComponent,
+    canActivate: [AuthGuard],
+  },
+  {
+    path: 'DanhMucVitamin',
+    component: VitaminComponent,
+    canActivate: [AuthGuard],
+  },
+  {
+    path: 'DotKhamSucKhoe',
+    component: DotKhamSucKhoeComponent,
+    canActivate: [AuthGuard],
+  },
+  {
+    path: 'DotSoGiun',
+    component: DotSoGiunComponent,
+    canActivate: [AuthGuard],
+  },
+  {
+    path: 'DotUongVitamin',
+    component: DotUongVitaminComponent,
+    canActivate: [AuthGuard],
+  },
+  {
+    path: 'PhieuKhamSucKhoe',
+    component: PhieuKhamSucKhoeComponent,
+    canActivate: [AuthGuard],
+  },
+  {
+    path: 'PhieuSoGiun',
+    component: PhieuSoGiunComponent,
+    canActivate: [AuthGuard],
+  },
+  {
+    path: 'PhieuUongVitamin',
+    component: PhieuUongVitaminComponent,
+    canActivate: [AuthGuard],
+  },
+  {
+    path: 'DanhMucThucDon',
+    component: DanhMucThucDonComponent,
+    canActivate: [AuthGuard],
+  },
+  { path: 'MonAn', component: MonAnComponent, canActivate: [AuthGuard] },
+  { path: 'ThucDon', component: ThucDonComponent, canActivate: [AuthGuard] },
+  { path: 'DangNhap', component: DangNhapComponent },
 
-  { path: '', component: HomeComponent },
-  { path: 'home', component: HomeComponent },
+  { path: '', component: HomeComponent, canActivate: [AuthGuard] },
+  { path: 'home', component: HomeComponent, canActivate: [AuthGuard] },
+  { path: 'Home', component: HomeComponent, canActivate: [AuthGuard] },
   { path: '**', component: PageNotFoundComponent },
 ];
 
