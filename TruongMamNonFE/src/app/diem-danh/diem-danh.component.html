@@ -236,7 +236,7 @@
 <p-dialog
   [(visible)]="diemDanhDialog"
   [style]="{ width: '75%' }"
-  header="Chi tiết tiêm vaccine"
+  header="{{ dialogHeader }}"
   [modal]="true"
   styleClass="p-fluid"
 >
@@ -337,6 +337,9 @@
             </ng-template>
           </p-dropdown>
           <label for="hocSinh" class="required-field">Học sinh</label>
+          <small class="p-error" *ngIf="submitted && diemDanh.maHocSinh === 0"
+            >Chưa chọn học sinh</small
+          >
         </span>
       </div>
       <div class="field col-12 md:col-4">
@@ -346,7 +349,7 @@
             [(ngModel)]="ngayDiemDanh"
             dateFormat="dd/mm/yy"
             appendTo="body"
-            [disabled]="!(diemDanh.maDiemDanh === 0)"
+            [disabled]="true"
           ></p-calendar>
           <label for="ngayDiemDanh" class="required-field"
             >Ngày điểm danh</label
@@ -381,6 +384,11 @@
           </p-dropdown>
           <label for="trangThaiDiemDanh" class="required-field"
             >Trạng thái</label
+          >
+          <small
+            class="p-error"
+            *ngIf="submitted && !diemDanh.maTrangThaiDiemDanh"
+            >Chưa chọn trạng thái</small
           >
         </span>
       </div>

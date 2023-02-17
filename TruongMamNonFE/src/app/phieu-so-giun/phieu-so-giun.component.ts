@@ -26,6 +26,7 @@ export class PhieuSoGiunComponent implements OnInit {
     private confirmationService: ConfirmationService
   ) {}
 
+  dialogHeader = '';
   loading = false;
   phieuSoGiunDialog: boolean = false;
 
@@ -49,50 +50,52 @@ export class PhieuSoGiunComponent implements OnInit {
   selectedHocSinhs: HocSinh[] = [];
 
   exportColumns: any[] | undefined;
-  public ngOnInit(): void {
+  ngOnInit(): void {
     this.dataService.selectedNienHoc$.subscribe((nienHoc) => {
       this.selectedNienHoc = nienHoc;
     });
     this.getPhieuSoGiunsByNienHoc();
   }
 
-  public exportExcel() {
-    // const exportData:any[]=[];
-    // this.phieuSoGiuns.forEach((table)=>{
-    //   exportData.push({
-    //     TenPhieuSoGiun: table.tenPhieuSoGiun,
-    //     GhiChu:table.ghiChu,
-    //   });
-    // });
-    //this.exportService.exportExcel(exportData, 'PhieuSoGiun');
+  exportExcel() {
+    const exportData: any[] = [];
+    this.phieuSoGiuns.forEach((table) => {
+      exportData.push({
+        DotSoGiun: table.dotSoGiun?.tenDotSoGiun,
+        MaHocSinh: table.hocSinh?.maHocSinh,
+        Ho: table.hocSinh?.ho,
+        Ten: table.hocSinh?.ten,
+        NgaySinh: table.hocSinh?.ngaySinh,
+      });
+    });
+    this.exportService.exportExcel(exportData, 'DanhSachPhieuSoGiun');
   }
 
   public exportPdf() {
-    // const exportData:any[]=[];
-    // this.phieuSoGiuns.forEach((table)=>{
-    //   exportData.push({
-    //     TenPhieuSoGiun: table.tenPhieuSoGiun,
-    //     GhiChu:table.ghiChu,
-    //   });
-    // });
-    // this.exportService.exportPdf(
-    //   {
-    //     TenPhieuSoGiun: "Tên PhieuSoGiun",
-    //     GhiChu: "Ghi Chú",
-    //   },
-    //   exportData,
-    //   'PhieuSoGiun'
-    // );
+    const exportData: any[] = [];
+    this.phieuSoGiuns.forEach((table) => {
+      exportData.push({
+        DotSoGiun: table.dotSoGiun?.tenDotSoGiun,
+        MaHocSinh: table.hocSinh?.maHocSinh,
+        Ho: table.hocSinh?.ho,
+        Ten: table.hocSinh?.ten,
+        NgaySinh: table.hocSinh?.ngaySinh,
+      });
+    });
+    this.exportService.exportPdf(
+      {
+        DotSoGiun: 'Đợt sổ giun',
+        MaHocSinh: 'Mã học sinh',
+        Ho: 'Họ',
+        Ten: 'Tên',
+        NgaySinh: 'Ngày sinh',
+      },
+      exportData,
+      'DanhSachPhieuSoGiun'
+    );
   }
-  // public getPhieuSoGiuns(): void {
-  //   this.loading = true;
-  //   this.dataService.getPhieuSoGiuns().subscribe((data) => {
-  //     this.phieuSoGiuns = data;
-  //     this.loading = false;
-  //   });
-  // }
 
-  public getPhieuSoGiunsByNienHoc(): void {
+  getPhieuSoGiunsByNienHoc(): void {
     this.loading = true;
     if (this.selectedNienHoc) {
       this.dataService
@@ -104,21 +107,11 @@ export class PhieuSoGiunComponent implements OnInit {
     }
   }
 
-  public getKhoiLops(): void {
+  getKhoiLops(): void {
     this.dataService.getKhoiLops().subscribe((data) => {
       this.khoiLops = data;
     });
   }
-
-  // public getLopHocsByNienHoc():void{
-  //   if(this.selectedNienHoc && this.selectedKhoiLop){
-  //     this.dataService.getLopHocsByNienHoc(this.selectedNienHoc?.maNienHoc).subscribe((data)=>{
-  //       this.lopHocs=data;
-  //       console.log(data);
-  //       //this.getHocSinhs();
-  //     });
-  //   }
-  // }
 
   getDotSoGiunsByNienHoc(): void {
     if (this.selectedNienHoc) {
@@ -133,19 +126,7 @@ export class PhieuSoGiunComponent implements OnInit {
     }
   }
 
-  // public getLopHocsByNienHocKhoiLop():void{
-  //   // this.loading=true;
-  //   if(this.selectedNienHoc && this.selectedKhoiLop){
-  //     this.dataService.getLopHocsByNienHocKhoiLop(this.selectedNienHoc?.maNienHoc, this.selectedKhoiLop?.maKhoiLop).subscribe((data)=>{
-  //       this.lopHocs=data;
-  //       // this.loading=false;
-  //       console.log(data);
-  //       //this.getHocSinhs();
-  //     });
-  //   }
-  // }
-
-  public getHocSinhs(): void {
+  getHocSinhs(): void {
     if (this.selectedLopHoc) {
       this.dataService
         .getHocSinhsByLopHoc(this.selectedLopHoc.maLop)
@@ -164,7 +145,7 @@ export class PhieuSoGiunComponent implements OnInit {
       });
     }
   }
-  public getLopHocs(): void {
+  getLopHocs(): void {
     if (this.selectedNienHoc && !this.selectedKhoiLop) {
       this.dataService
         .getLopHocsByNienHoc(this.selectedNienHoc.maNienHoc)
@@ -183,7 +164,8 @@ export class PhieuSoGiunComponent implements OnInit {
     }
   }
 
-  public openNew(): void {
+  openNew(): void {
+    this.dialogHeader = 'Thêm phiếu sổ giun';
     this.phieuSoGiun = Object.assign({}, this.dataService.newPhieuSoGiun);
     this.submitted = false;
     this.getDotSoGiunsByNienHoc();
@@ -193,14 +175,13 @@ export class PhieuSoGiunComponent implements OnInit {
     this.phieuSoGiunDialog = true;
   }
 
-  public editPhieuSoGiun(phieuSoGiun: PhieuSoGiun): void {
-    console.log('edit phieuSoGiun:', phieuSoGiun);
+  editPhieuSoGiun(phieuSoGiun: PhieuSoGiun): void {
+    this.dialogHeader = 'Thêm phiếu sổ giun';
     this.phieuSoGiun = phieuSoGiun;
     this.phieuSoGiunDialog = true;
   }
 
-  public deletePhieuSoGiun(phieuSoGiun: PhieuSoGiun) {
-    console.log('delete phieu tiem vaccine', phieuSoGiun);
+  deletePhieuSoGiun(phieuSoGiun: PhieuSoGiun) {
     this.confirmationService.confirm({
       message:
         'Bạn có muốn xóa phiếu tiêm của ' +
@@ -226,8 +207,7 @@ export class PhieuSoGiunComponent implements OnInit {
     });
   }
 
-  public hideDialog(cancel = true, success = true): void {
-    console.log('hideDialog: ');
+  hideDialog(cancel = true, success = true): void {
     this.phieuSoGiunDialog = false;
     if (cancel) {
       this.messageService.add({
@@ -254,9 +234,8 @@ export class PhieuSoGiunComponent implements OnInit {
     this.submitted = false;
   }
 
-  public savePhieuSoGiun() {
+  savePhieuSoGiun() {
     this.submitted = true;
-    console.log('savePhieuSoGiun: ', this.phieuSoGiun);
     if (this.selectedDotSoGiun) {
       this.phieuSoGiun.maDotSoGiun = this.selectedDotSoGiun.maDotSoGiun;
     }
@@ -264,11 +243,8 @@ export class PhieuSoGiunComponent implements OnInit {
       if (this.phieuSoGiun.maPhieuSoGiun === 0) {
         this.selectedHocSinhs.forEach((element) => {
           this.phieuSoGiun.maHocSinh = element.maHocSinh;
-          console.log(this.phieuSoGiun);
           this.dataService.addPhieuSoGiun(this.phieuSoGiun).subscribe(
-            (data) => {
-              console.log('return data = ', data);
-            },
+            (data) => {},
             (error) => {
               console.log(error);
               this.hideDialog(false, false);
@@ -282,7 +258,6 @@ export class PhieuSoGiunComponent implements OnInit {
           .updatePhieuSoGiun(this.phieuSoGiun.maPhieuSoGiun, this.phieuSoGiun)
           .subscribe(
             (data) => {
-              console.log('return data = ', data);
               this.getPhieuSoGiunsByNienHoc();
               this.hideDialog(false, true);
             },
@@ -295,25 +270,25 @@ export class PhieuSoGiunComponent implements OnInit {
     }
   }
 
-  public onKhoiLopChange(event: any) {
+  onKhoiLopChange(event: any) {
     const khoiLop: KhoiLop = event;
     this.selectedKhoiLop = khoiLop;
     this.getLopHocs();
     this.getHocSinhs();
   }
 
-  public onLopHocChange(event: any) {
+  onLopHocChange(event: any) {
     const lopHoc: LopHoc = event;
     this.selectedLopHoc = lopHoc;
     this.getHocSinhs();
   }
 
-  public onDotSoGiunChange(event: any) {
+  onDotSoGiunChange(event: any) {
     const dotSoGiun: DotSoGiun = event;
     this.selectedDotSoGiun = dotSoGiun;
   }
 
-  checkValid(phieuSoGiun: PhieuSoGiun): boolean {
+  private checkValid(phieuSoGiun: PhieuSoGiun): boolean {
     if (!phieuSoGiun.maDotSoGiun) return false;
     return true;
   }

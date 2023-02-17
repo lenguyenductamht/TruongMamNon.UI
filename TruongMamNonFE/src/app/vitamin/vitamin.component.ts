@@ -19,21 +19,19 @@ export class VitaminComponent implements OnInit {
     private confirmationService: ConfirmationService
   ) {}
 
-  public loading = true;
-  public vitaminDialog: boolean = false;
-
-  public vitamins: Vitamin[] = [];
-
-  public vitamin: Vitamin = Object.assign({}, this.dataService.newVitamin);
-  public submitted: boolean = false;
-  public cols: any[] | undefined;
-
-  public exportColumns: any[] | undefined;
-  public ngOnInit(): void {
+  dialogHeader = '';
+  loading = true;
+  vitaminDialog: boolean = false;
+  vitamins: Vitamin[] = [];
+  vitamin: Vitamin = Object.assign({}, this.dataService.newVitamin);
+  submitted: boolean = false;
+  cols: any[] | undefined;
+  exportColumns: any[] | undefined;
+  ngOnInit(): void {
     this.getVitamins();
   }
 
-  public exportExcel() {
+  exportExcel() {
     const exportData: any[] = [];
     this.vitamins.forEach((table) => {
       exportData.push({
@@ -41,10 +39,10 @@ export class VitaminComponent implements OnInit {
         GhiChu: table.ghiChu,
       });
     });
-    this.exportService.exportExcel(exportData, 'Vitamin');
+    this.exportService.exportExcel(exportData, 'DanhSachVitamin');
   }
 
-  public exportPdf() {
+  exportPdf() {
     const exportData: any[] = [];
     this.vitamins.forEach((table) => {
       exportData.push({
@@ -58,11 +56,11 @@ export class VitaminComponent implements OnInit {
         GhiChu: 'Ghi Chú',
       },
       exportData,
-      'Vitamin'
+      'DanhSachVitamin'
     );
   }
 
-  public getVitamins(): void {
+  getVitamins(): void {
     this.loading = true;
     this.dataService.getVitamins().subscribe((data) => {
       this.vitamins = data;
@@ -70,20 +68,20 @@ export class VitaminComponent implements OnInit {
     });
   }
 
-  public openNew(): void {
+  openNew(): void {
+    this.dialogHeader = 'Thêm vitamin';
     this.vitamin = Object.assign({}, this.dataService.newVitamin);
     this.submitted = false;
     this.vitaminDialog = true;
   }
 
-  public editVitamin(vitamin: Vitamin): void {
-    console.log('edit vitamin:', vitamin);
+  editVitamin(vitamin: Vitamin): void {
+    this.dialogHeader = 'Sửa vitamin';
     this.vitamin = vitamin;
     this.vitaminDialog = true;
   }
 
-  public deleteVitamin(vitamin: Vitamin) {
-    console.log('delete danh muc thuc don', vitamin);
+  deleteVitamin(vitamin: Vitamin) {
     this.confirmationService.confirm({
       message: 'Bạn có muốn xóa ' + vitamin.tenVitamin + '?',
       header: 'Xác nhận',
@@ -102,8 +100,7 @@ export class VitaminComponent implements OnInit {
     });
   }
 
-  public hideDialog(cancel = true, success = true): void {
-    console.log('hideDialog: ');
+  hideDialog(cancel = true, success = true): void {
     this.vitaminDialog = false;
     if (cancel) {
       this.messageService.add({
@@ -130,36 +127,39 @@ export class VitaminComponent implements OnInit {
     this.submitted = false;
   }
 
-  public saveVitamin() {
+  saveVitamin() {
     this.submitted = true;
-    console.log('saveVitamin: ', this.vitamin);
-    if (this.vitamin.maVitamin === 0) {
-      this.dataService.addVitamin(this.vitamin).subscribe(
-        (data) => {
-          console.log('return data = ', data);
-          this.getVitamins();
-          this.hideDialog(false, true);
-        },
-        (error) => {
-          console.log('error');
-          this.hideDialog(false, false);
-        }
-      );
-    } else {
-      console.log('ma', this.vitamin.maVitamin);
-      this.dataService
-        .updateVitamin(this.vitamin.maVitamin, this.vitamin)
-        .subscribe(
+    if (this.checkValid(this.vitamin)) {
+      if (this.vitamin.maVitamin === 0) {
+        this.dataService.addVitamin(this.vitamin).subscribe(
           (data) => {
-            console.log('return data = ', data);
             this.getVitamins();
             this.hideDialog(false, true);
           },
           (error) => {
-            console.log('error');
+            console.log(error);
             this.hideDialog(false, false);
           }
         );
+      } else {
+        this.dataService
+          .updateVitamin(this.vitamin.maVitamin, this.vitamin)
+          .subscribe(
+            (data) => {
+              this.getVitamins();
+              this.hideDialog(false, true);
+            },
+            (error) => {
+              console.log(error);
+              this.hideDialog(false, false);
+            }
+          );
+      }
     }
+  }
+
+  private checkValid(vitamin: Vitamin): boolean {
+    if (!vitamin.tenVitamin) return false;
+    return true;
   }
 }

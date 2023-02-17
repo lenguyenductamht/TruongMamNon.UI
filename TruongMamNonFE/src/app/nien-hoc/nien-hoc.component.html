@@ -184,8 +184,8 @@
         dateFormat="dd/mm/yy"
         appendTo="body"
       ></p-calendar>
-      <small class="p-error" *ngIf="submitted && !_ketThucHK1"
-        >Kết thúc học kỳ 1 không được để trống</small
+      <small class="p-error" *ngIf="submitted && _ketThucHK1 <= _batDauHK1"
+        >Kết thúc học kỳ 1 phải lớn hơn bắt đầu học kỳ 1</small
       >
     </div>
 
@@ -200,6 +200,9 @@
       <small class="p-error" *ngIf="submitted && !_batDauHK2"
         >Bắt đầu học kỳ 2 không được để trống</small
       >
+      <small class="p-error" *ngIf="submitted && _batDauHK2 <= _ketThucHK1"
+        >Bắt đầu học kỳ 2 phải lớn hơn kết thúc học kỳ 1</small
+      >
     </div>
 
     <div class="field">
@@ -212,6 +215,9 @@
       ></p-calendar>
       <small class="p-error" *ngIf="submitted && !_ketThucHK2"
         >Kết thúc học kỳ 2 không được để trống</small
+      >
+      <small class="p-error" *ngIf="submitted && _ketThucHK2 <= _batDauHK2"
+        >Kết thúc học kỳ 2 phải lớn hơn bắt đầu học kỳ 2</small
       >
     </div>
   </ng-template>

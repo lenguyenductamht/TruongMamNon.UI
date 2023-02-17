@@ -19,7 +19,7 @@ export class ThucPhamComponent implements OnInit {
     private messageService: MessageService,
     private confirmationService: ConfirmationService
   ) {}
-
+  dialogHeader = '';
   loading = true;
   thucPhamDialog: boolean = false;
 
@@ -38,32 +38,38 @@ export class ThucPhamComponent implements OnInit {
   }
 
   exportExcel() {
-    // const exportData: any[] = [];
-    // this.thucPhams.forEach((table) => {
-    //   exportData.push({
-    //     TenThucPham: table.tenThucPham,
-    //     GhiChu: table.ghiChu,
-    //   });
-    // });
-    // this.exportService.exportExcel(exportData, 'ThucPham');
+    const exportData: any[] = [];
+    this.thucPhams.forEach((table) => {
+      exportData.push({
+        TenThucPham: table.tenThucPham,
+        DonViTinh: table.donViTinh,
+        TonKho: table.tonKho,
+        DanhMuc: table.danhMucThucPham?.tenDanhMuc,
+      });
+    });
+    this.exportService.exportExcel(exportData, 'DanhSachThucPham');
   }
 
   exportPdf() {
-    // const exportData: any[] = [];
-    // this.thucPhams.forEach((table) => {
-    //   exportData.push({
-    //     tenThucPham: table.tenThucPham,
-    //     ghiChu: table.ghiChu,
-    //   });
-    // });
-    // this.exportService.exportPdf(
-    //   {
-    //     tenThucPham: 'Tên thucPham',
-    //     ghiChu: 'Ghi Chú',
-    //   },
-    //   exportData,
-    //   'ThucPham'
-    // );
+    const exportData: any[] = [];
+    this.thucPhams.forEach((table) => {
+      exportData.push({
+        TenThucPham: table.tenThucPham,
+        DonViTinh: table.donViTinh,
+        TonKho: table.tonKho,
+        DanhMuc: table.danhMucThucPham?.tenDanhMuc,
+      });
+    });
+    this.exportService.exportPdf(
+      {
+        TenThucPham: 'Tên thực phẩm',
+        DonViTinh: 'Đơn vị tính',
+        TonKho: 'Tồn kho',
+        DanhMuc: 'Danh mục',
+      },
+      exportData,
+      'DanhSachThucPham'
+    );
   }
 
   getThucPhams(): void {
@@ -81,6 +87,7 @@ export class ThucPhamComponent implements OnInit {
   }
 
   openNew(): void {
+    this.dialogHeader = 'Thêm thực phẩm';
     this.thucPham = Object.assign({}, this.dataService.newThucPham);
     this.submitted = false;
     this.thucPhamDialog = true;
@@ -88,13 +95,12 @@ export class ThucPhamComponent implements OnInit {
   }
 
   editThucPham(thucPham: ThucPham): void {
-    console.log('edit thucPham:', thucPham);
+    this.dialogHeader = 'Sửa thực phẩm';
     this.thucPham = thucPham;
     this.thucPhamDialog = true;
   }
 
   deleteThucPham(thucPham: ThucPham) {
-    console.log('delete danh muc thuc don', thucPham);
     this.confirmationService.confirm({
       message: 'Bạn có muốn xóa ' + thucPham.tenThucPham + '?',
       header: 'Xác nhận',
@@ -116,7 +122,6 @@ export class ThucPhamComponent implements OnInit {
   }
 
   hideDialog(cancel = true, success = true): void {
-    console.log('hideDialog: ');
     this.thucPhamDialog = false;
     if (cancel) {
       this.messageService.add({
@@ -148,32 +153,28 @@ export class ThucPhamComponent implements OnInit {
     if (this.selectedDanhMucThucPham) {
       this.thucPham.maDanhMuc = this.selectedDanhMucThucPham.maDanhMuc;
     }
-    console.log('saveThucPham: ', this.thucPham);
     if (this.checkValid(this.thucPham)) {
       if (this.thucPham.maThucPham === 0) {
         this.dataService.addThucPham(this.thucPham).subscribe(
           (data) => {
-            console.log('return data = ', data);
             this.getThucPhams();
             this.hideDialog(false, true);
           },
           (error) => {
-            console.log('error');
+            console.log(error);
             this.hideDialog(false, false);
           }
         );
       } else {
-        console.log('ma', this.thucPham.maThucPham);
         this.dataService
           .updateThucPham(this.thucPham.maThucPham, this.thucPham)
           .subscribe(
             (data) => {
-              console.log('return data = ', data);
               this.getThucPhams();
               this.hideDialog(false, true);
             },
             (error) => {
-              console.log('error');
+              console.log(error);
               this.hideDialog(false, false);
             }
           );

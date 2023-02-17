@@ -28,31 +28,33 @@ export class HocSinhComponent implements OnInit {
     private confirmationService: ConfirmationService
   ) {}
 
-  public loading = true;
-  public hocSinhDialog = false;
-
-  public hocSinhs: HocSinh[] = [];
-
-  public hocSinh: HocSinh = Object.assign({}, this.dataService.newHocSinh);
-  public submitted: boolean = false;
-  public gioiTinhs: GioiTinh[] = [];
-  public danTocs: DanToc[] = [];
-  public tonGiaos: TonGiao[] = [];
-  public quocTichs: QuocGia[] = [];
-  public trangThaiHocs: TrangThaiHoc[] = [];
-  public trangThaiTaiKhoans: TrangThaiTaiKhoan[] = [];
-  public khoiLops: KhoiLop[] = [];
-  public selectedKhoiLop: KhoiLop | undefined;
-  public lopHocs: LopHoc[] = [];
-  public selectedLopHoc: LopHoc | undefined;
-  public selectedGioiTinh: GioiTinh | undefined;
-  public selectedNienHoc: NienHoc | undefined;
-  public selectedTrangThaiHoc: TrangThaiHoc | undefined;
-  public selectedDanToc: DanToc | undefined;
-  public selectedTonGiao: TonGiao | undefined;
-  public selectedQuocTich: QuocGia | undefined;
-  public nienHocs: NienHoc[] = [];
-  public ngOnInit(): void {
+  dialogHeader = '';
+  loading = true;
+  hocSinhDialog = false;
+  hocSinhs: HocSinh[] = [];
+  hocSinh: HocSinh = Object.assign({}, this.dataService.newHocSinh);
+  submitted: boolean = false;
+  gioiTinhs: GioiTinh[] = [];
+  danTocs: DanToc[] = [];
+  tonGiaos: TonGiao[] = [];
+  quocTichs: QuocGia[] = [];
+  trangThaiHocs: TrangThaiHoc[] = [];
+  trangThaiTaiKhoans: TrangThaiTaiKhoan[] = [];
+  khoiLops: KhoiLop[] = [];
+  selectedKhoiLop: KhoiLop | undefined;
+  lopHocs: LopHoc[] = [];
+  selectedLopHoc: LopHoc | undefined;
+  selectedGioiTinh: GioiTinh | undefined;
+  selectedNienHoc: NienHoc | undefined;
+  selectedTrangThaiHoc: TrangThaiHoc | undefined;
+  selectedDanToc: DanToc | undefined;
+  selectedTonGiao: TonGiao | undefined;
+  selectedQuocTich: QuocGia | undefined;
+  nienHocs: NienHoc[] = [];
+  _ngayNhapHoc = new Date();
+  _ngaySinh = new Date();
+  _ngayCapNhat = new Date();
+  ngOnInit(): void {
     this.getHocSinhs();
     this.getKhoiLops();
     this.dataService.selectedNienHoc$.subscribe((nienHoc) => {
@@ -61,42 +63,54 @@ export class HocSinhComponent implements OnInit {
     this.gioiTinhs = this.dataService.gioiTinhs;
   }
 
-  public exportExcel() {
-    // const exportData:any[]=[];
-    // this.hocSinhs.forEach((table)=>{
-    //   exportData.push({
-    //     tenLop: table.tenLop,
-    //     khoiLop:table.khoiLop.tenKhoiLop,
-    //     hocPhi:table.hocPhi,
-    //     nienHoc:table.nienHoc.tenNienHoc,
-    //   });
-    // });
-    // this.exportService.exportExcel(exportData, 'DanhSachHocSinh');
+  exportExcel() {
+    const exportData: any[] = [];
+    this.hocSinhs.forEach((table) => {
+      exportData.push({
+        MaHocSinh: table.maHocSinh,
+        Ho: table.ho,
+        Ten: table.ten,
+        GioiTinh: table.gioiTinh?.tenGioiTinh,
+        NgaySinh: table.ngaySinh,
+        TrangThaiHoc: table.trangThaiHoc?.tenTrangThai,
+        NgayNhapHoc: table.ngayNhapHoc,
+        LopHoc: table.lopHoc?.tenLop,
+      });
+    });
+    this.exportService.exportExcel(exportData, 'DanhSachHocSinh');
   }
 
-  public exportPdf() {
-    // const exportData:any[]=[];
-    // this.hocSinhs.forEach((table)=>{
-    //   exportData.push({
-    //     tenLop: table.tenLop,
-    //     khoiLop:table.khoiLop.tenKhoiLop,
-    //     hocPhi:table.hocPhi,
-    //     nienHoc:table.nienHoc.tenNienHoc,
-    //   });
-    // });
-    // this.exportService.exportPdf(
-    //   {
-    //     tenLop: "Tên lớp",
-    //     khoiLop: "Khối lớp",
-    //     hocPhi: "Học phí",
-    //     nienHoc: "Niên học",
-    //   },
-    //   exportData,
-    //   'DanhSachHocSinh'
-    // );
+  exportPdf() {
+    const exportData: any[] = [];
+    this.hocSinhs.forEach((table) => {
+      exportData.push({
+        MaHocSinh: table.maHocSinh,
+        Ho: table.ho,
+        Ten: table.ten,
+        GioiTinh: table.gioiTinh?.tenGioiTinh,
+        NgaySinh: table.ngaySinh,
+        TrangThaiHoc: table.trangThaiHoc?.tenTrangThai,
+        NgayNhapHoc: table.ngayNhapHoc,
+        LopHoc: table.lopHoc?.tenLop,
+      });
+    });
+    this.exportService.exportPdf(
+      {
+        MaHocSinh: 'Mã học sinh',
+        Ho: 'Họ',
+        Ten: 'Tên',
+        GioiTinh: 'Giới tính',
+        NgaySinh: 'Ngày sinh',
+        TrangThaiHoc: 'Trạng thái học',
+        NgayNhapHoc: 'Ngày nhập học',
+        LopHoc: 'Lớp học',
+      },
+      exportData,
+      'DanhSachHocSinh'
+    );
   }
 
-  public getHocSinhs(): void {
+  getHocSinhs(): void {
     this.loading = true;
     this.dataService.getHocSinhs().subscribe((success) => {
       this.hocSinhs = success;
@@ -106,13 +120,13 @@ export class HocSinhComponent implements OnInit {
     });
   }
 
-  public getKhoiLops(): void {
+  getKhoiLops(): void {
     this.dataService.getKhoiLops().subscribe((success) => {
       this.khoiLops = success;
     });
   }
 
-  public getLopHocsByNienHocKhoiLop(): void {
+  getLopHocsByNienHocKhoiLop(): void {
     if (this.selectedNienHoc && this.selectedKhoiLop) {
       this.dataService
         .getLopHocsByNienHocKhoiLop(
@@ -125,31 +139,31 @@ export class HocSinhComponent implements OnInit {
     }
   }
 
-  public getGioiTinhs(): void {
+  getGioiTinhs(): void {
     this.dataService.getGioiTinhs().subscribe((success) => {
       this.gioiTinhs = success;
     });
   }
 
-  public getTrangThaiHocs(): void {
+  getTrangThaiHocs(): void {
     this.dataService.getTrangThaiHocs().subscribe((success) => {
       this.trangThaiHocs = success;
     });
   }
 
-  public getDanTocs(): void {
+  getDanTocs(): void {
     this.dataService.getDanTocs().subscribe((success) => {
       this.danTocs = success;
     });
   }
 
-  public getTonGiaos(): void {
+  getTonGiaos(): void {
     this.dataService.getTonGiaos().subscribe((success) => {
       this.tonGiaos = success;
     });
   }
 
-  public getQuocGias(): void {
+  getQuocGias(): void {
     this.dataService.getQuocGias().subscribe((success) => {
       this.quocTichs = success;
     });
@@ -161,10 +175,14 @@ export class HocSinhComponent implements OnInit {
   //   });
   // }
 
-  public openNew(): void {
+  openNew(): void {
+    this.dialogHeader = 'Thêm học sinh';
     this.hocSinh = Object.assign({}, this.dataService.newHocSinh);
     this.submitted = false;
     this.hocSinhDialog = true;
+    this._ngayNhapHoc = new Date();
+    this._ngaySinh = new Date();
+    this._ngayCapNhat = new Date();
     this.getGioiTinhs();
     this.getKhoiLops();
     this.getTrangThaiHocs();
@@ -174,8 +192,8 @@ export class HocSinhComponent implements OnInit {
     // this.getTrangThaiTaiKhoans();
   }
 
-  public editHocSinh(hocSinh: HocSinh): void {
-    console.log('edit hocSinh:', hocSinh);
+  editHocSinh(hocSinh: HocSinh): void {
+    this.dialogHeader = 'Sửa học sinh';
     this.hocSinh = hocSinh;
     this.selectedKhoiLop = this.hocSinh.khoiLop;
     this.selectedLopHoc = this.hocSinh.lopHoc;
@@ -185,6 +203,9 @@ export class HocSinhComponent implements OnInit {
     this.selectedTonGiao = this.hocSinh.tonGiao;
     this.selectedQuocTich = this.hocSinh.quocTich;
     this.hocSinhDialog = true;
+    this._ngayNhapHoc = new Date(hocSinh.ngayNhapHoc);
+    this._ngaySinh = new Date(hocSinh.ngaySinh);
+    this._ngayCapNhat = new Date(hocSinh.ngayCapNhat);
     this.getGioiTinhs();
     this.getKhoiLops();
     this.getTrangThaiHocs();
@@ -194,7 +215,7 @@ export class HocSinhComponent implements OnInit {
     this.getLopHocsByNienHocKhoiLop();
   }
 
-  public deleteHocSinh(hocSinh: HocSinh) {
+  deleteHocSinh(hocSinh: HocSinh) {
     console.log('delete hoc sinh', hocSinh);
     this.confirmationService.confirm({
       message: 'Bạn có muốn xóa ' + hocSinh.ho + ' ' + hocSinh.ten + '?',
@@ -214,7 +235,7 @@ export class HocSinhComponent implements OnInit {
     });
   }
 
-  public hideDialog(cancel = true, success = true): void {
+  hideDialog(cancel = true, success = true): void {
     console.log('hideDialog: ');
     this.hocSinhDialog = false;
     if (cancel) {
@@ -242,9 +263,8 @@ export class HocSinhComponent implements OnInit {
     this.submitted = false;
   }
 
-  public saveHocSinh() {
+  saveHocSinh() {
     this.submitted = true;
-    console.log('saveHocSinh: ', this.hocSinh);
 
     if (this.selectedKhoiLop) {
       this.hocSinh.maKhoiLop = this.selectedKhoiLop.maKhoiLop;
@@ -267,16 +287,15 @@ export class HocSinhComponent implements OnInit {
     if (this.selectedQuocTich) {
       this.hocSinh.maQuocTich = this.selectedQuocTich.maQuocGia;
     }
-
-    console.log('saveHocSinh: ', this.hocSinh);
+    this.hocSinh.ngayNhapHoc = this._ngayNhapHoc;
+    this.hocSinh.ngaySinh = this._ngaySinh;
+    this.hocSinh.ngayCapNhat = this._ngayCapNhat;
     if (this.checkValid(this.hocSinh)) {
       if (this.hocSinh.maHocSinh === 0) {
         this.hocSinh.matKhau = 'Student@123';
         this.hocSinh.maTrangThaiTaiKhoan = '0';
-        console.log('saveHocSinh: ', this.hocSinh);
         this.dataService.addHocSinh(this.hocSinh).subscribe(
           (data) => {
-            console.log('return data = ', data);
             this.hideDialog(false, true);
             this.getHocSinhs();
           },
@@ -290,7 +309,6 @@ export class HocSinhComponent implements OnInit {
           .updateHocSinh(this.hocSinh.maHocSinh, this.hocSinh)
           .subscribe(
             (data) => {
-              console.log('return data = ', data);
               this.hideDialog(false, true);
               this.getHocSinhs();
             },
@@ -303,38 +321,38 @@ export class HocSinhComponent implements OnInit {
     }
   }
 
-  public onKhoiLopChange(event: any): void {
+  onKhoiLopChange(event: any): void {
     const khopLop: KhoiLop = event;
     this.selectedKhoiLop = khopLop;
     this.getLopHocsByNienHocKhoiLop();
   }
 
-  public onLopHocChange(event: any): void {
+  onLopHocChange(event: any): void {
     const lopHoc: LopHoc = event;
     this.selectedLopHoc = lopHoc;
   }
 
-  public onGioiTinhChange(event: any): void {
+  onGioiTinhChange(event: any): void {
     const gioiTinh: GioiTinh = event;
     this.selectedGioiTinh = gioiTinh;
   }
 
-  public onTrangThaiHocChange(event: any): void {
+  onTrangThaiHocChange(event: any): void {
     const trangThaiHoc: TrangThaiHoc = event;
     this.selectedTrangThaiHoc = trangThaiHoc;
   }
 
-  public onDanTocChange(event: any): void {
+  onDanTocChange(event: any): void {
     const danToc: DanToc = event;
     this.selectedDanToc = danToc;
   }
 
-  public onTonGiaoChange(event: any): void {
+  onTonGiaoChange(event: any): void {
     const tonGiao: TonGiao = event;
     this.selectedTonGiao = tonGiao;
   }
 
-  public onQuocTichChange(event: any): void {
+  onQuocTichChange(event: any): void {
     const quocTich: QuocGia = event;
     this.selectedQuocTich = quocTich;
   }

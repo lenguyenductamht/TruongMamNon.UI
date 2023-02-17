@@ -22,12 +22,13 @@ export class DotKhamSucKhoeComponent implements OnInit {
     private confirmationService: ConfirmationService
   ) {}
 
-  public loading = true;
-  public dotKhamSucKhoeDialog: boolean = false;
+  dialogHeader = '';
+  loading = true;
+  dotKhamSucKhoeDialog: boolean = false;
 
-  public dotKhamSucKhoes: DotKhamSucKhoe[] = [];
+  dotKhamSucKhoes: DotKhamSucKhoe[] = [];
 
-  public dotKhamSucKhoe: DotKhamSucKhoe = Object.assign(
+  dotKhamSucKhoe: DotKhamSucKhoe = Object.assign(
     {},
     this.dataService.newDotKhamSucKhoe
   );
@@ -36,44 +37,47 @@ export class DotKhamSucKhoeComponent implements OnInit {
   _ngayKhamSucKhoe: Date = new Date();
   selectedNienHoc: NienHoc | undefined;
   nienHocs: NienHoc[] = [];
-  public cols: any[] | undefined;
+  cols: any[] | undefined;
 
-  public exportColumns: any[] | undefined;
+  exportColumns: any[] | undefined;
 
-  public ngOnInit(): void {
+  ngOnInit(): void {
     this.dataService.selectedNienHoc$.subscribe((nienHoc) => {
       this.selectedNienHoc = nienHoc;
     });
     this.getDotKhamSucKhoesByNienHoc();
   }
 
-  public exportExcel() {
-    // const exportData: any[] = [];
-    // this.dotTiemDotKhamSucKhoes.forEach((table) => {
-    //   exportData.push({
-    //     TenDotKhamSucKhoe: table.tenDotKhamSucKhoe,
-    //     GhiChu: table.ghiChu,
-    //   });
-    // });
-    // this.exportService.exportExcel(exportData, 'DotKhamSucKhoe');
+  exportExcel() {
+    const exportData: any[] = [];
+    this.dotKhamSucKhoes.forEach((table) => {
+      exportData.push({
+        TenDotKhamSucKhoe: table.tenDotKhamSucKhoe,
+        NgayKhamSucKhoe: table.ngayKhamSucKhoe,
+        NienHoc: table.nienHoc?.tenNienHoc,
+      });
+    });
+    this.exportService.exportExcel(exportData, 'DanhSachDotKhamSucKhoe');
   }
 
-  public exportPdf() {
-    // const exportData: any[] = [];
-    // this.dotTiemDotKhamSucKhoes.forEach((table) => {
-    //   exportData.push({
-    //     tenDotKhamSucKhoe: table.tenDotKhamSucKhoe,
-    //     ghiChu: table.ghiChu,
-    //   });
-    // });
-    // this.exportService.exportPdf(
-    //   {
-    //     tenDotKhamSucKhoe: 'Tên dotTiemDotKhamSucKhoe',
-    //     ghiChu: 'Ghi Chú',
-    //   },
-    //   exportData,
-    //   'DotKhamSucKhoe'
-    // );
+  exportPdf() {
+    const exportData: any[] = [];
+    this.dotKhamSucKhoes.forEach((table) => {
+      exportData.push({
+        TenDotKhamSucKhoe: table.tenDotKhamSucKhoe,
+        NgayKhamSucKhoe: table.ngayKhamSucKhoe,
+        NienHoc: table.nienHoc?.tenNienHoc,
+      });
+    });
+    this.exportService.exportPdf(
+      {
+        TenDotKhamSucKhoe: 'Tên đợt khám sức khỏe',
+        NgayKhamSucKhoe: 'Ngày khám sức khỏe',
+        NienHoc: 'Niên học',
+      },
+      exportData,
+      'DanhSachDotKhamSucKhoe'
+    );
   }
 
   getDotKhamSucKhoesByNienHoc(): void {
@@ -83,28 +87,27 @@ export class DotKhamSucKhoeComponent implements OnInit {
         .getDotKhamSucKhoesByNienHoc(this.selectedNienHoc.maNienHoc)
         .subscribe((data) => {
           this.dotKhamSucKhoes = data;
-          console.log(this.dotKhamSucKhoes);
           this.loading = false;
         });
     }
   }
 
-  public openNew(): void {
+  openNew(): void {
+    this.dialogHeader = 'Thêm đợt khám sức khỏe';
     this.dotKhamSucKhoe = Object.assign({}, this.dataService.newDotKhamSucKhoe);
     this.submitted = false;
     this.dotKhamSucKhoeDialog = true;
     this._ngayKhamSucKhoe = new Date();
   }
 
-  public editDotKhamSucKhoe(dotTiemDotKhamSucKhoe: DotKhamSucKhoe): void {
-    console.log('edit dotTiemDotKhamSucKhoe:', dotTiemDotKhamSucKhoe);
+  editDotKhamSucKhoe(dotTiemDotKhamSucKhoe: DotKhamSucKhoe): void {
+    this.dialogHeader = 'Sửa đợt khám sức khỏe';
     this.dotKhamSucKhoe = dotTiemDotKhamSucKhoe;
     this.dotKhamSucKhoeDialog = true;
     this._ngayKhamSucKhoe = new Date(dotTiemDotKhamSucKhoe.ngayKhamSucKhoe);
   }
 
-  public deleteDotKhamSucKhoe(dotTiemDotKhamSucKhoe: DotKhamSucKhoe) {
-    console.log('delete danh muc thuc don', dotTiemDotKhamSucKhoe);
+  deleteDotKhamSucKhoe(dotTiemDotKhamSucKhoe: DotKhamSucKhoe) {
     this.confirmationService.confirm({
       message: 'Bạn có muốn xóa đợt tiêm?',
       header: 'Xác nhận',
@@ -125,8 +128,7 @@ export class DotKhamSucKhoeComponent implements OnInit {
     });
   }
 
-  public hideDialog(cancel = true, success = true): void {
-    console.log('hideDialog: ');
+  hideDialog(cancel = true, success = true): void {
     this.dotKhamSucKhoeDialog = false;
     if (cancel) {
       this.messageService.add({
@@ -153,7 +155,7 @@ export class DotKhamSucKhoeComponent implements OnInit {
     this.submitted = false;
   }
 
-  public saveDotKhamSucKhoe() {
+  saveDotKhamSucKhoe() {
     if (this.selectedNienHoc?.maNienHoc === 0) {
       this.messageService.add({
         severity: 'error',
@@ -168,22 +170,19 @@ export class DotKhamSucKhoeComponent implements OnInit {
     if (this.selectedNienHoc) {
       this.dotKhamSucKhoe.maNienHoc = this.selectedNienHoc.maNienHoc;
     }
-    console.log('saveDotKhamSucKhoe: ', this.dotKhamSucKhoe);
     if (this.checkValid(this.dotKhamSucKhoe)) {
       if (this.dotKhamSucKhoe.maDotKhamSucKhoe === 0) {
         this.dataService.addDotKhamSucKhoe(this.dotKhamSucKhoe).subscribe(
           (data) => {
-            console.log('return data = ', data);
             this.getDotKhamSucKhoesByNienHoc();
             this.hideDialog(false, true);
           },
           (error) => {
-            console.log('error');
+            console.log(error);
             this.hideDialog(false, false);
           }
         );
       } else {
-        console.log('ma', this.dotKhamSucKhoe.maDotKhamSucKhoe);
         this.dataService
           .updateDotKhamSucKhoe(
             this.dotKhamSucKhoe.maDotKhamSucKhoe,
@@ -191,7 +190,6 @@ export class DotKhamSucKhoeComponent implements OnInit {
           )
           .subscribe(
             (data) => {
-              console.log('return data = ', data);
               this.getDotKhamSucKhoesByNienHoc();
               this.hideDialog(false, true);
             },
@@ -206,11 +204,7 @@ export class DotKhamSucKhoeComponent implements OnInit {
 
   checkValid(dotKhamSucKhoe: DotKhamSucKhoe): boolean {
     if (!dotKhamSucKhoe.tenDotKhamSucKhoe.trim()) return false;
-    if (
-      !dotKhamSucKhoe.ngayKhamSucKhoe ||
-      dotKhamSucKhoe.ngayKhamSucKhoe < new Date(Date.now())
-    )
-      return false;
+    if (!dotKhamSucKhoe.ngayKhamSucKhoe) return false;
     return true;
   }
 }

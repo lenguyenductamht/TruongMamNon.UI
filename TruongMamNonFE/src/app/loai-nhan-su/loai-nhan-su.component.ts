@@ -19,92 +19,90 @@ export class LoaiNhanSuComponent implements OnInit {
     private confirmationService: ConfirmationService
   ) {}
 
-  public loading = true;
-  public loaiNhanSuDialog: boolean = false;
-
-  public loaiNhanSus: LoaiNhanSu[] = [];
-
-  
-  public loaiNhanSu:LoaiNhanSu=Object.assign({},this.dataService.newLoaiNhanSu);
-  public submitted: boolean = false; 
-  public cols: any[]|undefined;
-
-  public exportColumns: any[]|undefined;
-  public ngOnInit(): void {
+  loading = true;
+  loaiNhanSuDialog: boolean = false;
+  dialogHeader = '';
+  loaiNhanSus: LoaiNhanSu[] = [];
+  loaiNhanSu: LoaiNhanSu = Object.assign({}, this.dataService.newLoaiNhanSu);
+  submitted: boolean = false;
+  cols: any[] | undefined;
+  exportColumns: any[] | undefined;
+  ngOnInit(): void {
     this.getLoaiNhanSus();
   }
 
-  public exportExcel(){
-    const exportData:any[]=[];
-    this.loaiNhanSus.forEach((table)=>{
+  exportExcel() {
+    const exportData: any[] = [];
+    this.loaiNhanSus.forEach((table) => {
       exportData.push({
         TenLoaiNhanSu: table.tenLoaiNhanSu,
-        GhiChu:table.ghiChu,
+        GhiChu: table.ghiChu,
       });
     });
-    this.exportService.exportExcel(exportData, 'LoaiNhanSu');
+    this.exportService.exportExcel(exportData, 'DanhSachLoaiNhanSu');
   }
 
-  public exportPdf(){
-    const exportData:any[]=[];
-    this.loaiNhanSus.forEach((table)=>{
+  exportPdf() {
+    const exportData: any[] = [];
+    this.loaiNhanSus.forEach((table) => {
       exportData.push({
         TenLoaiNhanSu: table.tenLoaiNhanSu,
-        GhiChu:table.ghiChu,
+        GhiChu: table.ghiChu,
       });
     });
     this.exportService.exportPdf(
       {
-        TenLoaiNhanSu: "Tên LoaiNhanSu", 
-        GhiChu: "Ghi Chú", 
+        TenLoaiNhanSu: 'Tên LoaiNhanSu',
+        GhiChu: 'Ghi Chú',
       },
-      exportData, 
-      'LoaiNhanSu'
+      exportData,
+      'DanhSachLoaiNhanSu'
     );
   }
 
-  public getLoaiNhanSus():void{
-    this.loading=true;
+  getLoaiNhanSus(): void {
+    this.loading = true;
     this.dataService.getLoaiNhanSus().subscribe((data) => {
       this.loaiNhanSus = data;
-      this.loading=false;
+      this.loading = false;
     });
   }
 
-  public openNew(): void {
+  openNew(): void {
+    this.dialogHeader = 'Thêm loại nhân sự';
     this.loaiNhanSu = Object.assign({}, this.dataService.newLoaiNhanSu);
     this.submitted = false;
     this.loaiNhanSuDialog = true;
   }
 
-  public editLoaiNhanSu(loaiNhanSu: LoaiNhanSu): void {
-    console.log('edit loaiNhanSu:', loaiNhanSu);
+  editLoaiNhanSu(loaiNhanSu: LoaiNhanSu): void {
+    this.dialogHeader = 'Sửa loại nhân sự';
     this.loaiNhanSu = loaiNhanSu;
     this.loaiNhanSuDialog = true;
   }
 
-  public deleteLoaiNhanSu(loaiNhanSu: LoaiNhanSu) {
-    console.log('delete danh muc thuc don', loaiNhanSu);
+  deleteLoaiNhanSu(loaiNhanSu: LoaiNhanSu) {
     this.confirmationService.confirm({
       message: 'Bạn có muốn xóa ' + loaiNhanSu.tenLoaiNhanSu + '?',
       header: 'Xác nhận',
       icon: 'pi pi-exclamation-triangle',
       accept: () => {
-        this.dataService.deleteLoaiNhanSu(loaiNhanSu.maLoaiNhanSu).subscribe((data)=>{
-          this.getLoaiNhanSus();
-          this.messageService.add({
-            severity: 'success',
-            summary: 'Thành công',
-            detail: 'Xóa thành công',
-            life: 3000,
+        this.dataService
+          .deleteLoaiNhanSu(loaiNhanSu.maLoaiNhanSu)
+          .subscribe((data) => {
+            this.getLoaiNhanSus();
+            this.messageService.add({
+              severity: 'success',
+              summary: 'Thành công',
+              detail: 'Xóa thành công',
+              life: 3000,
+            });
           });
-        });        
       },
     });
   }
 
-  public hideDialog(cancel = true, success = true): void {
-    console.log('hideDialog: ');
+  hideDialog(cancel = true, success = true): void {
     this.loaiNhanSuDialog = false;
     if (cancel) {
       this.messageService.add({
@@ -131,34 +129,39 @@ export class LoaiNhanSuComponent implements OnInit {
     this.submitted = false;
   }
 
-  public saveLoaiNhanSu() {
+  saveLoaiNhanSu() {
     this.submitted = true;
-    console.log('saveLoaiNhanSu: ', this.loaiNhanSu);
-    if (this.loaiNhanSu.maLoaiNhanSu === 0) {
-      this.dataService.postLoaiNhanSu(this.loaiNhanSu).subscribe(
-        (data) => {
-          console.log('return data = ', data);
-          this.getLoaiNhanSus();
-          this.hideDialog(false, true);
-        },
-        (error) => {
-          console.log('error');
-          this.hideDialog(false, false);
-        }
-      );
-    } else {
-      console.log('ma', this.loaiNhanSu.maLoaiNhanSu);
-      this.dataService.putLoaiNhanSu(this.loaiNhanSu.maLoaiNhanSu, this.loaiNhanSu).subscribe(
-        (data) => {
-          console.log('return data = ', data);
-          this.getLoaiNhanSus();
-          this.hideDialog(false, true);
-        },
-        (error) => {
-          console.log('error');
-          this.hideDialog(false, false);
-        }
-      );
+    if (this.checkValid(this.loaiNhanSu)) {
+      if (this.loaiNhanSu.maLoaiNhanSu === 0) {
+        this.dataService.postLoaiNhanSu(this.loaiNhanSu).subscribe(
+          (data) => {
+            this.getLoaiNhanSus();
+            this.hideDialog(false, true);
+          },
+          (error) => {
+            console.log(error);
+            this.hideDialog(false, false);
+          }
+        );
+      } else {
+        this.dataService
+          .putLoaiNhanSu(this.loaiNhanSu.maLoaiNhanSu, this.loaiNhanSu)
+          .subscribe(
+            (data) => {
+              this.getLoaiNhanSus();
+              this.hideDialog(false, true);
+            },
+            (error) => {
+              console.log(error);
+              this.hideDialog(false, false);
+            }
+          );
+      }
     }
+  }
+
+  private checkValid(loaiNhanSu: LoaiNhanSu): boolean {
+    if (!loaiNhanSu.tenLoaiNhanSu) return false;
+    return true;
   }
 }

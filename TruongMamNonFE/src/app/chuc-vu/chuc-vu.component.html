@@ -102,7 +102,7 @@
     <ng-template pTemplate="header">
       <tr>
         <th pSortableColumn="tenChucVu" style="min-width: 15rem">
-          Tên ChucVu <p-sortIcon field="tenChucVu"></p-sortIcon>
+          Tên chức vụ <p-sortIcon field="tenChucVu"></p-sortIcon>
         </th>
         <th pSortableColumn="loaiNhanSu.tenLoaiNhanSu" style="min-width: 10rem">
           Loại nhân sự
@@ -152,13 +152,13 @@
 <p-dialog
   [(visible)]="chucVuDialog"
   [style]="{ width: '550px' }"
-  header="Chi tiết ChucVu"
+  header="{{ dialogHeader }}"
   [modal]="true"
   styleClass="p-fluid"
 >
   <ng-template pTemplate="content">
     <div class="field">
-      <label for="tenChucVu" class="required-field">Tên ChucVu</label>
+      <label for="tenChucVu" class="required-field">Tên chức vụ</label>
       <input
         type="text"
         pInputText
@@ -168,7 +168,7 @@
         autofocus
       />
       <small class="p-error" *ngIf="submitted && !chucVu.tenChucVu"
-        >Tên chucVu không được để trống</small
+        >Tên chức vụ không được để trống</small
       >
     </div>
     <div class="field">
@@ -196,6 +196,9 @@
             <div>{{ loaiNhanSu?.tenLoaiNhanSu }}</div>
           </div>
         </ng-template></p-dropdown
+      >
+      <small class="p-error" *ngIf="submitted && chucVu.maLoaiNhanSu === 0"
+        >Chưa chọn loại nhân sự</small
       >
     </div>
     <div class="field">

@@ -21,21 +21,18 @@ export class LopHocComponent implements OnInit {
     private confirmationService: ConfirmationService
   ) {}
 
-  public loading = true;
-  public lopHocDialog = false;
-
-  public lopHocs: LopHoc[] = [];
-  public displayLopHocs: LopHoc[] = [];
-
-  public lopHoc: LopHoc = Object.assign({}, this.dataService.newLopHoc);
-  public submitted: boolean = false;
-  public selectedKhoiLop: KhoiLop | undefined;
-  public khoiLops: KhoiLop[] = [];
-
-  public selectedNienHoc: NienHoc | undefined;
-  public nienHocs: NienHoc[] = [];
-
-  public ngOnInit(): void {
+  dialogHeader = '';
+  loading = true;
+  lopHocDialog = false;
+  lopHocs: LopHoc[] = [];
+  displayLopHocs: LopHoc[] = [];
+  lopHoc: LopHoc = Object.assign({}, this.dataService.newLopHoc);
+  submitted: boolean = false;
+  selectedKhoiLop: KhoiLop | undefined;
+  khoiLops: KhoiLop[] = [];
+  selectedNienHoc: NienHoc | undefined;
+  nienHocs: NienHoc[] = [];
+  ngOnInit(): void {
     this.dataService.selectedNienHoc$.subscribe((nienHoc) => {
       this.selectedNienHoc = nienHoc;
     });
@@ -43,42 +40,42 @@ export class LopHocComponent implements OnInit {
     this.getLopHocs();
   }
 
-  public exportExcel() {
+  exportExcel() {
     const exportData: any[] = [];
     this.lopHocs.forEach((table) => {
       exportData.push({
-        tenLop: table.tenLop,
-        khoiLop: table.khoiLop.tenKhoiLop,
-        hocPhi: table.hocPhi,
-        nienHoc: table.nienHoc.tenNienHoc,
+        TenLop: table.tenLop,
+        KhoiLop: table.khoiLop?.tenKhoiLop,
+        HocPhi: table.hocPhi,
+        NienHoc: table.nienHoc?.tenNienHoc,
       });
     });
     this.exportService.exportExcel(exportData, 'DanhSachLopHoc');
   }
 
-  public exportPdf() {
+  exportPdf() {
     const exportData: any[] = [];
     this.lopHocs.forEach((table) => {
       exportData.push({
-        tenLop: table.tenLop,
-        khoiLop: table.khoiLop.tenKhoiLop,
-        hocPhi: table.hocPhi,
-        nienHoc: table.nienHoc.tenNienHoc,
+        TenLop: table.tenLop,
+        KhoiLop: table.khoiLop?.tenKhoiLop,
+        HocPhi: table.hocPhi,
+        NienHoc: table.nienHoc?.tenNienHoc,
       });
     });
     this.exportService.exportPdf(
       {
-        tenLop: 'Tên lớp',
-        khoiLop: 'Khối lớp',
-        hocPhi: 'Học phí',
-        nienHoc: 'Niên học',
+        TenLop: 'Tên lớp',
+        KhoiLop: 'Khối lớp',
+        HocPhi: 'Học phí',
+        NienHoc: 'Niên học',
       },
       exportData,
       'DanhSachLopHoc'
     );
   }
 
-  public getKhoiLops(): void {
+  getKhoiLops(): void {
     this.loading = true;
     this.dataService.getKhoiLops().subscribe((data) => {
       this.khoiLops = data;
@@ -87,26 +84,25 @@ export class LopHocComponent implements OnInit {
     });
   }
 
-  public getNienHocs(): void {
+  getNienHocs(): void {
     this.dataService.getNienHocs().subscribe((data) => {
       this.nienHocs = data;
     });
   }
 
-  public getLopHocs(): void {
+  getLopHocs(): void {
     this.loading = true;
     if (this.selectedNienHoc) {
       this.dataService
         .getLopHocsByNienHoc(this.selectedNienHoc.maNienHoc)
         .subscribe((data) => {
           this.lopHocs = data;
-          //this.displayLopHocs=this.lopHocs.filter((lopHoc)=>lopHoc.nienHoc.maNienHoc===this.selectedNienHoc?.maNienHoc);
           this.loading = false;
         });
     }
   }
 
-  public openNew(): void {
+  openNew(): void {
     if (!this.selectedNienHoc) {
       this.messageService.add({
         severity: 'error',
@@ -116,21 +112,21 @@ export class LopHocComponent implements OnInit {
       });
       return;
     }
+    this.dialogHeader = 'Thêm lớp học';
     this.lopHoc = Object.assign({}, this.dataService.newLopHoc);
     this.lopHocDialog = true;
     this.getKhoiLops();
   }
 
-  public editLopHoc(lopHoc: LopHoc): void {
-    console.log('edit lopHoc:', lopHoc);
+  editLopHoc(lopHoc: LopHoc): void {
+    this.dialogHeader = 'Sửa lớp học';
     this.lopHoc = lopHoc;
     this.selectedKhoiLop = this.lopHoc.khoiLop;
     this.lopHocDialog = true;
     this.getKhoiLops();
   }
 
-  public deleteLopHoc(lopHoc: LopHoc) {
-    console.log('delete danh muc thuc don', lopHoc);
+  deleteLopHoc(lopHoc: LopHoc) {
     this.confirmationService.confirm({
       message: 'Bạn có muốn xóa ' + lopHoc.tenLop + '?',
       header: 'Xác nhận',
@@ -149,8 +145,7 @@ export class LopHocComponent implements OnInit {
     });
   }
 
-  public hideDialog(cancel = true, success = true): void {
-    console.log('hideDialog: ');
+  hideDialog(cancel = true, success = true): void {
     this.lopHocDialog = false;
     if (cancel) {
       this.messageService.add({
@@ -177,8 +172,8 @@ export class LopHocComponent implements OnInit {
     this.submitted = false;
   }
 
-  public saveLopHoc() {
-    console.log('saveLopHoc: ', this.lopHoc);
+  saveLopHoc() {
+    this.submitted = true;
     if (!this.selectedKhoiLop) {
       this.messageService.add({
         severity: 'error',
@@ -188,7 +183,12 @@ export class LopHocComponent implements OnInit {
       });
       return;
     }
-    if (!this.selectedNienHoc) {
+
+    this.lopHoc.maKhoiLop = this.selectedKhoiLop.maKhoiLop;
+    if (this.selectedNienHoc) {
+      this.lopHoc.maNienHoc = this.selectedNienHoc.maNienHoc;
+    }
+    if (this.lopHoc.maNienHoc === 0) {
       this.messageService.add({
         severity: 'error',
         summary: 'Lỗi',
@@ -197,40 +197,41 @@ export class LopHocComponent implements OnInit {
       });
       return;
     }
-    this.lopHoc.maKhoiLop = this.selectedKhoiLop.maKhoiLop;
-    this.lopHoc.maNienHoc = this.selectedNienHoc.maNienHoc;
-    console.log('saveLopHoc: ', this.lopHoc);
-
-    if (this.lopHoc.maLop === 0) {
-      this.dataService.postLopHoc(this.lopHoc).subscribe(
-        (data) => {
-          console.log('return data = ', data);
-          this.lopHocs.push(data);
-          this.hideDialog(false, true);
-          this.getLopHocs();
-        },
-        (error) => {
-          console.log('error');
-          this.hideDialog(false, false);
-        }
-      );
-    } else {
-      this.dataService.putLopHoc(this.lopHoc.maLop, this.lopHoc).subscribe(
-        (data) => {
-          console.log('return data = ', data);
-          this.hideDialog(false, true);
-          this.getLopHocs();
-        },
-        (error) => {
-          console.log('error');
-          this.hideDialog(false, false);
-        }
-      );
+    if (this.checkValid(this.lopHoc)) {
+      if (this.lopHoc.maLop === 0) {
+        this.dataService.postLopHoc(this.lopHoc).subscribe(
+          (data) => {
+            this.getLopHocs();
+            this.hideDialog(false, true);
+            this.getLopHocs();
+          },
+          (error) => {
+            console.log(error);
+            this.hideDialog(false, false);
+          }
+        );
+      } else {
+        this.dataService.putLopHoc(this.lopHoc.maLop, this.lopHoc).subscribe(
+          (data) => {
+            this.hideDialog(false, true);
+            this.getLopHocs();
+          },
+          (error) => {
+            console.log(error);
+            this.hideDialog(false, false);
+          }
+        );
+      }
     }
   }
 
-  public onKhoiLopChange(event: any): void {
+  onKhoiLopChange(event: any): void {
     const khopLop: KhoiLop = event;
     this.selectedKhoiLop = khopLop;
+  }
+
+  private checkValid(lopHoc: LopHoc): boolean {
+    if (!lopHoc.tenLop) return false;
+    return true;
   }
 }

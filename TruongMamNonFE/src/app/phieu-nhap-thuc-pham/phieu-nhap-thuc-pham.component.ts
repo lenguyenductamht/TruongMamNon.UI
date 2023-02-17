@@ -29,6 +29,7 @@ export class PhieuNhapThucPhamComponent implements OnInit {
     private confirmationService: ConfirmationService
   ) {}
 
+  dialogHeader = '';
   loading = false;
   phieuNhapThucPhamDialog: boolean = false;
 
@@ -53,45 +54,47 @@ export class PhieuNhapThucPhamComponent implements OnInit {
   cols: any[] | undefined;
 
   exportColumns: any[] | undefined;
-  public ngOnInit(): void {
+  ngOnInit(): void {
     this.getPhieuNhapThucPhams();
   }
 
-  public exportExcel() {
-    // const exportData:any[]=[];
-    // this.phieuNhapThucPhams.forEach((table)=>{
-    //   exportData.push({
-    //     TenPhieuNhapThucPham: table.tenPhieuNhapThucPham,
-    //     GhiChu:table.ghiChu,
-    //   });
-    // });
-    //this.exportService.exportExcel(exportData, 'PhieuNhapThucPham');
+  exportExcel() {
+    const exportData: any[] = [];
+    this.phieuNhapThucPhams.forEach((table) => {
+      exportData.push({
+        MaPhieuNhap: table.maPhieuNhapThucPham,
+        NgayNhap: table.ngayNhap,
+        NguoiNhap: table.nguoiNhap.ho + ' ' + table.nguoiNhap.ten,
+        GhiChu: table.ghiChu,
+        TrangThai: table.trangThai,
+      });
+    });
+    this.exportService.exportExcel(exportData, 'DanhSachPhieuNhapThucPham');
   }
 
-  public exportPdf() {
-    // const exportData:any[]=[];
-    // this.phieuNhapThucPhams.forEach((table)=>{
-    //   exportData.push({
-    //     TenPhieuNhapThucPham: table.tenPhieuNhapThucPham,
-    //     GhiChu:table.ghiChu,
-    //   });
-    // });
-    // this.exportService.exportPdf(
-    //   {
-    //     TenPhieuNhapThucPham: "Tên PhieuNhapThucPham",
-    //     GhiChu: "Ghi Chú",
-    //   },
-    //   exportData,
-    //   'PhieuNhapThucPham'
-    // );
+  exportPdf() {
+    const exportData: any[] = [];
+    this.phieuNhapThucPhams.forEach((table) => {
+      exportData.push({
+        MaPhieuNhap: table.maPhieuNhapThucPham,
+        NgayNhap: table.ngayNhap,
+        NguoiNhap: table.nguoiNhap.ho + ' ' + table.nguoiNhap.ten,
+        GhiChu: table.ghiChu,
+        TrangThai: table.trangThai,
+      });
+    });
+    this.exportService.exportPdf(
+      {
+        MaPhieuNhap: 'Mã phiếu nhập',
+        NgayNhap: 'Ngày nhập',
+        NguoiNhap: 'Người nhập',
+        GhiChu: 'Ghi chú',
+        TrangThai: 'Trạng thái',
+      },
+      exportData,
+      'DanhSachPhieuNhapThucPham'
+    );
   }
-  // public getPhieuNhapThucPhams(): void {
-  //   this.loading = true;
-  //   this.dataService.getPhieuNhapThucPhams().subscribe((data) => {
-  //     this.phieuNhapThucPhams = data;
-  //     this.loading = false;
-  //   });
-  // }
 
   getPhieuNhapThucPhams(): void {
     this.loading = true;
@@ -121,7 +124,8 @@ export class PhieuNhapThucPhamComponent implements OnInit {
       .subscribe((success) => (this.chiTietPhieuNhapThucPhams = success));
   }
 
-  public openNew(): void {
+  openNew(): void {
+    this.dialogHeader = 'Thêm phiếu nhập thực phẩm';
     this.phieuNhapThucPham = Object.assign(
       {},
       this.dataService.newPhieuNhapThucPham
@@ -135,7 +139,7 @@ export class PhieuNhapThucPhamComponent implements OnInit {
   }
 
   public editPhieuNhapThucPham(phieuNhapThucPham: PhieuNhapThucPham): void {
-    console.log('edit phieuNhapThucPham:', phieuNhapThucPham);
+    this.dialogHeader = 'Sửa phiếu nhập thực phẩm';
     this.phieuNhapThucPham = phieuNhapThucPham;
     this._ngayNhap = new Date(this.phieuNhapThucPham.ngayNhap);
     this.selectedNguoiNhap = this.phieuNhapThucPham.nguoiNhap;
@@ -143,11 +147,9 @@ export class PhieuNhapThucPhamComponent implements OnInit {
     this.getNguoiNhaps();
     this.getThucPhams();
     this.getChiTietPhieuNhapThucPhamByMaPhieuNhapThucPham();
-    console.log(this.getChiTietPhieuNhapThucPhamByMaPhieuNhapThucPham());
   }
 
   public deletePhieuNhapThucPham(phieuNhapThucPham: PhieuNhapThucPham) {
-    console.log('delete phieu nhap thuc pham', phieuNhapThucPham);
     this.confirmationService.confirm({
       message: 'Bạn có muốn xóa phiếu nhập thực phẩm này?',
       header: 'Xác nhận',
@@ -169,8 +171,7 @@ export class PhieuNhapThucPhamComponent implements OnInit {
     });
   }
 
-  public hideDialog(cancel = true, success = true): void {
-    console.log('hideDialog: ');
+  hideDialog(cancel = true, success = true): void {
     this.phieuNhapThucPhamDialog = false;
     if (cancel) {
       this.messageService.add({
@@ -197,20 +198,18 @@ export class PhieuNhapThucPhamComponent implements OnInit {
     this.submitted = false;
   }
 
-  public savePhieuNhapThucPham() {
+  savePhieuNhapThucPham() {
     this.submitted = true;
     this.phieuNhapThucPham.ngayNhap = this._ngayNhap;
     if (this.selectedNguoiNhap) {
       this.phieuNhapThucPham.maNguoiNhap = this.selectedNguoiNhap.maNhanSu;
     }
 
-    console.log('savePhieuNhapThucPham: ', this.phieuNhapThucPham);
     if (this.checkValid(this.phieuNhapThucPham) && this.checkValid2()) {
       if (this.phieuNhapThucPham.maPhieuNhapThucPham === 0) {
         this.phieuNhapThucPham.trangThai = 'Đề xuất';
         this.dataService.addPhieuNhapThucPham(this.phieuNhapThucPham).subscribe(
           (data) => {
-            console.log('return data = ', data);
             this.chiTietPhieuNhapThucPhams.forEach((element) => {
               element.maPhieuNhapThucPham = data.maPhieuNhapThucPham;
               this.dataService
@@ -237,7 +236,6 @@ export class PhieuNhapThucPhamComponent implements OnInit {
           )
           .subscribe(
             (data) => {
-              console.log('return data = ', data);
               this.getPhieuNhapThucPhams();
               this.hideDialog(false, true);
             },
@@ -289,13 +287,13 @@ export class PhieuNhapThucPhamComponent implements OnInit {
     );
   }
 
-  checkValid(phieuNhapThucPham: PhieuNhapThucPham): boolean {
+  private checkValid(phieuNhapThucPham: PhieuNhapThucPham): boolean {
     if (!phieuNhapThucPham.ngayNhap) return false;
     if (!phieuNhapThucPham.maNguoiNhap) return false;
     return true;
   }
 
-  checkValid2(): boolean {
+  private checkValid2(): boolean {
     if (this.chiTietPhieuNhapThucPhams.length === 0) {
       this.messageService.add({
         severity: 'error',

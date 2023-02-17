@@ -159,7 +159,7 @@
 <p-dialog
   [(visible)]="hocSinhDialog"
   [style]="{ width: '80%' }"
-  header="Thông tin hồ sơ học sinh"
+  header="{{ dialogHeader }}"
   [modal]="true"
   styleClass="p-fluid"
 >
@@ -308,7 +308,7 @@
       <div class="field col-12 md:col-3">
         <span class="p-float-label">
           <p-calendar
-            [(ngModel)]="hocSinh.ngayNhapHoc"
+            [(ngModel)]="_ngayNhapHoc"
             [showIcon]="true"
             dateFormat="dd/mm/yy"
             appendTo="body"
@@ -364,7 +364,7 @@
       <div class="field col-12 md:col-3">
         <span class="p-float-label">
           <p-calendar
-            [(ngModel)]="hocSinh.ngaySinh"
+            [(ngModel)]="_ngaySinh"
             [showIcon]="true"
             dateFormat="dd/mm/yy"
             appendTo="body"
@@ -513,7 +513,7 @@
       <div class="field col-12 md:col-3">
         <span class="p-float-label">
           <p-calendar
-            [(ngModel)]="hocSinh.ngayCapNhat"
+            [(ngModel)]="_ngayCapNhat"
             [showIcon]="true"
             dateFormat="dd/mm/yy"
             appendTo="body"

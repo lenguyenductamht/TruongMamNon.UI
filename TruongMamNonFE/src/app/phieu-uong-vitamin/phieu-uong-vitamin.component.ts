@@ -26,6 +26,7 @@ export class PhieuUongVitaminComponent implements OnInit {
     private confirmationService: ConfirmationService
   ) {}
 
+  dialogHeader = '';
   loading = false;
   phieuUongVitaminDialog: boolean = false;
 
@@ -52,50 +53,52 @@ export class PhieuUongVitaminComponent implements OnInit {
   selectedHocSinhs: HocSinh[] = [];
 
   exportColumns: any[] | undefined;
-  public ngOnInit(): void {
+  ngOnInit(): void {
     this.dataService.selectedNienHoc$.subscribe((nienHoc) => {
       this.selectedNienHoc = nienHoc;
     });
     this.getPhieuUongVitaminsByNienHoc();
   }
 
-  public exportExcel() {
-    // const exportData:any[]=[];
-    // this.phieuUongVitamins.forEach((table)=>{
-    //   exportData.push({
-    //     TenPhieuUongVitamin: table.tenPhieuUongVitamin,
-    //     GhiChu:table.ghiChu,
-    //   });
-    // });
-    //this.exportService.exportExcel(exportData, 'PhieuUongVitamin');
+  exportExcel() {
+    const exportData: any[] = [];
+    this.phieuUongVitamins.forEach((table) => {
+      exportData.push({
+        DotUongVitamin: table.dotUongVitamin?.tenDotUongVitamin,
+        MaHocSinh: table.hocSinh?.maHocSinh,
+        Ho: table.hocSinh?.ho,
+        Ten: table.hocSinh?.ten,
+        NgaySinh: table.hocSinh?.ngaySinh,
+      });
+    });
+    this.exportService.exportExcel(exportData, 'DanhSachPhieuUongVitamin');
   }
 
-  public exportPdf() {
-    // const exportData:any[]=[];
-    // this.phieuUongVitamins.forEach((table)=>{
-    //   exportData.push({
-    //     TenPhieuUongVitamin: table.tenPhieuUongVitamin,
-    //     GhiChu:table.ghiChu,
-    //   });
-    // });
-    // this.exportService.exportPdf(
-    //   {
-    //     TenPhieuUongVitamin: "Tên PhieuUongVitamin",
-    //     GhiChu: "Ghi Chú",
-    //   },
-    //   exportData,
-    //   'PhieuUongVitamin'
-    // );
+  exportPdf() {
+    const exportData: any[] = [];
+    this.phieuUongVitamins.forEach((table) => {
+      exportData.push({
+        DotUongVitamin: table.dotUongVitamin?.tenDotUongVitamin,
+        MaHocSinh: table.hocSinh?.maHocSinh,
+        Ho: table.hocSinh?.ho,
+        Ten: table.hocSinh?.ten,
+        NgaySinh: table.hocSinh?.ngaySinh,
+      });
+    });
+    this.exportService.exportPdf(
+      {
+        DotUongVitamin: 'Đợt uống vitamin',
+        MaHocSinh: 'Mã học sinh',
+        Ho: 'Họ',
+        Ten: 'Tên',
+        NgaySinh: 'Ngày sinh',
+      },
+      exportData,
+      'DanhSachPhieuUongVitamin'
+    );
   }
-  // public getPhieuUongVitamins(): void {
-  //   this.loading = true;
-  //   this.dataService.getPhieuUongVitamins().subscribe((data) => {
-  //     this.phieuUongVitamins = data;
-  //     this.loading = false;
-  //   });
-  // }
 
-  public getPhieuUongVitaminsByNienHoc(): void {
+  getPhieuUongVitaminsByNienHoc(): void {
     this.loading = true;
     if (this.selectedNienHoc) {
       this.dataService
@@ -107,21 +110,11 @@ export class PhieuUongVitaminComponent implements OnInit {
     }
   }
 
-  public getKhoiLops(): void {
+  getKhoiLops(): void {
     this.dataService.getKhoiLops().subscribe((data) => {
       this.khoiLops = data;
     });
   }
-
-  // public getLopHocsByNienHoc():void{
-  //   if(this.selectedNienHoc && this.selectedKhoiLop){
-  //     this.dataService.getLopHocsByNienHoc(this.selectedNienHoc?.maNienHoc).subscribe((data)=>{
-  //       this.lopHocs=data;
-  //       console.log(data);
-  //       //this.getHocSinhs();
-  //     });
-  //   }
-  // }
 
   getDotUongVitaminsByNienHoc(): void {
     if (this.selectedNienHoc) {
@@ -136,19 +129,7 @@ export class PhieuUongVitaminComponent implements OnInit {
     }
   }
 
-  // public getLopHocsByNienHocKhoiLop():void{
-  //   // this.loading=true;
-  //   if(this.selectedNienHoc && this.selectedKhoiLop){
-  //     this.dataService.getLopHocsByNienHocKhoiLop(this.selectedNienHoc?.maNienHoc, this.selectedKhoiLop?.maKhoiLop).subscribe((data)=>{
-  //       this.lopHocs=data;
-  //       // this.loading=false;
-  //       console.log(data);
-  //       //this.getHocSinhs();
-  //     });
-  //   }
-  // }
-
-  public getHocSinhs(): void {
+  getHocSinhs(): void {
     if (this.selectedLopHoc) {
       this.dataService
         .getHocSinhsByLopHoc(this.selectedLopHoc.maLop)
@@ -167,7 +148,7 @@ export class PhieuUongVitaminComponent implements OnInit {
       });
     }
   }
-  public getLopHocs(): void {
+  getLopHocs(): void {
     if (this.selectedNienHoc && !this.selectedKhoiLop) {
       this.dataService
         .getLopHocsByNienHoc(this.selectedNienHoc.maNienHoc)
@@ -186,7 +167,8 @@ export class PhieuUongVitaminComponent implements OnInit {
     }
   }
 
-  public openNew(): void {
+  openNew(): void {
+    this.dialogHeader = 'Thêm phiếu uống vitamin';
     this.phieuUongVitamin = Object.assign(
       {},
       this.dataService.newPhieuUongVitamin
@@ -199,14 +181,13 @@ export class PhieuUongVitaminComponent implements OnInit {
     this.phieuUongVitaminDialog = true;
   }
 
-  public editPhieuUongVitamin(phieuUongVitamin: PhieuUongVitamin): void {
-    console.log('edit phieuUongVitamin:', phieuUongVitamin);
+  editPhieuUongVitamin(phieuUongVitamin: PhieuUongVitamin): void {
+    this.dialogHeader = 'Sửa phiếu uống vitamin';
     this.phieuUongVitamin = phieuUongVitamin;
     this.phieuUongVitaminDialog = true;
   }
 
-  public deletePhieuUongVitamin(phieuUongVitamin: PhieuUongVitamin) {
-    console.log('delete phieu tiem vaccine', phieuUongVitamin);
+  deletePhieuUongVitamin(phieuUongVitamin: PhieuUongVitamin) {
     this.confirmationService.confirm({
       message:
         'Bạn có muốn xóa phiếu tiêm của ' +
@@ -232,8 +213,7 @@ export class PhieuUongVitaminComponent implements OnInit {
     });
   }
 
-  public hideDialog(cancel = true, success = true): void {
-    console.log('hideDialog: ');
+  hideDialog(cancel = true, success = true): void {
     this.phieuUongVitaminDialog = false;
     if (cancel) {
       this.messageService.add({
@@ -260,9 +240,8 @@ export class PhieuUongVitaminComponent implements OnInit {
     this.submitted = false;
   }
 
-  public savePhieuUongVitamin() {
+  savePhieuUongVitamin() {
     this.submitted = true;
-    console.log('savePhieuUongVitamin: ', this.phieuUongVitamin);
     if (this.selectedDotUongVitamin) {
       this.phieuUongVitamin.maDotUongVitamin =
         this.selectedDotUongVitamin.maDotUongVitamin;
@@ -271,11 +250,8 @@ export class PhieuUongVitaminComponent implements OnInit {
       if (this.phieuUongVitamin.maPhieuUongVitamin === 0) {
         this.selectedHocSinhs.forEach((element) => {
           this.phieuUongVitamin.maHocSinh = element.maHocSinh;
-          console.log(this.phieuUongVitamin);
           this.dataService.addPhieuUongVitamin(this.phieuUongVitamin).subscribe(
-            (data) => {
-              console.log('return data = ', data);
-            },
+            (data) => {},
             (error) => {
               console.log(error);
               this.hideDialog(false, false);
@@ -292,7 +268,6 @@ export class PhieuUongVitaminComponent implements OnInit {
           )
           .subscribe(
             (data) => {
-              console.log('return data = ', data);
               this.getPhieuUongVitaminsByNienHoc();
               this.hideDialog(false, true);
             },
@@ -305,25 +280,25 @@ export class PhieuUongVitaminComponent implements OnInit {
     }
   }
 
-  public onKhoiLopChange(event: any) {
+  onKhoiLopChange(event: any) {
     const khoiLop: KhoiLop = event;
     this.selectedKhoiLop = khoiLop;
     this.getLopHocs();
     this.getHocSinhs();
   }
 
-  public onLopHocChange(event: any) {
+  onLopHocChange(event: any) {
     const lopHoc: LopHoc = event;
     this.selectedLopHoc = lopHoc;
     this.getHocSinhs();
   }
 
-  public onDotUongVitaminChange(event: any) {
+  onDotUongVitaminChange(event: any) {
     const dotUongVitamin: DotUongVitamin = event;
     this.selectedDotUongVitamin = dotUongVitamin;
   }
 
-  checkValid(phieuUongVitamin: PhieuUongVitamin): boolean {
+  private checkValid(phieuUongVitamin: PhieuUongVitamin): boolean {
     if (!phieuUongVitamin.maDotUongVitamin) return false;
     return true;
   }

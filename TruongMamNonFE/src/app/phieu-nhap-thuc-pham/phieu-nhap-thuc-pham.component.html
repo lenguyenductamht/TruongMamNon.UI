@@ -155,7 +155,7 @@
 <p-dialog
   [(visible)]="phieuNhapThucPhamDialog"
   [style]="{ width: '75%' }"
-  header="Chi tiết tiêm vaccine"
+  header="{{ dialogHeader }}"
   [modal]="true"
   styleClass="p-fluid"
 >
@@ -211,7 +211,7 @@
         </span>
       </div>
 
-      <div class="field col-12 md:col-2">
+      <div class="field col-12 md:col-3">
         <span class="p-float-label">
           <input
             type="text"
@@ -223,7 +223,7 @@
         </span>
       </div>
 
-      <div class="field col-12 md:col-2">
+      <div class="field col-12 md:col-3">
         <span class="p-float-label">
           <input
             type="text"
@@ -236,7 +236,7 @@
         </span>
       </div>
 
-      <div class="field col-12 md:col-2">
+      <!-- <div class="field col-12 md:col-2">
         <span class="p-float-label">
           <input
             type="text"
@@ -247,130 +247,10 @@
           />
           <label for="tongTien">Tổng tiền</label>
         </span>
-      </div>
+      </div> -->
     </div>
 
     <div class="card">
-      <!-- <p-table
-        #dt
-        [value]="chiTietPhieuNhapThucPhams"
-        [rows]="10"
-        [paginator]="true"
-        [globalFilterFields]="['maHocSinh', 'ho', 'ten']"
-        [tableStyle]="{ 'min-width': '75%' }"
-        [rowHover]="true"
-        dataKey="maThucPham"
-        currentPageReportTemplate="Hiển thị {first} đến {last} trong {totalRecords} mục"
-        [showCurrentPageReport]="true"
-        [rowsPerPageOptions]="[10, 25, 50]"
-        styleClass="p-datatable-sm p-datatable-striped p-datatable-gridlines"
-      >
-        <ng-template pTemplate="caption">
-          <div class="flex align-items-center justify-content-between">
-            <h3 class="m-0">Chi tiết phiếu nhập thực phẩm</h3>
-            <div class="field col-12 md:col-3">
-              <span class="p-float-label">
-                <p-dropdown
-                  [options]="thucPhams"
-                  [(ngModel)]="selectedThucPham"
-                  [filter]="true"
-                  filterBy="tenThucPham"
-                  dataKey="maThucPham"
-                  placeholder="Chọn thực phẩm"
-                  (onChange)="onThucPhamChange($event.value)"
-                  appendTo="body"
-                >
-                  <ng-template pTemplate="selectedItem">
-                    <div *ngIf="selectedThucPham">
-                      <div>
-                        {{ selectedThucPham.tenThucPham }}
-                      </div>
-                    </div>
-                  </ng-template>
-                  <ng-template let-thucPham pTemplate="item">
-                    <div>
-                      <div>{{ thucPham.tenThucPham }}</div>
-                    </div>
-                  </ng-template>
-                </p-dropdown>
-
-                <label for="thucPham" class="required-field"> Thực phẩm</label>
-              </span>
-            </div>
-          </div>
-        </ng-template>
-        <ng-template pTemplate="header">
-          <tr>
-            <th pSortableColumn="tenThucPham" style="min-width: 5rem">
-              Tên thực phẩm <p-sortIcon field="tenThucPham"></p-sortIcon>
-            </th>
-            <th pSortableColumn="donViTinh" style="min-width: 5rem">
-              Đơn vị tính <p-sortIcon field="donViTinh"></p-sortIcon>
-            </th>
-            <th pSortableColumn="donGia" style="min-width: 5rem">
-              Đơn giá <p-sortIcon field="donGia"></p-sortIcon>
-            </th>
-            <th pSortableColumn="soLuong" style="min-width: 5rem">
-              Số lượng <p-sortIcon field="soLuong"></p-sortIcon>
-            </th>
-            <th pSortableColumn="thanhTien" style="min-width: 5rem">
-              Thành tiền<p-sortIcon field="thanhTien"></p-sortIcon>
-            </th>
-            <th style="width: 4rem"></th>
-          </tr>
-        </ng-template>
-        <ng-template pTemplate="body" let-chiTietPhieuNhapThucPham>
-          <tr>
-            <td>{{ chiTietPhieuNhapThucPham.thucPham.tenThucPham }}</td>
-            <td>{{ chiTietPhieuNhapThucPham.thucPham.donViTinh }}</td>
-            <td
-              [pEditableColumn]="chiTietPhieuNhapThucPham.donGia"
-              pEditableColumnField="donGia"
-            >
-              <p-cellEditor>
-                <ng-template pTemplate="input">
-                  <input
-                    pInputText
-                    type="text"
-                    [(ngModel)]="chiTietPhieuNhapThucPham.donGia"
-                  />
-                </ng-template>
-                <ng-tamplate pTemplate="output">
-                  {{ chiTietPhieuNhapThucPham.donGia }}
-                </ng-tamplate>
-              </p-cellEditor>
-            </td>
-            <td>{{ chiTietPhieuNhapThucPham.soLuong }}</td>
-            <td>
-              {{
-                chiTietPhieuNhapThucPham.donGia *
-                  chiTietPhieuNhapThucPham.soLuong
-              }}
-            </td>
-            <td>
-              <button
-                pButton
-                pRipple
-                icon="pi pi-trash"
-                class="p-button-rounded p-button-warning"
-                pTooltip="Xóa"
-                tooltipPosition="top"
-                (click)="deletePhieuNhapThucPham(phieuNhapThucPham)"
-              ></button>
-            </td>
-          </tr>
-        </ng-template>
-        <ng-template pTemplate="summary">
-          <div class="flex align-items-center justify-content-between">
-            Tổng cộng có
-            {{
-              chiTietPhieuNhapThucPhams ? chiTietPhieuNhapThucPhams.length : 0
-            }}
-            mục.
-          </div>
-        </ng-template>
-      </p-table> -->
-
       <p-table
         [value]="chiTietPhieuNhapThucPhams"
         dataKey="maThucPham"
@@ -442,7 +322,7 @@
                   ></p-inputNumber>
                 </ng-template>
                 <ng-template pTemplate="output">
-                  {{ chiTietPhieuNhapThucPham.donGia }}
+                  {{ chiTietPhieuNhapThucPham.donGia | currency : "VND" }}
                 </ng-template>
               </p-cellEditor>
             </td>
@@ -467,8 +347,7 @@
             <td>
               {{
                 chiTietPhieuNhapThucPham.donGia *
-                  chiTietPhieuNhapThucPham.soLuong +
-                  " đ"
+                  chiTietPhieuNhapThucPham.soLuong | currency : "VND"
               }}
             </td>
             <td>

@@ -20,58 +20,59 @@ export class ChucVuComponent implements OnInit {
     private confirmationService: ConfirmationService
   ) {}
 
-  public loading = false;
-  public chucVuDialog: boolean = false;
-
-  public chucVus: ChucVu[] = [];
-  public loaiNhanSus: LoaiNhanSu[] = [];
-  public filterSelectedLoaiNhanSu: LoaiNhanSu | undefined;
-  public selectedLoaiNhanSu: LoaiNhanSu | undefined;
-
-  public chucVu: ChucVu = Object.assign({}, this.dataService.newChucVu);
-  public submitted: boolean = false;
-  public cols: any[] | undefined;
-
-  public exportColumns: any[] | undefined;
-  public ngOnInit(): void {
+  loading = false;
+  chucVuDialog: boolean = false;
+  dialogHeader = '';
+  chucVus: ChucVu[] = [];
+  loaiNhanSus: LoaiNhanSu[] = [];
+  filterSelectedLoaiNhanSu: LoaiNhanSu | undefined;
+  selectedLoaiNhanSu: LoaiNhanSu | undefined;
+  chucVu: ChucVu = Object.assign({}, this.dataService.newChucVu);
+  submitted: boolean = false;
+  cols: any[] | undefined;
+  exportColumns: any[] | undefined;
+  ngOnInit(): void {
     this.getLoaiNhanSus();
     this.getChucVus();
   }
 
-  public exportExcel() {
+  exportExcel() {
     const exportData: any[] = [];
     this.chucVus.forEach((table) => {
       exportData.push({
         TenChucVu: table.tenChucVu,
+        LoaiNhanSu: table.loaiNhanSu.tenLoaiNhanSu,
         GhiChu: table.ghiChu,
       });
     });
-    this.exportService.exportExcel(exportData, 'ChucVu');
+    this.exportService.exportExcel(exportData, 'DanhSachChucVu');
   }
 
-  public exportPdf() {
+  exportPdf() {
     const exportData: any[] = [];
     this.chucVus.forEach((table) => {
       exportData.push({
         TenChucVu: table.tenChucVu,
+        LoaiNhanSu: table.loaiNhanSu.tenLoaiNhanSu,
         GhiChu: table.ghiChu,
       });
     });
     this.exportService.exportPdf(
       {
-        TenChucVu: 'Tên ChucVu',
+        TenChucVu: 'Tên chức vụ',
+        LoaiNhanSu: 'Loại nhân sự',
         GhiChu: 'Ghi Chú',
       },
       exportData,
-      'ChucVu'
+      'DanhSachChucVu'
     );
   }
-  public getLoaiNhanSus(): void {
+  getLoaiNhanSus(): void {
     this.dataService.getLoaiNhanSus().subscribe((data) => {
       this.loaiNhanSus = data;
     });
   }
-  public getChucVus(): void {
+  getChucVus(): void {
     this.loading = true;
     if (this.filterSelectedLoaiNhanSu) {
       this.dataService
@@ -88,22 +89,22 @@ export class ChucVuComponent implements OnInit {
     }
   }
 
-  public openNew(): void {
+  openNew(): void {
+    this.dialogHeader = 'Thêm chức vụ';
     this.chucVu = Object.assign({}, this.dataService.newChucVu);
     this.submitted = false;
     this.chucVuDialog = true;
   }
 
-  public editChucVu(chucVu: ChucVu): void {
-    console.log('edit chucVu:', chucVu);
+  editChucVu(chucVu: ChucVu): void {
+    this.dialogHeader = 'Sửa chức vụ';
     this.chucVu = chucVu;
     this.selectedLoaiNhanSu = chucVu.loaiNhanSu;
     this.chucVuDialog = true;
     this.getLoaiNhanSus();
   }
 
-  public deleteChucVu(chucVu: ChucVu) {
-    console.log('delete danh muc thuc don', chucVu);
+  deleteChucVu(chucVu: ChucVu) {
     this.confirmationService.confirm({
       message: 'Bạn có muốn xóa ' + chucVu.tenChucVu + '?',
       header: 'Xác nhận',
@@ -122,8 +123,7 @@ export class ChucVuComponent implements OnInit {
     });
   }
 
-  public hideDialog(cancel = true, success = true): void {
-    console.log('hideDialog: ');
+  hideDialog(cancel = true, success = true): void {
     this.chucVuDialog = false;
     if (cancel) {
       this.messageService.add({
@@ -150,57 +150,54 @@ export class ChucVuComponent implements OnInit {
     this.submitted = false;
   }
 
-  public saveChucVu() {
+  saveChucVu() {
     this.submitted = true;
-    console.log('saveChucVu: ', this.chucVu);
-    if (!this.selectedLoaiNhanSu) {
-      this.messageService.add({
-        severity: 'error',
-        summary: 'Lỗi',
-        detail: 'Chưa chọn loại nhân sự',
-        life: 3000,
-      });
-      return;
+    if (this.selectedLoaiNhanSu) {
+      this.chucVu.maLoaiNhanSu = this.selectedLoaiNhanSu.maLoaiNhanSu;
     }
-    this.chucVu.maLoaiNhanSu = this.selectedLoaiNhanSu.maLoaiNhanSu;
-    if (this.chucVu.maChucVu === 0) {
-      this.dataService.addChucVu(this.chucVu).subscribe(
-        (data) => {
-          console.log('return data = ', data);
-          this.getChucVus();
-          this.hideDialog(false, true);
-        },
-        (error) => {
-          console.log('error');
-          this.hideDialog(false, false);
-        }
-      );
-    } else {
-      console.log('ma', this.chucVu.maChucVu);
-      this.dataService
-        .updateChucVu(this.chucVu.maChucVu, this.chucVu)
-        .subscribe(
+    if (this.checkValid(this.chucVu)) {
+      if (this.chucVu.maChucVu === 0) {
+        this.dataService.addChucVu(this.chucVu).subscribe(
           (data) => {
-            console.log('return data = ', data);
             this.getChucVus();
             this.hideDialog(false, true);
           },
           (error) => {
-            console.log('error');
+            console.log(error);
             this.hideDialog(false, false);
           }
         );
+      } else {
+        this.dataService
+          .updateChucVu(this.chucVu.maChucVu, this.chucVu)
+          .subscribe(
+            (data) => {
+              this.getChucVus();
+              this.hideDialog(false, true);
+            },
+            (error) => {
+              console.log(error);
+              this.hideDialog(false, false);
+            }
+          );
+      }
     }
   }
 
-  public onFilterLoaiNhanSuChange(event: any): void {
+  onFilterLoaiNhanSuChange(event: any): void {
     const loaiNhanSu: LoaiNhanSu = event;
     this.filterSelectedLoaiNhanSu = loaiNhanSu;
     this.getChucVus();
   }
 
-  public onLoaiNhanSuChange(event: any): void {
+  onLoaiNhanSuChange(event: any): void {
     const loaiNhanSu: LoaiNhanSu = event;
     this.selectedLoaiNhanSu = loaiNhanSu;
+  }
+
+  private checkValid(chucVu: ChucVu): boolean {
+    if (!chucVu.tenChucVu) return false;
+    if (chucVu.maLoaiNhanSu === 0) return false;
+    return true;
   }
 }

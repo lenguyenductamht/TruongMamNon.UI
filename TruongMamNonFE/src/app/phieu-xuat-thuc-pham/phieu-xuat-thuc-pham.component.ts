@@ -29,6 +29,7 @@ export class PhieuXuatThucPhamComponent implements OnInit {
     private confirmationService: ConfirmationService
   ) {}
 
+  dialogHeader = '';
   loading = false;
   phieuXuatThucPhamDialog: boolean = false;
 
@@ -48,50 +49,51 @@ export class PhieuXuatThucPhamComponent implements OnInit {
     {},
     this.dataService.newChiTietPhieuXuatThucPham
   );
-  tongTien = 0;
   submitted: boolean = false;
   cols: any[] | undefined;
 
   exportColumns: any[] | undefined;
-  public ngOnInit(): void {
+  ngOnInit(): void {
     this.getPhieuXuatThucPhams();
   }
 
-  public exportExcel() {
-    // const exportData:any[]=[];
-    // this.phieuXuatThucPhams.forEach((table)=>{
-    //   exportData.push({
-    //     TenPhieuXuatThucPham: table.tenPhieuXuatThucPham,
-    //     GhiChu:table.ghiChu,
-    //   });
-    // });
-    //this.exportService.exportExcel(exportData, 'PhieuXuatThucPham');
+  exportExcel() {
+    const exportData: any[] = [];
+    this.phieuXuatThucPhams.forEach((table) => {
+      exportData.push({
+        MaPhieuXuat: table.maPhieuXuatThucPham,
+        NgayXuat: table.ngayXuat,
+        NguoiXuat: table.nguoiXuat.ho + ' ' + table.nguoiXuat.ten,
+        GhiChu: table.ghiChu,
+        TrangThai: table.trangThai,
+      });
+    });
+    this.exportService.exportExcel(exportData, 'DanhSachPhieuXuatThucPham');
   }
 
-  public exportPdf() {
-    // const exportData:any[]=[];
-    // this.phieuXuatThucPhams.forEach((table)=>{
-    //   exportData.push({
-    //     TenPhieuXuatThucPham: table.tenPhieuXuatThucPham,
-    //     GhiChu:table.ghiChu,
-    //   });
-    // });
-    // this.exportService.exportPdf(
-    //   {
-    //     TenPhieuXuatThucPham: "Tên PhieuXuatThucPham",
-    //     GhiChu: "Ghi Chú",
-    //   },
-    //   exportData,
-    //   'PhieuXuatThucPham'
-    // );
+  exportPdf() {
+    const exportData: any[] = [];
+    this.phieuXuatThucPhams.forEach((table) => {
+      exportData.push({
+        MaPhieuXuat: table.maPhieuXuatThucPham,
+        NgayXuat: table.ngayXuat,
+        NguoiXuat: table.nguoiXuat.ho + ' ' + table.nguoiXuat.ten,
+        GhiChu: table.ghiChu,
+        TrangThai: table.trangThai,
+      });
+    });
+    this.exportService.exportPdf(
+      {
+        MaPhieuXuat: 'Mã phiếu xuất',
+        NgayXuat: 'Ngày xuất',
+        NguoiXuat: 'Người xuất',
+        GhiChu: 'Ghi chú',
+        TrangThai: 'Trạng thái',
+      },
+      exportData,
+      'DanhSachPhieuXuatThucPham'
+    );
   }
-  // public getPhieuXuatThucPhams(): void {
-  //   this.loading = true;
-  //   this.dataService.getPhieuXuatThucPhams().subscribe((data) => {
-  //     this.phieuXuatThucPhams = data;
-  //     this.loading = false;
-  //   });
-  // }
 
   getPhieuXuatThucPhams(): void {
     this.loading = true;
@@ -121,7 +123,8 @@ export class PhieuXuatThucPhamComponent implements OnInit {
       .subscribe((success) => (this.chiTietPhieuXuatThucPhams = success));
   }
 
-  public openNew(): void {
+  openNew(): void {
+    this.dialogHeader = 'Thêm phiếu xuất thực phẩm';
     this.phieuXuatThucPham = Object.assign(
       {},
       this.dataService.newPhieuXuatThucPham
@@ -134,8 +137,8 @@ export class PhieuXuatThucPhamComponent implements OnInit {
     this.phieuXuatThucPhamDialog = true;
   }
 
-  public editPhieuXuatThucPham(phieuXuatThucPham: PhieuXuatThucPham): void {
-    console.log('edit phieuXuatThucPham:', phieuXuatThucPham);
+  editPhieuXuatThucPham(phieuXuatThucPham: PhieuXuatThucPham): void {
+    this.dialogHeader = 'Sửa phiếu xuất thực phẩm';
     this.phieuXuatThucPham = phieuXuatThucPham;
     this._ngayXuat = new Date(this.phieuXuatThucPham.ngayXuat);
     this.selectedNguoiXuat = this.phieuXuatThucPham.nguoiXuat;
@@ -143,13 +146,11 @@ export class PhieuXuatThucPhamComponent implements OnInit {
     this.getNguoiXuats();
     this.getThucPhams();
     this.getChiTietPhieuXuatThucPhamByMaPhieuXuatThucPham();
-    console.log(this.getChiTietPhieuXuatThucPhamByMaPhieuXuatThucPham());
   }
 
-  public deletePhieuXuatThucPham(phieuXuatThucPham: PhieuXuatThucPham) {
-    console.log('delete phieu xuat thuc pham', phieuXuatThucPham);
+  deletePhieuXuatThucPham(phieuXuatThucPham: PhieuXuatThucPham) {
     this.confirmationService.confirm({
-      message: 'Bạn có muốn xóa phiếu nhập thực phẩm này?',
+      message: 'Bạn có muốn xóa phiếu xuất thực phẩm này?',
       header: 'Xác nhận',
       icon: 'pi pi-exclamation-triangle',
       accept: () => {
@@ -169,8 +170,7 @@ export class PhieuXuatThucPhamComponent implements OnInit {
     });
   }
 
-  public hideDialog(cancel = true, success = true): void {
-    console.log('hideDialog: ');
+  hideDialog(cancel = true, success = true): void {
     this.phieuXuatThucPhamDialog = false;
     if (cancel) {
       this.messageService.add({
@@ -197,20 +197,18 @@ export class PhieuXuatThucPhamComponent implements OnInit {
     this.submitted = false;
   }
 
-  public savePhieuXuatThucPham() {
+  savePhieuXuatThucPham() {
     this.submitted = true;
     this.phieuXuatThucPham.ngayXuat = this._ngayXuat;
     if (this.selectedNguoiXuat) {
       this.phieuXuatThucPham.maNguoiXuat = this.selectedNguoiXuat.maNhanSu;
     }
 
-    console.log('savePhieuXuatThucPham: ', this.phieuXuatThucPham);
     if (this.checkValid(this.phieuXuatThucPham) && this.checkValid2()) {
       if (this.phieuXuatThucPham.maPhieuXuatThucPham === 0) {
         this.phieuXuatThucPham.trangThai = 'Đề xuất';
         this.dataService.addPhieuXuatThucPham(this.phieuXuatThucPham).subscribe(
           (data) => {
-            console.log('return data = ', data);
             this.chiTietPhieuXuatThucPhams.forEach((element) => {
               element.maPhieuXuatThucPham = data.maPhieuXuatThucPham;
               this.dataService.addChiTietPhieuXuatThucPham(element).subscribe();
@@ -234,7 +232,6 @@ export class PhieuXuatThucPhamComponent implements OnInit {
           )
           .subscribe(
             (data) => {
-              console.log('return data = ', data);
               this.getPhieuXuatThucPhams();
               this.hideDialog(false, true);
             },
@@ -277,8 +274,6 @@ export class PhieuXuatThucPhamComponent implements OnInit {
       chiTietPhieuXuatThucPham.soLuong = 0;
       chiTietPhieuXuatThucPham.thucPham = thucPham;
       this.chiTietPhieuXuatThucPhams.push(chiTietPhieuXuatThucPham);
-      console.log(thucPham.maThucPham);
-      console.log(this.chiTietPhieuXuatThucPhams);
     }
   }
 

@@ -19,21 +19,22 @@ export class VaccineComponent implements OnInit {
     private confirmationService: ConfirmationService
   ) {}
 
-  public loading = true;
-  public vaccineDialog: boolean = false;
+  dialogHeader = '';
+  loading = true;
+  vaccineDialog: boolean = false;
 
-  public vaccines: Vaccine[] = [];
+  vaccines: Vaccine[] = [];
 
-  public vaccine: Vaccine = Object.assign({}, this.dataService.newVaccine);
-  public submitted: boolean = false;
-  public cols: any[] | undefined;
+  vaccine: Vaccine = Object.assign({}, this.dataService.newVaccine);
+  submitted: boolean = false;
+  cols: any[] | undefined;
 
-  public exportColumns: any[] | undefined;
-  public ngOnInit(): void {
+  exportColumns: any[] | undefined;
+  ngOnInit(): void {
     this.getVaccines();
   }
 
-  public exportExcel() {
+  exportExcel() {
     const exportData: any[] = [];
     this.vaccines.forEach((table) => {
       exportData.push({
@@ -41,28 +42,28 @@ export class VaccineComponent implements OnInit {
         GhiChu: table.ghiChu,
       });
     });
-    this.exportService.exportExcel(exportData, 'Vaccine');
+    this.exportService.exportExcel(exportData, 'DanhSachVaccine');
   }
 
   public exportPdf() {
     const exportData: any[] = [];
     this.vaccines.forEach((table) => {
       exportData.push({
-        tenVaccine: table.tenVaccine,
-        ghiChu: table.ghiChu,
+        TenVaccine: table.tenVaccine,
+        GhiChu: table.ghiChu,
       });
     });
     this.exportService.exportPdf(
       {
-        tenVaccine: 'Tên vaccine',
-        ghiChu: 'Ghi Chú',
+        TenVaccine: 'Tên vaccine',
+        GhiChu: 'Ghi Chú',
       },
       exportData,
-      'Vaccine'
+      'DanhSachVaccine'
     );
   }
 
-  public getVaccines(): void {
+  getVaccines(): void {
     this.loading = true;
     this.dataService.getVaccines().subscribe((data) => {
       this.vaccines = data;
@@ -70,20 +71,20 @@ export class VaccineComponent implements OnInit {
     });
   }
 
-  public openNew(): void {
+  openNew(): void {
+    this.dialogHeader = 'Thêm vaccine';
     this.vaccine = Object.assign({}, this.dataService.newVaccine);
     this.submitted = false;
     this.vaccineDialog = true;
   }
 
-  public editVaccine(vaccine: Vaccine): void {
-    console.log('edit vaccine:', vaccine);
+  editVaccine(vaccine: Vaccine): void {
+    this.dialogHeader = 'Sửa vaccine';
     this.vaccine = vaccine;
     this.vaccineDialog = true;
   }
 
-  public deleteVaccine(vaccine: Vaccine) {
-    console.log('delete danh muc thuc don', vaccine);
+  deleteVaccine(vaccine: Vaccine) {
     this.confirmationService.confirm({
       message: 'Bạn có muốn xóa ' + vaccine.tenVaccine + '?',
       header: 'Xác nhận',
@@ -102,8 +103,7 @@ export class VaccineComponent implements OnInit {
     });
   }
 
-  public hideDialog(cancel = true, success = true): void {
-    console.log('hideDialog: ');
+  hideDialog(cancel = true, success = true): void {
     this.vaccineDialog = false;
     if (cancel) {
       this.messageService.add({
@@ -130,36 +130,40 @@ export class VaccineComponent implements OnInit {
     this.submitted = false;
   }
 
-  public saveVaccine() {
+  saveVaccine() {
     this.submitted = true;
-    console.log('saveVaccine: ', this.vaccine);
-    if (this.vaccine.maVaccine === 0) {
-      this.dataService.addVaccine(this.vaccine).subscribe(
-        (data) => {
-          console.log('return data = ', data);
-          this.getVaccines();
-          this.hideDialog(false, true);
-        },
-        (error) => {
-          console.log('error');
-          this.hideDialog(false, false);
-        }
-      );
-    } else {
-      console.log('ma', this.vaccine.maVaccine);
-      this.dataService
-        .updateVaccine(this.vaccine.maVaccine, this.vaccine)
-        .subscribe(
+    if (this.checkValid(this.vaccine)) {
+      if (this.vaccine.maVaccine === 0) {
+        this.dataService.addVaccine(this.vaccine).subscribe(
           (data) => {
-            console.log('return data = ', data);
             this.getVaccines();
             this.hideDialog(false, true);
           },
           (error) => {
-            console.log('error');
+            console.log(error);
             this.hideDialog(false, false);
           }
         );
+      } else {
+        console.log('ma', this.vaccine.maVaccine);
+        this.dataService
+          .updateVaccine(this.vaccine.maVaccine, this.vaccine)
+          .subscribe(
+            (data) => {
+              this.getVaccines();
+              this.hideDialog(false, true);
+            },
+            (error) => {
+              console.log(error);
+              this.hideDialog(false, false);
+            }
+          );
+      }
     }
+  }
+
+  private checkValid(vaccine: Vaccine): boolean {
+    if (!vaccine.tenVaccine) return false;
+    return true;
   }
 }

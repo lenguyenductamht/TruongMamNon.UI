@@ -4,6 +4,7 @@ import { NienHoc } from '../models/nien-hoc.model';
 import { ConfirmationService } from 'primeng/api';
 import { MessageService } from 'primeng/api';
 import { NgForm } from '@angular/forms';
+import { ExportService } from '../services/export.service';
 
 @Component({
   selector: 'app-nien-hoc',
@@ -14,30 +15,63 @@ export class NienHocComponent implements OnInit {
   constructor(
     private dataService: DataService,
     private messageService: MessageService,
-    private confirmationService: ConfirmationService
+    private confirmationService: ConfirmationService,
+    private exportService: ExportService
   ) {}
-  public loading = false;
-  public nienHocDialog = false;
-  public nienHocs: NienHoc[] = [];
-  public nienHoc: NienHoc = Object.assign({}, this.dataService.newNienHoc);
-  public submitted: boolean = false;
+  loading = false;
+  nienHocDialog = false;
+  nienHocs: NienHoc[] = [];
+  nienHoc: NienHoc = Object.assign({}, this.dataService.newNienHoc);
+  submitted: boolean = false;
+  dialogHeader = '';
+  _batDauHK1 = new Date();
+  _ketThucHK1 = new Date();
+  _batDauHK2 = new Date();
+  _ketThucHK2 = new Date();
 
-  public dialogHeader = '';
-
-  public _batDauHK1 = new Date();
-  public _ketThucHK1 = new Date();
-  public _batDauHK2 = new Date();
-  public _ketThucHK2 = new Date();
-
-  public ngOnInit(): void {
+  ngOnInit(): void {
     this.getNienHocs();
   }
 
-  public exportExcel() {}
+  exportExcel() {
+    const exportData: any[] = [];
+    this.nienHocs.forEach((table) => {
+      exportData.push({
+        TenNienHoc: table.tenNienHoc,
+        BatDauHK1: table.batDauHK1,
+        KetThucHK1: table.ketThucHK1,
+        BatDauHK2: table.batDauHK2,
+        KetThucHK2: table.ketThucHK2,
+      });
+    });
+    this.exportService.exportExcel(exportData, 'DanhSachNienHoc');
+  }
 
-  public exportPdf() {}
+  exportPdf() {
+    const exportData: any[] = [];
+    this.nienHocs.forEach((table) => {
+      exportData.push({
+        TenNienHoc: table.tenNienHoc,
+        BatDauHK1: table.batDauHK1,
+        KetThucHK1: table.ketThucHK1,
+        BatDauHK2: table.batDauHK2,
+        KetThucHK2: table.ketThucHK2,
+      });
+    });
+    this.exportService.exportPdf(
+      {
+        tenNienHoc: 'Tên niên học',
+        batDauHK1: 'Bắt đầu học kỳ 1',
+        ketThucHK1: 'Kết thúc học kỳ 1',
+        batDauHK2: 'Bắt đầu học kỳ 2',
+        ketThucHK2: 'Kết thúc học kỳ 2',
+      },
+      exportData,
+      'DanhSachNienHoc'
+    );
+  }
 
-  public getNienHocs(): void {
+  getNienHocs(): void {
     this.loading = true;
     this.dataService.getNienHocs().subscribe((data) => {
       this.nienHocs = data;
@@ -45,7 +79,7 @@ export class NienHocComponent implements OnInit {
     });
   }
 
-  public openNew(): void {
+  openNew(): void {
     this.submitted = false;
     this.nienHoc = Object.assign({}, this.dataService.newNienHoc);
     this._batDauHK1 = new Date();
@@ -57,7 +91,7 @@ export class NienHocComponent implements OnInit {
     this.nienHocDialog = true;
   }
 
-  public editNienHoc(nienHoc: NienHoc): void {
+  editNienHoc(nienHoc: NienHoc): void {
     console.log('edit nienHoc:', nienHoc);
     this._batDauHK1 = new Date(nienHoc.batDauHK1);
     this._ketThucHK1 = new Date(nienHoc.ketThucHK1);
@@ -68,7 +102,7 @@ export class NienHocComponent implements OnInit {
     this.nienHocDialog = true;
   }
 
-  public deleteNienHoc(nienHoc: NienHoc) {
+  deleteNienHoc(nienHoc: NienHoc) {
     console.log('delete nien hoc', nienHoc);
     this.confirmationService.confirm({
       message: 'Bạn có muốn xóa ' + nienHoc.tenNienHoc + '?',
@@ -88,7 +122,7 @@ export class NienHocComponent implements OnInit {
     });
   }
 
-  public hideDialog(cancel = true, success = true): void {
+  hideDialog(cancel = true, success = true): void {
     this.nienHocDialog = false;
     if (cancel) {
       this.messageService.add({
@@ -115,7 +149,7 @@ export class NienHocComponent implements OnInit {
     this.submitted = false;
   }
 
-  public saveNienHoc() {
+  saveNienHoc() {
     this.submitted = true;
     this.nienHoc.batDauHK1 = this._batDauHK1;
     this.nienHoc.ketThucHK1 = this._ketThucHK1;
@@ -153,16 +187,19 @@ export class NienHocComponent implements OnInit {
     }
   }
 
-  checkValid(nienHoc: NienHoc): boolean {
+  private checkValid(nienHoc: NienHoc): boolean {
     if (
-      nienHoc.tenNienHoc.trim().length &&
-      nienHoc.batDauHK1 &&
-      nienHoc.ketThucHK1 &&
-      nienHoc.batDauHK2 &&
-      nienHoc.ketThucHK2
+      !nienHoc.tenNienHoc.trim().length ||
+      !nienHoc.batDauHK1 ||
+      !nienHoc.ketThucHK1 ||
+      !nienHoc.batDauHK2 ||
+      !nienHoc.ketThucHK2
     ) {
-      return true;
+      return false;
     }
-    return false;
+    if (nienHoc.ketThucHK1 <= nienHoc.batDauHK1) return false;
+    if (nienHoc.batDauHK2 <= nienHoc.ketThucHK1) return false;
+    if (nienHoc.ketThucHK2 <= nienHoc.batDauHK2) return false;
+    return true;
   }
 }

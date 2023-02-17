@@ -75,18 +75,6 @@
       <div class="flex align-items-center justify-content-between mt-3">
         <h3 class="m-0">Danh sách phiếu xuất thực phẩm</h3>
         <div class="flex">
-          <!-- <span class="p-float-label mr-2">
-            <p-dropdown
-              inputId="filterLoaiNhanSu"
-              [options]="loaiNhanSus"
-              [(ngModel)]="filterSelectedLoaiNhanSu"
-              optionLabel="tenLoaiNhanSu"
-              placeholder="Chọn loại nhân sự"
-              [showClear]="true"
-              (onChange)="onFilterLoaiNhanSuChange($event.value)"
-            ></p-dropdown>
-            <label for="filterLoaiNhanSu">Loại nhân sự</label>
-          </span> -->
           <span class="p-input-icon-left">
             <i class="pi pi-search"></i>
             <input
@@ -167,7 +155,7 @@
 <p-dialog
   [(visible)]="phieuXuatThucPhamDialog"
   [style]="{ width: '75%' }"
-  header="Chi tiết tiêm vaccine"
+  header="{{ dialogHeader }}"
   [modal]="true"
   styleClass="p-fluid"
 >

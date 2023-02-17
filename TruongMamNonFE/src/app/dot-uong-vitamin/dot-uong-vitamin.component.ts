@@ -23,12 +23,13 @@ export class DotUongVitaminComponent implements OnInit {
     private confirmationService: ConfirmationService
   ) {}
 
-  public loading = true;
-  public dotUongVitaminDialog: boolean = false;
+  dialogHeader = '';
+  loading = true;
+  dotUongVitaminDialog: boolean = false;
 
-  public dotUongVitamins: DotUongVitamin[] = [];
+  dotUongVitamins: DotUongVitamin[] = [];
 
-  public dotUongVitamin: DotUongVitamin = Object.assign(
+  dotUongVitamin: DotUongVitamin = Object.assign(
     {},
     this.dataService.newDotUongVitamin
   );
@@ -39,44 +40,50 @@ export class DotUongVitaminComponent implements OnInit {
   _ngayUongVitamin: Date = new Date();
   selectedNienHoc: NienHoc | undefined;
   nienHocs: NienHoc[] = [];
-  public cols: any[] | undefined;
+  cols: any[] | undefined;
 
-  public exportColumns: any[] | undefined;
+  exportColumns: any[] | undefined;
 
-  public ngOnInit(): void {
+  ngOnInit(): void {
     this.dataService.selectedNienHoc$.subscribe((nienHoc) => {
       this.selectedNienHoc = nienHoc;
     });
     this.getDotUongVitaminsByNienHoc();
   }
 
-  public exportExcel() {
-    // const exportData: any[] = [];
-    // this.dotTiemDotUongVitamins.forEach((table) => {
-    //   exportData.push({
-    //     TenDotUongVitamin: table.tenDotUongVitamin,
-    //     GhiChu: table.ghiChu,
-    //   });
-    // });
-    // this.exportService.exportExcel(exportData, 'DotUongVitamin');
+  exportExcel() {
+    const exportData: any[] = [];
+    this.dotUongVitamins.forEach((table) => {
+      exportData.push({
+        TenDotUongVitamin: table.tenDotUongVitamin,
+        NgayUongVitamin: table.ngayUongVitamin,
+        ThuocUongVitamin: table.vitamin.tenVitamin,
+        NienHoc: table.nienHoc.tenNienHoc,
+      });
+    });
+    this.exportService.exportExcel(exportData, 'DanhSachDotUongVitamin');
   }
 
-  public exportPdf() {
-    // const exportData: any[] = [];
-    // this.dotTiemDotUongVitamins.forEach((table) => {
-    //   exportData.push({
-    //     tenDotUongVitamin: table.tenDotUongVitamin,
-    //     ghiChu: table.ghiChu,
-    //   });
-    // });
-    // this.exportService.exportPdf(
-    //   {
-    //     tenDotUongVitamin: 'Tên dotTiemDotUongVitamin',
-    //     ghiChu: 'Ghi Chú',
-    //   },
-    //   exportData,
-    //   'DotUongVitamin'
-    // );
+  exportPdf() {
+    const exportData: any[] = [];
+    this.dotUongVitamins.forEach((table) => {
+      exportData.push({
+        TenDotUongVitamin: table.tenDotUongVitamin,
+        NgayUongVitamin: table.ngayUongVitamin,
+        Vitamin: table.vitamin.tenVitamin,
+        NienHoc: table.nienHoc.tenNienHoc,
+      });
+    });
+    this.exportService.exportPdf(
+      {
+        TenDotUongVitamin: 'Tên đợt uống vitamin',
+        NgayUongVitamin: 'Ngày uống vitamin',
+        Vitamin: 'Vitamin',
+        NienHoc: 'Niên học',
+      },
+      exportData,
+      'DanhSachDotUongVitamin'
+    );
   }
 
   getVitamins(): void {
@@ -87,15 +94,6 @@ export class DotUongVitaminComponent implements OnInit {
       (error) => console.log(error)
     );
   }
-
-  // getDotUongVitamins(): void {
-  //   this.loading = true;
-  //   this.dataService.getDotUongVitamins().subscribe((data) => {
-  //     this.dotUongVitamins = data;
-  //     console.log(this.dotUongVitamins);
-  //     this.loading = false;
-  //   });
-  // }
 
   getDotUongVitaminsByNienHoc(): void {
     this.loading = true;
@@ -110,7 +108,8 @@ export class DotUongVitaminComponent implements OnInit {
     }
   }
 
-  public openNew(): void {
+  openNew(): void {
+    this.dialogHeader = 'Thêm đợt uống vitamin';
     this.dotUongVitamin = Object.assign({}, this.dataService.newDotUongVitamin);
     this.submitted = false;
     this.dotUongVitaminDialog = true;
@@ -118,8 +117,8 @@ export class DotUongVitaminComponent implements OnInit {
     this.getVitamins();
   }
 
-  public editDotUongVitamin(dotTiemDotUongVitamin: DotUongVitamin): void {
-    console.log('edit dotTiemDotUongVitamin:', dotTiemDotUongVitamin);
+  editDotUongVitamin(dotTiemDotUongVitamin: DotUongVitamin): void {
+    this.dialogHeader = 'Sửa đợt uống vitamin';
     this.dotUongVitamin = dotTiemDotUongVitamin;
     this.dotUongVitaminDialog = true;
     this._ngayUongVitamin = new Date(dotTiemDotUongVitamin.ngayUongVitamin);
@@ -127,7 +126,7 @@ export class DotUongVitaminComponent implements OnInit {
     this.selectedVitamin = this.dotUongVitamin.vitamin;
   }
 
-  public deleteDotUongVitamin(dotTiemDotUongVitamin: DotUongVitamin) {
+  deleteDotUongVitamin(dotTiemDotUongVitamin: DotUongVitamin) {
     console.log('delete danh muc thuc don', dotTiemDotUongVitamin);
     this.confirmationService.confirm({
       message: 'Bạn có muốn xóa đợt tiêm?',
@@ -149,8 +148,7 @@ export class DotUongVitaminComponent implements OnInit {
     });
   }
 
-  public hideDialog(cancel = true, success = true): void {
-    console.log('hideDialog: ');
+  hideDialog(cancel = true, success = true): void {
     this.dotUongVitaminDialog = false;
     if (cancel) {
       this.messageService.add({
@@ -177,7 +175,7 @@ export class DotUongVitaminComponent implements OnInit {
     this.submitted = false;
   }
 
-  public saveDotUongVitamin() {
+  saveDotUongVitamin() {
     if (this.selectedNienHoc?.maNienHoc === 0) {
       this.messageService.add({
         severity: 'error',
@@ -195,22 +193,19 @@ export class DotUongVitaminComponent implements OnInit {
     if (this.selectedNienHoc) {
       this.dotUongVitamin.maNienHoc = this.selectedNienHoc.maNienHoc;
     }
-    console.log('saveDotUongVitamin: ', this.dotUongVitamin);
     if (this.checkValid(this.dotUongVitamin)) {
       if (this.dotUongVitamin.maDotUongVitamin === 0) {
         this.dataService.addDotUongVitamin(this.dotUongVitamin).subscribe(
           (data) => {
-            console.log('return data = ', data);
             this.getDotUongVitaminsByNienHoc();
             this.hideDialog(false, true);
           },
           (error) => {
-            console.log('error');
+            console.log(error);
             this.hideDialog(false, false);
           }
         );
       } else {
-        console.log('ma', this.dotUongVitamin.maDotUongVitamin);
         this.dataService
           .updateDotUongVitamin(
             this.dotUongVitamin.maDotUongVitamin,
@@ -218,7 +213,6 @@ export class DotUongVitaminComponent implements OnInit {
           )
           .subscribe(
             (data) => {
-              console.log('return data = ', data);
               this.getDotUongVitaminsByNienHoc();
               this.hideDialog(false, true);
             },
@@ -236,13 +230,9 @@ export class DotUongVitaminComponent implements OnInit {
     this.selectedVitamin = vitamin;
   }
 
-  checkValid(dotUongVitamin: DotUongVitamin): boolean {
+  private checkValid(dotUongVitamin: DotUongVitamin): boolean {
     if (!dotUongVitamin.tenDotUongVitamin.trim()) return false;
-    if (
-      !dotUongVitamin.ngayUongVitamin ||
-      dotUongVitamin.ngayUongVitamin < new Date(Date.now())
-    )
-      return false;
+    if (!dotUongVitamin.ngayUongVitamin) return false;
     return true;
   }
 }

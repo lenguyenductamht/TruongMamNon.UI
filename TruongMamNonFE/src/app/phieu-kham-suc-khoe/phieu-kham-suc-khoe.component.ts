@@ -26,6 +26,7 @@ export class PhieuKhamSucKhoeComponent implements OnInit {
     private confirmationService: ConfirmationService
   ) {}
 
+  dialogHeader = '';
   loading = false;
   phieuKhamSucKhoeDialog: boolean = false;
 
@@ -52,50 +53,52 @@ export class PhieuKhamSucKhoeComponent implements OnInit {
   selectedHocSinh: HocSinh | undefined;
 
   exportColumns: any[] | undefined;
-  public ngOnInit(): void {
+  ngOnInit(): void {
     this.dataService.selectedNienHoc$.subscribe((nienHoc) => {
       this.selectedNienHoc = nienHoc;
     });
     this.getPhieuKhamSucKhoesByNienHoc();
   }
 
-  public exportExcel() {
-    // const exportData:any[]=[];
-    // this.phieuKhamSucKhoes.forEach((table)=>{
-    //   exportData.push({
-    //     TenPhieuKhamSucKhoe: table.tenPhieuKhamSucKhoe,
-    //     GhiChu:table.ghiChu,
-    //   });
-    // });
-    //this.exportService.exportExcel(exportData, 'PhieuKhamSucKhoe');
+  exportExcel() {
+    const exportData: any[] = [];
+    this.phieuKhamSucKhoes.forEach((table) => {
+      exportData.push({
+        DotKhamSucKhoe: table.dotKhamSucKhoe?.tenDotKhamSucKhoe,
+        MaHocSinh: table.hocSinh?.maHocSinh,
+        Ho: table.hocSinh?.ho,
+        Ten: table.hocSinh?.ten,
+        NgaySinh: table.hocSinh?.ngaySinh,
+      });
+    });
+    this.exportService.exportExcel(exportData, 'DanhSachPhieuKhamSucKhoe');
   }
 
-  public exportPdf() {
-    // const exportData:any[]=[];
-    // this.phieuKhamSucKhoes.forEach((table)=>{
-    //   exportData.push({
-    //     TenPhieuKhamSucKhoe: table.tenPhieuKhamSucKhoe,
-    //     GhiChu:table.ghiChu,
-    //   });
-    // });
-    // this.exportService.exportPdf(
-    //   {
-    //     TenPhieuKhamSucKhoe: "Tên PhieuKhamSucKhoe",
-    //     GhiChu: "Ghi Chú",
-    //   },
-    //   exportData,
-    //   'PhieuKhamSucKhoe'
-    // );
+  exportPdf() {
+    const exportData: any[] = [];
+    this.phieuKhamSucKhoes.forEach((table) => {
+      exportData.push({
+        DotKhamSucKhoe: table.dotKhamSucKhoe?.tenDotKhamSucKhoe,
+        MaHocSinh: table.hocSinh?.maHocSinh,
+        Ho: table.hocSinh?.ho,
+        Ten: table.hocSinh?.ten,
+        NgaySinh: table.hocSinh?.ngaySinh,
+      });
+    });
+    this.exportService.exportPdf(
+      {
+        DotKhamSucKhoe: 'Đợt khám sức khỏe',
+        MaHocSinh: 'Mã học sinh',
+        Ho: 'Họ',
+        Ten: 'Tên',
+        NgaySinh: 'Ngày sinh',
+      },
+      exportData,
+      'DanhSachPhieuKhamSucKhoe'
+    );
   }
-  // public getPhieuKhamSucKhoes(): void {
-  //   this.loading = true;
-  //   this.dataService.getPhieuKhamSucKhoes().subscribe((data) => {
-  //     this.phieuKhamSucKhoes = data;
-  //     this.loading = false;
-  //   });
-  // }
 
-  public getPhieuKhamSucKhoesByNienHoc(): void {
+  getPhieuKhamSucKhoesByNienHoc(): void {
     this.loading = true;
     if (this.selectedNienHoc) {
       this.dataService
@@ -107,21 +110,11 @@ export class PhieuKhamSucKhoeComponent implements OnInit {
     }
   }
 
-  public getKhoiLops(): void {
+  getKhoiLops(): void {
     this.dataService.getKhoiLops().subscribe((data) => {
       this.khoiLops = data;
     });
   }
-
-  // public getLopHocsByNienHoc():void{
-  //   if(this.selectedNienHoc && this.selectedKhoiLop){
-  //     this.dataService.getLopHocsByNienHoc(this.selectedNienHoc?.maNienHoc).subscribe((data)=>{
-  //       this.lopHocs=data;
-  //       console.log(data);
-  //       //this.getHocSinhs();
-  //     });
-  //   }
-  // }
 
   getDotKhamSucKhoesByNienHoc(): void {
     if (this.selectedNienHoc) {
@@ -136,19 +129,7 @@ export class PhieuKhamSucKhoeComponent implements OnInit {
     }
   }
 
-  // public getLopHocsByNienHocKhoiLop():void{
-  //   // this.loading=true;
-  //   if(this.selectedNienHoc && this.selectedKhoiLop){
-  //     this.dataService.getLopHocsByNienHocKhoiLop(this.selectedNienHoc?.maNienHoc, this.selectedKhoiLop?.maKhoiLop).subscribe((data)=>{
-  //       this.lopHocs=data;
-  //       // this.loading=false;
-  //       console.log(data);
-  //       //this.getHocSinhs();
-  //     });
-  //   }
-  // }
-
-  public getHocSinhs(): void {
+  getHocSinhs(): void {
     if (this.selectedLopHoc) {
       this.dataService
         .getHocSinhsByLopHoc(this.selectedLopHoc.maLop)
@@ -157,7 +138,7 @@ export class PhieuKhamSucKhoeComponent implements OnInit {
         });
     }
   }
-  public getLopHocs(): void {
+  getLopHocs(): void {
     if (this.selectedNienHoc && !this.selectedKhoiLop) {
       this.dataService
         .getLopHocsByNienHoc(this.selectedNienHoc.maNienHoc)
@@ -176,7 +157,8 @@ export class PhieuKhamSucKhoeComponent implements OnInit {
     }
   }
 
-  public openNew(): void {
+  openNew(): void {
+    this.dialogHeader = 'Thêm phiếu khám sức khỏe';
     this.phieuKhamSucKhoe = Object.assign(
       {},
       this.dataService.newPhieuKhamSucKhoe
@@ -189,14 +171,13 @@ export class PhieuKhamSucKhoeComponent implements OnInit {
     this.phieuKhamSucKhoeDialog = true;
   }
 
-  public editPhieuKhamSucKhoe(phieuKhamSucKhoe: PhieuKhamSucKhoe): void {
-    console.log('edit phieuKhamSucKhoe:', phieuKhamSucKhoe);
+  editPhieuKhamSucKhoe(phieuKhamSucKhoe: PhieuKhamSucKhoe): void {
+    this.dialogHeader = 'Sửa phiếu khám sức khỏe';
     this.phieuKhamSucKhoe = phieuKhamSucKhoe;
     this.phieuKhamSucKhoeDialog = true;
   }
 
-  public deletePhieuKhamSucKhoe(phieuKhamSucKhoe: PhieuKhamSucKhoe) {
-    console.log('delete phieu tiem vaccine', phieuKhamSucKhoe);
+  deletePhieuKhamSucKhoe(phieuKhamSucKhoe: PhieuKhamSucKhoe) {
     this.confirmationService.confirm({
       message:
         'Bạn có muốn xóa phiếu tiêm của ' +
@@ -222,8 +203,7 @@ export class PhieuKhamSucKhoeComponent implements OnInit {
     });
   }
 
-  public hideDialog(cancel = true, success = true): void {
-    console.log('hideDialog: ');
+  hideDialog(cancel = true, success = true): void {
     this.phieuKhamSucKhoeDialog = false;
     if (cancel) {
       this.messageService.add({
@@ -250,9 +230,8 @@ export class PhieuKhamSucKhoeComponent implements OnInit {
     this.submitted = false;
   }
 
-  public savePhieuKhamSucKhoe() {
+  savePhieuKhamSucKhoe() {
     this.submitted = true;
-    console.log('savePhieuKhamSucKhoe: ', this.phieuKhamSucKhoe);
     if (this.selectedDotKhamSucKhoe) {
       this.phieuKhamSucKhoe.maDotKhamSucKhoe =
         this.selectedDotKhamSucKhoe.maDotKhamSucKhoe;
@@ -264,7 +243,6 @@ export class PhieuKhamSucKhoeComponent implements OnInit {
       if (this.phieuKhamSucKhoe.maPhieuKhamSucKhoe === 0) {
         this.dataService.addPhieuKhamSucKhoe(this.phieuKhamSucKhoe).subscribe(
           (data) => {
-            console.log('return data = ', data);
             this.getPhieuKhamSucKhoesByNienHoc();
             this.hideDialog(false, true);
           },
@@ -281,7 +259,6 @@ export class PhieuKhamSucKhoeComponent implements OnInit {
           )
           .subscribe(
             (data) => {
-              console.log('return data = ', data);
               this.getPhieuKhamSucKhoesByNienHoc();
               this.hideDialog(false, true);
             },
@@ -294,14 +271,14 @@ export class PhieuKhamSucKhoeComponent implements OnInit {
     }
   }
 
-  public onKhoiLopChange(event: any) {
+  onKhoiLopChange(event: any) {
     const khoiLop: KhoiLop = event;
     this.selectedKhoiLop = khoiLop;
     this.getLopHocs();
     this.getHocSinhs();
   }
 
-  public onLopHocChange(event: any) {
+  onLopHocChange(event: any) {
     const lopHoc: LopHoc = event;
     this.selectedLopHoc = lopHoc;
     this.getHocSinhs();
@@ -312,7 +289,7 @@ export class PhieuKhamSucKhoeComponent implements OnInit {
     this.selectedHocSinh = hocSinh;
   }
 
-  public onDotKhamSucKhoeChange(event: any) {
+  onDotKhamSucKhoeChange(event: any) {
     const dotKhamSucKhoe: DotKhamSucKhoe = event;
     this.selectedDotKhamSucKhoe = dotKhamSucKhoe;
   }

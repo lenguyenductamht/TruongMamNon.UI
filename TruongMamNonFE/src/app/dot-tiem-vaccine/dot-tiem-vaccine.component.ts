@@ -22,12 +22,13 @@ export class DotTiemVaccineComponent implements OnInit {
     private confirmationService: ConfirmationService
   ) {}
 
-  public loading = true;
-  public dotTiemVaccineDialog: boolean = false;
+  dialogHeader = '';
+  loading = true;
+  dotTiemVaccineDialog: boolean = false;
 
-  public dotTiemVaccines: DotTiemVaccine[] = [];
+  dotTiemVaccines: DotTiemVaccine[] = [];
 
-  public dotTiemVaccine: DotTiemVaccine = Object.assign(
+  dotTiemVaccine: DotTiemVaccine = Object.assign(
     {},
     this.dataService.newDotTiemVaccine
   );
@@ -38,44 +39,50 @@ export class DotTiemVaccineComponent implements OnInit {
   _ngayTiemVaccine: Date = new Date();
   selectedNienHoc: NienHoc | undefined;
   nienHocs: NienHoc[] = [];
-  public cols: any[] | undefined;
+  cols: any[] | undefined;
 
-  public exportColumns: any[] | undefined;
+  exportColumns: any[] | undefined;
 
-  public ngOnInit(): void {
+  ngOnInit(): void {
     this.dataService.selectedNienHoc$.subscribe((nienHoc) => {
       this.selectedNienHoc = nienHoc;
     });
     this.getDotTiemVaccinesByNienHoc();
   }
 
-  public exportExcel() {
-    // const exportData: any[] = [];
-    // this.dotTiemDotTiemVaccines.forEach((table) => {
-    //   exportData.push({
-    //     TenDotTiemVaccine: table.tenDotTiemVaccine,
-    //     GhiChu: table.ghiChu,
-    //   });
-    // });
-    // this.exportService.exportExcel(exportData, 'DotTiemVaccine');
+  exportExcel() {
+    const exportData: any[] = [];
+    this.dotTiemVaccines.forEach((table) => {
+      exportData.push({
+        TenDotTiemVaccine: table.tenDotTiemVaccine,
+        NgayTiemVaccine: table.ngayTiemVaccine,
+        ThuocTiemVaccine: table.vaccine.tenVaccine,
+        NienHoc: table.nienHoc.tenNienHoc,
+      });
+    });
+    this.exportService.exportExcel(exportData, 'DanhSachDotTiemVaccine');
   }
 
-  public exportPdf() {
-    // const exportData: any[] = [];
-    // this.dotTiemDotTiemVaccines.forEach((table) => {
-    //   exportData.push({
-    //     tenDotTiemVaccine: table.tenDotTiemVaccine,
-    //     ghiChu: table.ghiChu,
-    //   });
-    // });
-    // this.exportService.exportPdf(
-    //   {
-    //     tenDotTiemVaccine: 'Tên dotTiemDotTiemVaccine',
-    //     ghiChu: 'Ghi Chú',
-    //   },
-    //   exportData,
-    //   'DotTiemVaccine'
-    // );
+  exportPdf() {
+    const exportData: any[] = [];
+    this.dotTiemVaccines.forEach((table) => {
+      exportData.push({
+        TenDotTiemVaccine: table.tenDotTiemVaccine,
+        NgayTiemVaccine: table.ngayTiemVaccine,
+        Vaccine: table.vaccine.tenVaccine,
+        NienHoc: table.nienHoc.tenNienHoc,
+      });
+    });
+    this.exportService.exportPdf(
+      {
+        TenDotTiemVaccine: 'Tên đợt tiêm vaccine',
+        NgayTiemVaccine: 'Ngày tiêm vaccine',
+        Vaccine: 'Vaccine',
+        NienHoc: 'Niên học',
+      },
+      exportData,
+      'DanhSachDotTiemVaccine'
+    );
   }
 
   getVaccines(): void {
@@ -86,15 +93,6 @@ export class DotTiemVaccineComponent implements OnInit {
       (error) => console.log(error)
     );
   }
-
-  // getDotTiemVaccines(): void {
-  //   this.loading = true;
-  //   this.dataService.getDotTiemVaccines().subscribe((data) => {
-  //     this.dotTiemVaccines = data;
-  //     console.log(this.dotTiemVaccines);
-  //     this.loading = false;
-  //   });
-  // }
 
   getDotTiemVaccinesByNienHoc(): void {
     this.loading = true;
@@ -109,7 +107,8 @@ export class DotTiemVaccineComponent implements OnInit {
     }
   }
 
-  public openNew(): void {
+  openNew(): void {
+    this.dialogHeader = 'Thêm đợt tiêm vaccine';
     this.dotTiemVaccine = Object.assign({}, this.dataService.newDotTiemVaccine);
     this.submitted = false;
     this.dotTiemVaccineDialog = true;
@@ -117,8 +116,8 @@ export class DotTiemVaccineComponent implements OnInit {
     this.getVaccines();
   }
 
-  public editDotTiemVaccine(dotTiemDotTiemVaccine: DotTiemVaccine): void {
-    console.log('edit dotTiemDotTiemVaccine:', dotTiemDotTiemVaccine);
+  editDotTiemVaccine(dotTiemDotTiemVaccine: DotTiemVaccine): void {
+    this.dialogHeader = 'Sửa đợt tiêm vaccine';
     this.dotTiemVaccine = dotTiemDotTiemVaccine;
     this.dotTiemVaccineDialog = true;
     this._ngayTiemVaccine = new Date(dotTiemDotTiemVaccine.ngayTiemVaccine);
@@ -126,8 +125,7 @@ export class DotTiemVaccineComponent implements OnInit {
     this.selectedVaccine = dotTiemDotTiemVaccine.vaccine;
   }
 
-  public deleteDotTiemVaccine(dotTiemDotTiemVaccine: DotTiemVaccine) {
-    console.log('delete danh muc thuc don', dotTiemDotTiemVaccine);
+  deleteDotTiemVaccine(dotTiemDotTiemVaccine: DotTiemVaccine) {
     this.confirmationService.confirm({
       message: 'Bạn có muốn xóa đợt tiêm?',
       header: 'Xác nhận',
@@ -148,8 +146,7 @@ export class DotTiemVaccineComponent implements OnInit {
     });
   }
 
-  public hideDialog(cancel = true, success = true): void {
-    console.log('hideDialog: ');
+  hideDialog(cancel = true, success = true): void {
     this.dotTiemVaccineDialog = false;
     if (cancel) {
       this.messageService.add({
@@ -194,22 +191,19 @@ export class DotTiemVaccineComponent implements OnInit {
     if (this.selectedNienHoc) {
       this.dotTiemVaccine.maNienHoc = this.selectedNienHoc.maNienHoc;
     }
-    console.log('saveDotTiemVaccine: ', this.dotTiemVaccine);
     if (this.checkValid(this.dotTiemVaccine)) {
       if (this.dotTiemVaccine.maDotTiemVaccine === 0) {
         this.dataService.addDotTiemVaccine(this.dotTiemVaccine).subscribe(
           (data) => {
-            console.log('return data = ', data);
             this.getDotTiemVaccinesByNienHoc();
             this.hideDialog(false, true);
           },
           (error) => {
-            console.log('error');
+            console.log(error);
             this.hideDialog(false, false);
           }
         );
       } else {
-        console.log('ma', this.dotTiemVaccine.maDotTiemVaccine);
         this.dataService
           .updateDotTiemVaccine(
             this.dotTiemVaccine.maDotTiemVaccine,
@@ -217,7 +211,6 @@ export class DotTiemVaccineComponent implements OnInit {
           )
           .subscribe(
             (data) => {
-              console.log('return data = ', data);
               this.getDotTiemVaccinesByNienHoc();
               this.hideDialog(false, true);
             },
@@ -235,13 +228,9 @@ export class DotTiemVaccineComponent implements OnInit {
     this.selectedVaccine = vaccine;
   }
 
-  checkValid(dotTiemVaccine: DotTiemVaccine): boolean {
+  private checkValid(dotTiemVaccine: DotTiemVaccine): boolean {
     if (!dotTiemVaccine.tenDotTiemVaccine.trim()) return false;
-    if (
-      !dotTiemVaccine.ngayTiemVaccine ||
-      dotTiemVaccine.ngayTiemVaccine < new Date(Date.now())
-    )
-      return false;
+    if (!dotTiemVaccine.ngayTiemVaccine) return false;
     return true;
   }
 }

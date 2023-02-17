@@ -19,24 +19,22 @@ export class ThuocSoGiunComponent implements OnInit {
     private confirmationService: ConfirmationService
   ) {}
 
-  public loading = true;
-  public thuocSoGiunDialog: boolean = false;
+  dialogHeader = '';
+  loading = true;
+  thuocSoGiunDialog: boolean = false;
 
-  public thuocSoGiuns: ThuocSoGiun[] = [];
+  thuocSoGiuns: ThuocSoGiun[] = [];
 
-  public thuocSoGiun: ThuocSoGiun = Object.assign(
-    {},
-    this.dataService.newThuocSoGiun
-  );
-  public submitted: boolean = false;
-  public cols: any[] | undefined;
+  thuocSoGiun: ThuocSoGiun = Object.assign({}, this.dataService.newThuocSoGiun);
+  submitted: boolean = false;
+  cols: any[] | undefined;
 
-  public exportColumns: any[] | undefined;
-  public ngOnInit(): void {
+  exportColumns: any[] | undefined;
+  ngOnInit(): void {
     this.getThuocSoGiuns();
   }
 
-  public exportExcel() {
+  exportExcel() {
     const exportData: any[] = [];
     this.thuocSoGiuns.forEach((table) => {
       exportData.push({
@@ -44,28 +42,28 @@ export class ThuocSoGiunComponent implements OnInit {
         GhiChu: table.ghiChu,
       });
     });
-    this.exportService.exportExcel(exportData, 'ThuocSoGiun');
+    this.exportService.exportExcel(exportData, 'DanhSachThuocSoGiun');
   }
 
-  public exportPdf() {
+  exportPdf() {
     const exportData: any[] = [];
     this.thuocSoGiuns.forEach((table) => {
       exportData.push({
-        tenThuocSoGiun: table.tenThuocSoGiun,
-        ghiChu: table.ghiChu,
+        TenThuocSoGiun: table.tenThuocSoGiun,
+        GhiChu: table.ghiChu,
       });
     });
     this.exportService.exportPdf(
       {
-        tenThuocSoGiun: 'Tên thuốc sổ giun',
-        ghiChu: 'Ghi Chú',
+        TenThuocSoGiun: 'Tên thuốc sổ giun',
+        GhiChu: 'Ghi Chú',
       },
       exportData,
-      'ThuocSoGiun'
+      'DanhSachThuocSoGiun'
     );
   }
 
-  public getThuocSoGiuns(): void {
+  getThuocSoGiuns(): void {
     this.loading = true;
     this.dataService.getThuocSoGiuns().subscribe((data) => {
       this.thuocSoGiuns = data;
@@ -73,20 +71,18 @@ export class ThuocSoGiunComponent implements OnInit {
     });
   }
 
-  public openNew(): void {
+  openNew(): void {
     this.thuocSoGiun = Object.assign({}, this.dataService.newThuocSoGiun);
     this.submitted = false;
     this.thuocSoGiunDialog = true;
   }
 
-  public editThuocSoGiun(thuocSoGiun: ThuocSoGiun): void {
-    console.log('edit thuocSoGiun:', thuocSoGiun);
+  editThuocSoGiun(thuocSoGiun: ThuocSoGiun): void {
     this.thuocSoGiun = thuocSoGiun;
     this.thuocSoGiunDialog = true;
   }
 
-  public deleteThuocSoGiun(thuocSoGiun: ThuocSoGiun) {
-    console.log('delete danh muc thuc don', thuocSoGiun);
+  deleteThuocSoGiun(thuocSoGiun: ThuocSoGiun) {
     this.confirmationService.confirm({
       message: 'Bạn có muốn xóa ' + thuocSoGiun.tenThuocSoGiun + '?',
       header: 'Xác nhận',
@@ -107,8 +103,7 @@ export class ThuocSoGiunComponent implements OnInit {
     });
   }
 
-  public hideDialog(cancel = true, success = true): void {
-    console.log('hideDialog: ');
+  hideDialog(cancel = true, success = true): void {
     this.thuocSoGiunDialog = false;
     if (cancel) {
       this.messageService.add({
@@ -135,36 +130,39 @@ export class ThuocSoGiunComponent implements OnInit {
     this.submitted = false;
   }
 
-  public saveThuocSoGiun() {
+  saveThuocSoGiun() {
     this.submitted = true;
-    console.log('saveThuocSoGiun: ', this.thuocSoGiun);
-    if (this.thuocSoGiun.maThuocSoGiun === 0) {
-      this.dataService.addThuocSoGiun(this.thuocSoGiun).subscribe(
-        (data) => {
-          console.log('return data = ', data);
-          this.getThuocSoGiuns();
-          this.hideDialog(false, true);
-        },
-        (error) => {
-          console.log('error');
-          this.hideDialog(false, false);
-        }
-      );
-    } else {
-      console.log('ma', this.thuocSoGiun.maThuocSoGiun);
-      this.dataService
-        .updateThuocSoGiun(this.thuocSoGiun.maThuocSoGiun, this.thuocSoGiun)
-        .subscribe(
+    if (this.checkValid(this.thuocSoGiun)) {
+      if (this.thuocSoGiun.maThuocSoGiun === 0) {
+        this.dataService.addThuocSoGiun(this.thuocSoGiun).subscribe(
           (data) => {
-            console.log('return data = ', data);
             this.getThuocSoGiuns();
             this.hideDialog(false, true);
           },
           (error) => {
-            console.log('error');
+            console.log(error);
             this.hideDialog(false, false);
           }
         );
+      } else {
+        this.dataService
+          .updateThuocSoGiun(this.thuocSoGiun.maThuocSoGiun, this.thuocSoGiun)
+          .subscribe(
+            (data) => {
+              this.getThuocSoGiuns();
+              this.hideDialog(false, true);
+            },
+            (error) => {
+              console.log(error);
+              this.hideDialog(false, false);
+            }
+          );
+      }
     }
+  }
+
+  private checkValid(thuocSoGiun: ThuocSoGiun): boolean {
+    if (!thuocSoGiun.tenThuocSoGiun) return false;
+    return true;
   }
 }

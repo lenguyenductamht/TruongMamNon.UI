@@ -42,9 +42,9 @@ export class MenuBarComponent implements OnInit {
           //command:()=>this.router.navigate(['/'])
           routerLink: ['/'],
         },
-        {
-          icon: 'pi pi-search',
-        },
+        // {
+        //   icon: 'pi pi-search',
+        // },
         {
           label: 'Hệ thống',
           items: [
@@ -75,10 +75,10 @@ export class MenuBarComponent implements OnInit {
         {
           label: 'Nhân sự',
           items: [
-            {
-              label: 'Loại nhân sự',
-              routerLink: ['/LoaiNhanSu'],
-            },
+            // {
+            //   label: 'Loại nhân sự',
+            //   routerLink: ['/LoaiNhanSu'],
+            // },
             {
               label: 'Quản lý nhân sự',
               routerLink: ['/TraCuuNhanSu'],

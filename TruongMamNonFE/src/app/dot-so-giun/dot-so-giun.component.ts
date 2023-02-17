@@ -23,15 +23,13 @@ export class DotSoGiunComponent implements OnInit {
     private confirmationService: ConfirmationService
   ) {}
 
-  public loading = true;
-  public dotSoGiunDialog: boolean = false;
+  dialogHeader = '';
+  loading = true;
+  dotSoGiunDialog: boolean = false;
 
-  public dotSoGiuns: DotSoGiun[] = [];
+  dotSoGiuns: DotSoGiun[] = [];
 
-  public dotSoGiun: DotSoGiun = Object.assign(
-    {},
-    this.dataService.newDotSoGiun
-  );
+  dotSoGiun: DotSoGiun = Object.assign({}, this.dataService.newDotSoGiun);
 
   thuocSoGiuns: ThuocSoGiun[] = [];
   selectedThuocSoGiun: ThuocSoGiun | undefined;
@@ -39,44 +37,50 @@ export class DotSoGiunComponent implements OnInit {
   _ngaySoGiun: Date = new Date();
   selectedNienHoc: NienHoc | undefined;
   nienHocs: NienHoc[] = [];
-  public cols: any[] | undefined;
+  cols: any[] | undefined;
 
-  public exportColumns: any[] | undefined;
+  exportColumns: any[] | undefined;
 
-  public ngOnInit(): void {
+  ngOnInit(): void {
     this.dataService.selectedNienHoc$.subscribe((nienHoc) => {
       this.selectedNienHoc = nienHoc;
     });
     this.getDotSoGiunsByNienHoc();
   }
 
-  public exportExcel() {
-    // const exportData: any[] = [];
-    // this.dotTiemDotSoGiuns.forEach((table) => {
-    //   exportData.push({
-    //     TenDotSoGiun: table.tenDotSoGiun,
-    //     GhiChu: table.ghiChu,
-    //   });
-    // });
-    // this.exportService.exportExcel(exportData, 'DotSoGiun');
+  exportExcel() {
+    const exportData: any[] = [];
+    this.dotSoGiuns.forEach((table) => {
+      exportData.push({
+        TenDotSoGiun: table.tenDotSoGiun,
+        NgaySoGiun: table.ngaySoGiun,
+        ThuocSoGiun: table.thuocSoGiun.tenThuocSoGiun,
+        NienHoc: table.nienHoc.tenNienHoc,
+      });
+    });
+    this.exportService.exportExcel(exportData, 'DanhSachDotSoGiun');
   }
 
-  public exportPdf() {
-    // const exportData: any[] = [];
-    // this.dotTiemDotSoGiuns.forEach((table) => {
-    //   exportData.push({
-    //     tenDotSoGiun: table.tenDotSoGiun,
-    //     ghiChu: table.ghiChu,
-    //   });
-    // });
-    // this.exportService.exportPdf(
-    //   {
-    //     tenDotSoGiun: 'Tên dotTiemDotSoGiun',
-    //     ghiChu: 'Ghi Chú',
-    //   },
-    //   exportData,
-    //   'DotSoGiun'
-    // );
+  exportPdf() {
+    const exportData: any[] = [];
+    this.dotSoGiuns.forEach((table) => {
+      exportData.push({
+        TenDotSoGiun: table.tenDotSoGiun,
+        NgaySoGiun: table.ngaySoGiun,
+        ThuocSoGiun: table.thuocSoGiun.tenThuocSoGiun,
+        NienHoc: table.nienHoc.tenNienHoc,
+      });
+    });
+    this.exportService.exportPdf(
+      {
+        TenDotSoGiun: 'Tên đợt sổ giun',
+        NgaySoGiun: 'Ngày sổ giun',
+        ThuocSoGiun: 'Thuốc sổ giun',
+        NienHoc: 'Niên học',
+      },
+      exportData,
+      'DanhSachDotSoGiun'
+    );
   }
 
   getThuocSoGiuns(): void {
@@ -88,15 +92,6 @@ export class DotSoGiunComponent implements OnInit {
     );
   }
 
-  // getDotSoGiuns(): void {
-  //   this.loading = true;
-  //   this.dataService.getDotSoGiuns().subscribe((data) => {
-  //     this.dotSoGiuns = data;
-  //     console.log(this.dotSoGiuns);
-  //     this.loading = false;
-  //   });
-  // }
-
   getDotSoGiunsByNienHoc(): void {
     this.loading = true;
     if (this.selectedNienHoc) {
@@ -104,13 +99,13 @@ export class DotSoGiunComponent implements OnInit {
         .getDotSoGiunsByNienHoc(this.selectedNienHoc.maNienHoc)
         .subscribe((data) => {
           this.dotSoGiuns = data;
-          console.log(this.dotSoGiuns);
           this.loading = false;
         });
     }
   }
 
-  public openNew(): void {
+  openNew(): void {
+    this.dialogHeader = 'Thêm đợt sổ giun';
     this.dotSoGiun = Object.assign({}, this.dataService.newDotSoGiun);
     this.submitted = false;
     this.dotSoGiunDialog = true;
@@ -118,8 +113,8 @@ export class DotSoGiunComponent implements OnInit {
     this.getThuocSoGiuns();
   }
 
-  public editDotSoGiun(dotSoGiun: DotSoGiun): void {
-    console.log('edit dotTiemDotSoGiun:', dotSoGiun);
+  editDotSoGiun(dotSoGiun: DotSoGiun): void {
+    this.dialogHeader = 'Sửa đợt sổ giun';
     this.dotSoGiun = dotSoGiun;
     this.dotSoGiunDialog = true;
     this._ngaySoGiun = new Date(dotSoGiun.ngaySoGiun);
@@ -127,8 +122,7 @@ export class DotSoGiunComponent implements OnInit {
     this.selectedThuocSoGiun = dotSoGiun.thuocSoGiun;
   }
 
-  public deleteDotSoGiun(dotTiemDotSoGiun: DotSoGiun) {
-    console.log('delete danh muc thuc don', dotTiemDotSoGiun);
+  deleteDotSoGiun(dotTiemDotSoGiun: DotSoGiun) {
     this.confirmationService.confirm({
       message: 'Bạn có muốn xóa đợt tiêm?',
       header: 'Xác nhận',
@@ -149,8 +143,7 @@ export class DotSoGiunComponent implements OnInit {
     });
   }
 
-  public hideDialog(cancel = true, success = true): void {
-    console.log('hideDialog: ');
+  hideDialog(cancel = true, success = true): void {
     this.dotSoGiunDialog = false;
     if (cancel) {
       this.messageService.add({
@@ -177,7 +170,7 @@ export class DotSoGiunComponent implements OnInit {
     this.submitted = false;
   }
 
-  public saveDotSoGiun() {
+  saveDotSoGiun() {
     if (this.selectedNienHoc?.maNienHoc === 0) {
       this.messageService.add({
         severity: 'error',
@@ -195,12 +188,10 @@ export class DotSoGiunComponent implements OnInit {
     if (this.selectedNienHoc) {
       this.dotSoGiun.maNienHoc = this.selectedNienHoc.maNienHoc;
     }
-    console.log('saveDotSoGiun: ', this.dotSoGiun);
     if (this.checkValid(this.dotSoGiun)) {
       if (this.dotSoGiun.maDotSoGiun === 0) {
         this.dataService.addDotSoGiun(this.dotSoGiun).subscribe(
           (data) => {
-            console.log('return data = ', data);
             this.getDotSoGiunsByNienHoc();
             this.hideDialog(false, true);
           },
@@ -210,12 +201,10 @@ export class DotSoGiunComponent implements OnInit {
           }
         );
       } else {
-        console.log('ma', this.dotSoGiun.maDotSoGiun);
         this.dataService
           .updateDotSoGiun(this.dotSoGiun.maDotSoGiun, this.dotSoGiun)
           .subscribe(
             (data) => {
-              console.log('return data = ', data);
               this.getDotSoGiunsByNienHoc();
               this.hideDialog(false, true);
             },
@@ -235,8 +224,7 @@ export class DotSoGiunComponent implements OnInit {
 
   checkValid(dotSoGiun: DotSoGiun): boolean {
     if (!dotSoGiun.tenDotSoGiun.trim()) return false;
-    if (!dotSoGiun.ngaySoGiun || dotSoGiun.ngaySoGiun < new Date(Date.now()))
-      return false;
+    if (!dotSoGiun.ngaySoGiun) return false;
     return true;
   }
 }

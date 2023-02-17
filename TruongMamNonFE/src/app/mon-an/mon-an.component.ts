@@ -29,6 +29,7 @@ export class MonAnComponent implements OnInit {
     private confirmationService: ConfirmationService
   ) {}
 
+  dialogHeader = '';
   loading = false;
   monAnDialog: boolean = false;
 
@@ -42,50 +43,42 @@ export class MonAnComponent implements OnInit {
     {},
     this.dataService.newMonAnThucPham
   );
-  tongTien = 0;
   submitted: boolean = false;
   cols: any[] | undefined;
 
   exportColumns: any[] | undefined;
-  public ngOnInit(): void {
+  ngOnInit(): void {
     this.getMonAns();
   }
 
-  public exportExcel() {
-    // const exportData:any[]=[];
-    // this.monAns.forEach((table)=>{
-    //   exportData.push({
-    //     TenMonAn: table.tenMonAn,
-    //     GhiChu:table.ghiChu,
-    //   });
-    // });
-    //this.exportService.exportExcel(exportData, 'MonAn');
+  exportExcel() {
+    const exportData: any[] = [];
+    this.monAns.forEach((table) => {
+      exportData.push({
+        TenMonAn: table.tenMonAn,
+        GhiChu: table.ghiChu,
+      });
+    });
+    this.exportService.exportExcel(exportData, 'DanhSachMonAn');
   }
 
   public exportPdf() {
-    // const exportData:any[]=[];
-    // this.monAns.forEach((table)=>{
-    //   exportData.push({
-    //     TenMonAn: table.tenMonAn,
-    //     GhiChu:table.ghiChu,
-    //   });
-    // });
-    // this.exportService.exportPdf(
-    //   {
-    //     TenMonAn: "Tên MonAn",
-    //     GhiChu: "Ghi Chú",
-    //   },
-    //   exportData,
-    //   'MonAn'
-    // );
+    const exportData: any[] = [];
+    this.monAns.forEach((table) => {
+      exportData.push({
+        TenMonAn: table.tenMonAn,
+        GhiChu: table.ghiChu,
+      });
+    });
+    this.exportService.exportPdf(
+      {
+        TenMonAn: 'Tên món ăn',
+        GhiChu: 'Ghi chú',
+      },
+      exportData,
+      'DanhSachMonAn'
+    );
   }
-  // public getMonAns(): void {
-  //   this.loading = true;
-  //   this.dataService.getMonAns().subscribe((data) => {
-  //     this.monAns = data;
-  //     this.loading = false;
-  //   });
-  // }
 
   getMonAns(): void {
     this.loading = true;
@@ -107,7 +100,8 @@ export class MonAnComponent implements OnInit {
       .subscribe((success) => (this.monAnThucPhams = success));
   }
 
-  public openNew(): void {
+  openNew(): void {
+    this.dialogHeader = 'Thêm món ăn';
     this.monAn = Object.assign({}, this.dataService.newMonAn);
     this.monAnThucPhams = [];
     this.getThucPhams();
@@ -115,23 +109,21 @@ export class MonAnComponent implements OnInit {
     this.monAnDialog = true;
   }
 
-  public editMonAn(monAn: MonAn): void {
-    console.log('edit monAn:', monAn);
+  editMonAn(monAn: MonAn): void {
+    this.dialogHeader = 'Sửa món ăn';
     this.monAn = monAn;
     this.monAnDialog = true;
     this.getThucPhams();
     this.getMonAnThucPhamByMonAn();
   }
 
-  public deleteMonAn(monAn: MonAn) {
-    console.log('delete phieu nhap thuc pham', monAn);
+  deleteMonAn(monAn: MonAn) {
     this.confirmationService.confirm({
       message: 'Bạn có muốn xóa ' + monAn.tenMonAn + '?',
       header: 'Xác nhận',
       icon: 'pi pi-exclamation-triangle',
       accept: () => {
         this.dataService.deleteMonAn(monAn.maMonAn).subscribe((data) => {
-          console.log(data);
           this.getMonAns();
           this.messageService.add({
             severity: 'success',
@@ -144,8 +136,7 @@ export class MonAnComponent implements OnInit {
     });
   }
 
-  public hideDialog(cancel = true, success = true): void {
-    console.log('hideDialog: ');
+  hideDialog(cancel = true, success = true): void {
     this.monAnDialog = false;
     if (cancel) {
       this.messageService.add({
@@ -174,12 +165,10 @@ export class MonAnComponent implements OnInit {
 
   public saveMonAn() {
     this.submitted = true;
-    console.log('saveMonAn: ', this.monAn);
     if (this.checkValid(this.monAn) && this.checkValid2()) {
       if (this.monAn.maMonAn === 0) {
         this.dataService.addMonAn(this.monAn).subscribe(
           (data) => {
-            console.log('return data = ', data);
             this.monAnThucPhams.forEach((element) => {
               element.maMonAn = data.maMonAn;
               this.dataService
@@ -197,7 +186,6 @@ export class MonAnComponent implements OnInit {
       } else {
         this.dataService.updateMonAn(this.monAn.maMonAn, this.monAn).subscribe(
           (data) => {
-            console.log('return data = ', data);
             this.getMonAns();
             this.hideDialog(false, true);
           },
@@ -225,8 +213,6 @@ export class MonAnComponent implements OnInit {
       monAnThucPham.soLuong = 0;
       monAnThucPham.thucPham = thucPham;
       this.monAnThucPhams.push(monAnThucPham);
-      console.log(thucPham.maThucPham);
-      console.log(this.monAnThucPhams);
     }
   }
 
@@ -236,12 +222,12 @@ export class MonAnComponent implements OnInit {
     );
   }
 
-  checkValid(monAn: MonAn): boolean {
+  private checkValid(monAn: MonAn): boolean {
     if (!monAn.tenMonAn) return false;
     return true;
   }
 
-  checkValid2(): boolean {
+  private checkValid2(): boolean {
     if (this.monAnThucPhams.length === 0) {
       this.messageService.add({
         severity: 'error',

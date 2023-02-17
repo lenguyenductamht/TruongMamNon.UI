@@ -73,7 +73,7 @@
   >
     <ng-template pTemplate="caption">
       <div class="flex align-items-center justify-content-between">
-        <h3 class="m-0">Danh mục LoaiNhanSu</h3>
+        <h3 class="m-0">Danh mục loại nhân sự</h3>
         <span class="p-input-icon-left">
           <i class="pi pi-search"></i>
           <input
@@ -88,7 +88,7 @@
     <ng-template pTemplate="header">
       <tr>
         <th pSortableColumn="tenLoaiNhanSu" style="min-width: 15rem">
-          Tên LoaiNhanSu <p-sortIcon field="tenLoaiNhanSu"></p-sortIcon>
+          Tên loại nhân sự <p-sortIcon field="tenLoaiNhanSu"></p-sortIcon>
         </th>
         <th pSortableColumn="ghiChu" style="min-width: 10rem">
           Ghi Chú <p-sortIcon field="ghiChu"></p-sortIcon>
@@ -133,13 +133,13 @@
 <p-dialog
   [(visible)]="loaiNhanSuDialog"
   [style]="{ width: '550px' }"
-  header="Chi tiết LoaiNhanSu"
+  header="{{ dialogHeader }}"
   [modal]="true"
   styleClass="p-fluid"
 >
   <ng-template pTemplate="content">
     <div class="field">
-      <label for="tenLoaiNhanSu" class="required-field">Tên LoaiNhanSu</label>
+      <label for="tenLoaiNhanSu" class="required-field">Tên loại nhân sự</label>
       <input
         type="text"
         pInputText
@@ -149,7 +149,7 @@
         autofocus
       />
       <small class="p-error" *ngIf="submitted && !loaiNhanSu.tenLoaiNhanSu"
-        >Tên loaiNhanSu không được để trống</small
+        >Tên loại nhân sự không được để trống</small
       >
     </div>
     <div class="field">

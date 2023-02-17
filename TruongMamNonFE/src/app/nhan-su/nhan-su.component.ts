@@ -30,44 +30,43 @@ export class NhanSuComponent implements OnInit {
     private confirmationService: ConfirmationService
   ) {}
 
-  public loading = true;
-  public nhanSuDialog = false;
+  dialogHeader = '';
+  loading = true;
+  nhanSuDialog = false;
+  nhanSus: NhanSu[] = [];
+  nhanSu: NhanSu = Object.assign({}, this.dataService.newNhanSu);
+  submitted: boolean = false;
+  gioiTinhs: GioiTinh[] = [];
+  danTocs: DanToc[] = [];
+  tonGiaos: TonGiao[] = [];
+  quocTichs: QuocGia[] = [];
+  trangThaiLamViecs: TrangThaiLamViec[] = [];
+  khoiLops: KhoiLop[] = [];
+  selectedKhoiLop: KhoiLop | undefined;
+  lopHocs: LopHoc[] = [];
+  selectedLopHoc: LopHoc | undefined;
+  selectedGioiTinh: GioiTinh | undefined;
+  selectedNienHoc: NienHoc | undefined;
+  selectedTrangThaiLamViec: TrangThaiLamViec | undefined;
+  selectedDanToc: DanToc | undefined;
+  selectedTonGiao: TonGiao | undefined;
+  selectedQuocTich: QuocGia | undefined;
+  nienHocs: NienHoc[] = [];
+  phongBans: PhongBan[] = [];
+  selectedPhongBan: PhongBan | undefined;
 
-  public nhanSus: NhanSu[] = [];
+  loaiNhanSus: LoaiNhanSu[] = [];
+  selectedLoaiNhanSu: LoaiNhanSu | undefined;
 
-  public nhanSu: NhanSu = Object.assign({}, this.dataService.newNhanSu);
-  public submitted: boolean = false;
-  public gioiTinhs: GioiTinh[] = [];
-  public danTocs: DanToc[] = [];
-  public tonGiaos: TonGiao[] = [];
-  public quocTichs: QuocGia[] = [];
-  public trangThaiLamViecs: TrangThaiLamViec[] = [];
-  public khoiLops: KhoiLop[] = [];
-  public selectedKhoiLop: KhoiLop | undefined;
-  public lopHocs: LopHoc[] = [];
-  public selectedLopHoc: LopHoc | undefined;
-  public selectedGioiTinh: GioiTinh | undefined;
-  public selectedNienHoc: NienHoc | undefined;
-  public selectedTrangThaiLamViec: TrangThaiLamViec | undefined;
-  public selectedDanToc: DanToc | undefined;
-  public selectedTonGiao: TonGiao | undefined;
-  public selectedQuocTich: QuocGia | undefined;
-  public nienHocs: NienHoc[] = [];
-  public phongBans: PhongBan[] = [];
-  public selectedPhongBan: PhongBan | undefined;
-
-  public loaiNhanSus: LoaiNhanSu[] = [];
-  public selectedLoaiNhanSu: LoaiNhanSu | undefined;
-
-  public chucVus: ChucVu[] = [];
-  public selectedChucVu: ChucVu | undefined;
+  chucVus: ChucVu[] = [];
+  selectedChucVu: ChucVu | undefined;
 
   _ngaySinh = new Date();
   _ngayCap = new Date();
   _ngayVaoTruong = new Date();
   _ngayCapNhat = new Date();
 
-  public ngOnInit(): void {
+  ngOnInit(): void {
     this.getNhanSus();
     this.getKhoiLops();
     this.dataService.selectedNienHoc$.subscribe((nienHoc) => {
@@ -76,42 +75,57 @@ export class NhanSuComponent implements OnInit {
     this.gioiTinhs = this.dataService.gioiTinhs;
   }
 
-  public exportExcel() {
-    // const exportData:any[]=[];
-    // this.nhanSus.forEach((table)=>{
-    //   exportData.push({
-    //     tenLop: table.tenLop,
-    //     khoiLop:table.khoiLop.tenKhoiLop,
-    //     hocPhi:table.hocPhi,
-    //     nienHoc:table.nienHoc.tenNienHoc,
-    //   });
-    // });
-    // this.exportService.exportExcel(exportData, 'DanhSachNhanSu');
+  exportExcel() {
+    const exportData: any[] = [];
+    this.nhanSus.forEach((table) => {
+      exportData.push({
+        MaNhanSu: table.maNhanSu,
+        Ho: table.ho,
+        Ten: table.ten,
+        GioiTinh: table.gioiTinh?.tenGioiTinh,
+        NgaySinh: table.ngaySinh,
+        TrangThai: table.trangThaiLamViec?.tenTrangThai,
+        ViTri: table.loaiNhanSu?.tenLoaiNhanSu,
+        ChucVu: table.chucVu?.tenChucVu,
+        PhongBan: table.phongBan?.tenPhongBan,
+      });
+    });
+    this.exportService.exportExcel(exportData, 'DanhSachNhanSu');
   }
 
-  public exportPdf() {
-    // const exportData:any[]=[];
-    // this.nhanSus.forEach((table)=>{
-    //   exportData.push({
-    //     tenLop: table.tenLop,
-    //     khoiLop:table.khoiLop.tenKhoiLop,
-    //     hocPhi:table.hocPhi,
-    //     nienHoc:table.nienHoc.tenNienHoc,
-    //   });
-    // });
-    // this.exportService.exportPdf(
-    //   {
-    //     tenLop: "Tên lớp",
-    //     khoiLop: "Khối lớp",
-    //     hocPhi: "Học phí",
-    //     nienHoc: "Niên học",
-    //   },
-    //   exportData,
-    //   'DanhSachNhanSu'
-    // );
+  exportPdf() {
+    const exportData: any[] = [];
+    this.nhanSus.forEach((table) => {
+      exportData.push({
+        MaNhanSu: table.maNhanSu,
+        Ho: table.ho,
+        Ten: table.ten,
+        GioiTinh: table.gioiTinh?.tenGioiTinh,
+        NgaySinh: table.ngaySinh,
+        TrangThai: table.trangThaiLamViec?.tenTrangThai,
+        ViTri: table.loaiNhanSu?.tenLoaiNhanSu,
+        ChucVu: table.chucVu?.tenChucVu,
+        PhongBan: table.phongBan?.tenPhongBan,
+      });
+    });
+    this.exportService.exportPdf(
+      {
+        MaNhanSu: 'Mã nhân sự',
+        Ho: 'Họ',
+        Ten: 'Tên',
+        GioiTinh: 'Giới tính',
+        NgaySinh: 'Ngày sinh',
+        TrangThai: 'Trạng thái',
+        ViTri: 'Vị trí',
+        ChucVu: 'Chức vụ',
+        PhongBan: 'Phòng ban',
+      },
+      exportData,
+      'DanhSachNhanSu'
+    );
   }
 
-  public getPhongBans(): void {
+  getPhongBans(): void {
     this.dataService.getPhongBans().subscribe(
       (success) => {
         this.phongBans = success;
@@ -122,12 +136,11 @@ export class NhanSuComponent implements OnInit {
     );
   }
 
-  public getNhanSus(): void {
+  getNhanSus(): void {
     this.loading = true;
     this.dataService.getNhanSus().subscribe(
       (data) => {
         this.nhanSus = data;
-        //this.displayNhanSus=this.nhanSus.filter((nhanSu)=>nhanSu.nienHoc.maNienHoc===this.selectedNienHoc?.maNienHoc);
         this.loading = false;
       },
       (error) => {
@@ -136,13 +149,13 @@ export class NhanSuComponent implements OnInit {
     );
   }
 
-  public getLoaiNhanSus(): void {
+  getLoaiNhanSus(): void {
     this.dataService.getLoaiNhanSus().subscribe((data) => {
       this.loaiNhanSus = data;
     });
   }
 
-  public getChucVus(): void {
+  getChucVus(): void {
     if (this.selectedLoaiNhanSu) {
       this.dataService
         .getChucVusByLoaiNhanSu(this.selectedLoaiNhanSu?.maLoaiNhanSu)
@@ -152,13 +165,13 @@ export class NhanSuComponent implements OnInit {
     }
   }
 
-  public getKhoiLops(): void {
+  getKhoiLops(): void {
     this.dataService.getKhoiLops().subscribe((data) => {
       this.khoiLops = data;
     });
   }
 
-  public getLopHocsByKhoiLop(): void {
+  getLopHocsByKhoiLop(): void {
     // this.loading=true;
     if (this.selectedNienHoc && this.selectedKhoiLop) {
       this.dataService
@@ -174,37 +187,38 @@ export class NhanSuComponent implements OnInit {
     }
   }
 
-  public getGioiTinhs(): void {
+  getGioiTinhs(): void {
     this.dataService.getGioiTinhs().subscribe((success) => {
       this.gioiTinhs = success;
     });
   }
 
-  public getTrangThaiLamViecs(): void {
+  getTrangThaiLamViecs(): void {
     this.dataService.getTrangThaiLamViecs().subscribe((success) => {
       this.trangThaiLamViecs = success;
     });
   }
 
-  public getDanTocs(): void {
+  getDanTocs(): void {
     this.dataService.getDanTocs().subscribe((success) => {
       this.danTocs = success;
     });
   }
 
-  public getTonGiaos(): void {
+  getTonGiaos(): void {
     this.dataService.getTonGiaos().subscribe((success) => {
       this.tonGiaos = success;
     });
   }
 
-  public getQuocGias(): void {
+  getQuocGias(): void {
     this.dataService.getQuocGias().subscribe((success) => {
       this.quocTichs = success;
     });
   }
 
-  public openNew(): void {
+  openNew(): void {
+    this.dialogHeader = 'Thêm nhân sự';
     this.nhanSu = Object.assign({}, this.dataService.newNhanSu);
     this.submitted = false;
     this.nhanSuDialog = true;
@@ -222,8 +236,8 @@ export class NhanSuComponent implements OnInit {
     this.getQuocGias();
   }
 
-  public editNhanSu(nhanSu: NhanSu): void {
-    console.log('edit nhanSu:', nhanSu);
+  editNhanSu(nhanSu: NhanSu): void {
+    this.dialogHeader = 'Sửa nhân sự';
     this.nhanSu = nhanSu;
     this.selectedKhoiLop = this.nhanSu.khoiLop;
     this.selectedGioiTinh = this.nhanSu.gioiTinh;
@@ -253,8 +267,7 @@ export class NhanSuComponent implements OnInit {
     this.getLopHocsByKhoiLop();
   }
 
-  public deleteNhanSu(nhanSu: NhanSu) {
-    console.log('delete hoc sinh', nhanSu);
+  deleteNhanSu(nhanSu: NhanSu) {
     this.confirmationService.confirm({
       message: 'Bạn có muốn xóa ' + nhanSu.ho + ' ' + nhanSu.ten + '?',
       header: 'Xác nhận',
@@ -273,8 +286,7 @@ export class NhanSuComponent implements OnInit {
     });
   }
 
-  public hideDialog(cancel = true, success = true): void {
-    console.log('hideDialog: ');
+  hideDialog(cancel = true, success = true): void {
     this.nhanSuDialog = false;
     if (cancel) {
       // this.messageService.add({
@@ -301,9 +313,8 @@ export class NhanSuComponent implements OnInit {
     this.submitted = false;
   }
 
-  public saveNhanSu() {
+  saveNhanSu() {
     this.submitted = true;
-    console.log('saveNhanSu: ', this.nhanSu);
     if (this.selectedGioiTinh) {
       this.nhanSu.maGioiTinh = this.selectedGioiTinh.maGioiTinh;
     }
@@ -342,14 +353,12 @@ export class NhanSuComponent implements OnInit {
     this.nhanSu.ngaySinh = this._ngaySinh;
     this.nhanSu.ngayVaoTruong = this._ngayVaoTruong;
     this.nhanSu.ngayCapNhat = new Date();
-    console.log('saveNhanSu: ', this.nhanSu);
     if (this.checkValid(this.nhanSu)) {
       if (this.nhanSu.maNhanSu === 0) {
         this.nhanSu.matKhau = 'Admin@123';
         this.nhanSu.maTrangThaiTaiKhoan = '0';
         this.dataService.addNhanSu(this.nhanSu).subscribe(
           (data) => {
-            console.log('return data = ', data);
             this.hideDialog(false, true);
             this.getNhanSus();
           },
@@ -363,7 +372,6 @@ export class NhanSuComponent implements OnInit {
           .updateNhanSu(this.nhanSu.maNhanSu, this.nhanSu)
           .subscribe(
             (data) => {
-              console.log('return data = ', data);
               this.hideDialog(false, true);
               this.getNhanSus();
             },
@@ -376,59 +384,59 @@ export class NhanSuComponent implements OnInit {
     }
   }
 
-  public onKhoiLopChange(event: any): void {
+  onKhoiLopChange(event: any): void {
     const khopLop: KhoiLop = event;
     this.selectedKhoiLop = khopLop;
     this.getLopHocsByKhoiLop();
   }
 
-  public onLopHocChange(event: any): void {
+  onLopHocChange(event: any): void {
     const lopHoc: LopHoc = event;
     this.selectedLopHoc = lopHoc;
   }
 
-  public onPhongBanChange(event: any): void {
+  onPhongBanChange(event: any): void {
     const phongBan: PhongBan = event;
     this.selectedPhongBan = phongBan;
   }
 
-  public onLoaiNhanSuChange(event: any): void {
+  onLoaiNhanSuChange(event: any): void {
     const loaiNhanSu: LoaiNhanSu = event;
     this.selectedLoaiNhanSu = loaiNhanSu;
     this.getChucVus();
   }
 
-  public onChucVuChange(event: any): void {
+  onChucVuChange(event: any): void {
     const chucVu: ChucVu = event;
     this.selectedChucVu = chucVu;
   }
 
-  public onGioiTinhChange(event: any): void {
+  onGioiTinhChange(event: any): void {
     const gioiTinh: GioiTinh = event;
     this.selectedGioiTinh = gioiTinh;
   }
 
-  public onTrangThaiLamViecChange(event: any): void {
+  onTrangThaiLamViecChange(event: any): void {
     const trangThaiLamViec: TrangThaiLamViec = event;
     this.selectedTrangThaiLamViec = trangThaiLamViec;
   }
 
-  public onDanTocChange(event: any): void {
+  onDanTocChange(event: any): void {
     const danToc: DanToc = event;
     this.selectedDanToc = danToc;
   }
 
-  public onTonGiaoChange(event: any): void {
+  onTonGiaoChange(event: any): void {
     const tonGiao: TonGiao = event;
     this.selectedTonGiao = tonGiao;
   }
 
-  public onQuocTichChange(event: any): void {
+  onQuocTichChange(event: any): void {
     const quocTich: QuocGia = event;
     this.selectedQuocTich = quocTich;
   }
 
-  checkValid(nhanSu: NhanSu): boolean {
+  private checkValid(nhanSu: NhanSu): boolean {
     if (!nhanSu.ho.trim()) return false;
     if (!nhanSu.ten.trim()) return false;
     if (!nhanSu.maGioiTinh) return false;

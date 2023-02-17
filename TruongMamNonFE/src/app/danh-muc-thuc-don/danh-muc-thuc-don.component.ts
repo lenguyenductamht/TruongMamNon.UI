@@ -19,30 +19,31 @@ export class DanhMucThucDonComponent implements OnInit {
     private confirmationService: ConfirmationService
   ) {}
 
-  public loading = true;
-  public danhMucThucDonDialog: boolean = false;
+  dialogHeader = '';
+  loading = true;
+  danhMucThucDonDialog: boolean = false;
 
-  public danhMucThucDons: DanhMucThucDon[] = [];
+  danhMucThucDons: DanhMucThucDon[] = [];
 
-  public danhMucThucDon: DanhMucThucDon = Object.assign(
+  danhMucThucDon: DanhMucThucDon = Object.assign(
     {},
     this.dataService.newDanhMucThucDon
   );
-  public submitted: boolean = false;
-  public cols: any[] | undefined;
+  submitted: boolean = false;
+  cols: any[] | undefined;
 
-  public exportColumns: any[] | undefined;
-  public ngOnInit(): void {
+  exportColumns: any[] | undefined;
+  ngOnInit(): void {
     this.getDanhMucThucDons();
   }
 
-  public exportExcel() {
+  exportExcel() {
     const exportData: any[] = [];
     this.danhMucThucDons.forEach((table) => {
       exportData.push({
-        tenDanhMuc: table.tenDanhMuc,
-        ghiChu: table.ghiChu,
-        thoiGian: table.thoiGian,
+        TenDanhMuc: table.tenDanhMuc,
+        GhiChu: table.ghiChu,
+        ThoiGian: table.thoiGian,
       });
     });
     this.exportService.exportExcel(exportData, 'DanhMucThucDon');
@@ -52,47 +53,43 @@ export class DanhMucThucDonComponent implements OnInit {
     const exportData: any[] = [];
     this.danhMucThucDons.forEach((table) => {
       exportData.push({
-        tenDanhMuc: table.tenDanhMuc,
-        ghiChu: table.ghiChu,
-        thoiGian: table.thoiGian,
+        TenDanhMuc: table.tenDanhMuc,
+        GhiChu: table.ghiChu,
+        ThoiGian: table.thoiGian,
       });
     });
     this.exportService.exportPdf(
       {
-        tenDanhMuc: 'Tên danh mục',
-        ghiChu: 'Ghi Chú',
-        thoiGian: 'Thời gian',
-        nangLuong: 'Năng lượng',
-        chatDam: 'Chất đạm',
-        chatBeo: 'Chất béo',
-        chatBot: 'Chất bột',
+        TenDanhMuc: 'Tên danh mục',
+        GhiChu: 'Ghi Chú',
+        ThoiGian: 'Thời gian',
       },
       exportData,
       'DanhMucThucDon'
     );
   }
 
-  public getDanhMucThucDons(): void {
+  getDanhMucThucDons(): void {
     this.dataService.getDanhMucThucDons().subscribe((data) => {
       this.danhMucThucDons = data;
       this.loading = false;
     });
   }
 
-  public openNew(): void {
+  openNew(): void {
+    this.dialogHeader = 'Thêm danh mục thực đơn';
     this.danhMucThucDon = Object.assign({}, this.dataService.newDanhMucThucDon);
     this.submitted = false;
     this.danhMucThucDonDialog = true;
   }
 
-  public editDanhMucThucDon(danhMucThucDon: DanhMucThucDon): void {
-    console.log('edit danhMucThucDon:', danhMucThucDon);
+  editDanhMucThucDon(danhMucThucDon: DanhMucThucDon): void {
+    this.dialogHeader = 'Sửa danh mục thực đơn';
     this.danhMucThucDon = danhMucThucDon;
     this.danhMucThucDonDialog = true;
   }
 
-  public deleteDanhMucThucDon(danhMucThucDon: DanhMucThucDon) {
-    console.log('delete danh muc thuc don', danhMucThucDon);
+  deleteDanhMucThucDon(danhMucThucDon: DanhMucThucDon) {
     this.confirmationService.confirm({
       message: 'Bạn có muốn xóa ' + danhMucThucDon.tenDanhMuc + '?',
       header: 'Xác nhận',
@@ -113,8 +110,7 @@ export class DanhMucThucDonComponent implements OnInit {
     });
   }
 
-  public hideDialog(cancel = true, success = true): void {
-    console.log('hideDialog: ');
+  hideDialog(cancel = true, success = true): void {
     this.danhMucThucDonDialog = false;
     if (cancel) {
       this.messageService.add({
@@ -141,18 +137,16 @@ export class DanhMucThucDonComponent implements OnInit {
     this.submitted = false;
   }
 
-  public saveDanhMucThucDon() {
+  saveDanhMucThucDon() {
     this.submitted = true;
-    console.log('saveDanhMucThucDon: ', this.danhMucThucDon);
     if (this.danhMucThucDon.maDanhMuc === 0) {
       this.dataService.addDanhMucThucDon(this.danhMucThucDon).subscribe(
         (data) => {
-          console.log('return data = ', data);
-          this.danhMucThucDons.push(data);
+          this.getDanhMucThucDons();
           this.hideDialog(false, true);
         },
         (error) => {
-          console.log('error');
+          console.log(error);
           this.hideDialog(false, false);
         }
       );
@@ -165,11 +159,11 @@ export class DanhMucThucDonComponent implements OnInit {
         )
         .subscribe(
           (data) => {
-            console.log('return data = ', data);
+            this.getDanhMucThucDons();
             this.hideDialog(false, true);
           },
           (error) => {
-            console.log('error');
+            console.log(error);
             this.hideDialog(false, false);
           }
         );

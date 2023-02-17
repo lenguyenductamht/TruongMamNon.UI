@@ -23,6 +23,7 @@ export class ThucDonComponent implements OnInit {
     private confirmationService: ConfirmationService
   ) {}
 
+  dialogHeader = '';
   loading = false;
   thucDonDialog: boolean = false;
 
@@ -44,45 +45,41 @@ export class ThucDonComponent implements OnInit {
   cols: any[] | undefined;
 
   exportColumns: any[] | undefined;
-  public ngOnInit(): void {
+  ngOnInit(): void {
     this.getThucDons();
   }
 
-  public exportExcel() {
-    // const exportData:any[]=[];
-    // this.thucDons.forEach((table)=>{
-    //   exportData.push({
-    //     TenThucDon: table.tenThucDon,
-    //     GhiChu:table.ghiChu,
-    //   });
-    // });
-    //this.exportService.exportExcel(exportData, 'ThucDon');
+  exportExcel() {
+    const exportData: any[] = [];
+    this.thucDons.forEach((table) => {
+      exportData.push({
+        NgayTao: table.ngayTao,
+        NgayApDung: table.ngayApDung,
+        DanhMuc: table.danhMucThucDon?.tenDanhMuc,
+      });
+    });
+    this.exportService.exportExcel(exportData, 'DanhSachThucDon');
   }
 
-  public exportPdf() {
-    // const exportData:any[]=[];
-    // this.thucDons.forEach((table)=>{
-    //   exportData.push({
-    //     TenThucDon: table.tenThucDon,
-    //     GhiChu:table.ghiChu,
-    //   });
-    // });
-    // this.exportService.exportPdf(
-    //   {
-    //     TenThucDon: "Tên ThucDon",
-    //     GhiChu: "Ghi Chú",
-    //   },
-    //   exportData,
-    //   'ThucDon'
-    // );
+  exportPdf() {
+    const exportData: any[] = [];
+    this.thucDons.forEach((table) => {
+      exportData.push({
+        NgayTao: table.ngayTao,
+        NgayApDung: table.ngayApDung,
+        DanhMuc: table.danhMucThucDon?.tenDanhMuc,
+      });
+    });
+    this.exportService.exportPdf(
+      {
+        NgayTao: 'Ngày tạo',
+        NgayApDung: 'Ngày áp dụng',
+        DanhMuc: 'Danh mục',
+      },
+      exportData,
+      'DanhSachThucDon'
+    );
   }
-  // public getThucDons(): void {
-  //   this.loading = true;
-  //   this.dataService.getThucDons().subscribe((data) => {
-  //     this.thucDons = data;
-  //     this.loading = false;
-  //   });
-  // }
 
   getThucDons(): void {
     this.loading = true;
@@ -110,7 +107,8 @@ export class ThucDonComponent implements OnInit {
     });
   }
 
-  public openNew(): void {
+  openNew(): void {
+    this.dialogHeader = 'Thêm thực đơn';
     this.thucDon = Object.assign({}, this.dataService.newThucDon);
     this.thucDonMonAns = [];
     this.getMonAns();
@@ -121,8 +119,8 @@ export class ThucDonComponent implements OnInit {
     this._ngayApDung = new Date();
   }
 
-  public editThucDon(thucDon: ThucDon): void {
-    console.log('edit thucDon:', thucDon);
+  editThucDon(thucDon: ThucDon): void {
+    this.dialogHeader = 'Sửa thực đơn';
     this.thucDon = thucDon;
     this.thucDonDialog = true;
     this.getMonAns();
@@ -133,15 +131,13 @@ export class ThucDonComponent implements OnInit {
     this.selectedDanhMucThucDon = this.thucDon.danhMucThucDon;
   }
 
-  public deleteThucDon(thucDon: ThucDon) {
-    console.log('delete phieu nhap thuc pham', thucDon);
+  deleteThucDon(thucDon: ThucDon) {
     this.confirmationService.confirm({
       message: 'Bạn có muốn xóa thực đơn này?',
       header: 'Xác nhận',
       icon: 'pi pi-exclamation-triangle',
       accept: () => {
         this.dataService.deleteThucDon(thucDon.maThucDon).subscribe((data) => {
-          console.log(data);
           this.getThucDons();
           this.messageService.add({
             severity: 'success',
@@ -154,8 +150,7 @@ export class ThucDonComponent implements OnInit {
     });
   }
 
-  public hideDialog(cancel = true, success = true): void {
-    console.log('hideDialog: ');
+  hideDialog(cancel = true, success = true): void {
     this.thucDonDialog = false;
     if (cancel) {
       this.messageService.add({
@@ -182,9 +177,8 @@ export class ThucDonComponent implements OnInit {
     this.submitted = false;
   }
 
-  public saveThucDon() {
+  saveThucDon() {
     this.submitted = true;
-    console.log('saveThucDon: ', this.thucDon);
     this.thucDon.ngayTao = this._ngayTao;
     this.thucDon.ngayApDung = this._ngayApDung;
     if (this.selectedDanhMucThucDon) {
@@ -195,7 +189,6 @@ export class ThucDonComponent implements OnInit {
       if (this.thucDon.maThucDon === 0) {
         this.dataService.addThucDon(this.thucDon).subscribe(
           (data) => {
-            console.log('return data = ', data);
             this.thucDonMonAns.forEach((element) => {
               element.maThucDon = data.maThucDon;
               this.dataService
@@ -215,7 +208,6 @@ export class ThucDonComponent implements OnInit {
           .updateThucDon(this.thucDon.maThucDon, this.thucDon)
           .subscribe(
             (data) => {
-              console.log('return data = ', data);
               this.getThucDons();
               this.hideDialog(false, true);
             },
@@ -258,14 +250,14 @@ export class ThucDonComponent implements OnInit {
     );
   }
 
-  checkValid(thucDon: ThucDon): boolean {
+  private checkValid(thucDon: ThucDon): boolean {
     if (!thucDon.ngayTao) return false;
     if (!thucDon.ngayApDung) return false;
     if (thucDon.maDanhMuc === 0) return false;
     return true;
   }
 
-  checkValid2(): boolean {
+  private checkValid2(): boolean {
     if (this.thucDonMonAns.length === 0) {
       this.messageService.add({
         severity: 'error',

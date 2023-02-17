@@ -26,6 +26,7 @@ export class PhieuTiemVaccineComponent implements OnInit {
     private confirmationService: ConfirmationService
   ) {}
 
+  dialogHeader = '';
   loading = false;
   phieuTiemVaccineDialog: boolean = false;
 
@@ -52,50 +53,52 @@ export class PhieuTiemVaccineComponent implements OnInit {
   selectedHocSinhs: HocSinh[] = [];
 
   exportColumns: any[] | undefined;
-  public ngOnInit(): void {
+  ngOnInit(): void {
     this.dataService.selectedNienHoc$.subscribe((nienHoc) => {
       this.selectedNienHoc = nienHoc;
     });
     this.getPhieuTiemVaccinesByNienHoc();
   }
 
-  public exportExcel() {
-    // const exportData:any[]=[];
-    // this.phieuTiemVaccines.forEach((table)=>{
-    //   exportData.push({
-    //     TenPhieuTiemVaccine: table.tenPhieuTiemVaccine,
-    //     GhiChu:table.ghiChu,
-    //   });
-    // });
-    //this.exportService.exportExcel(exportData, 'PhieuTiemVaccine');
+  exportExcel() {
+    const exportData: any[] = [];
+    this.phieuTiemVaccines.forEach((table) => {
+      exportData.push({
+        DotTiemVaccine: table.dotTiemVaccine?.tenDotTiemVaccine,
+        MaHocSinh: table.hocSinh?.maHocSinh,
+        Ho: table.hocSinh?.ho,
+        Ten: table.hocSinh?.ten,
+        NgaySinh: table.hocSinh?.ngaySinh,
+      });
+    });
+    this.exportService.exportExcel(exportData, 'DanhSachPhieuTiemVaccine');
   }
 
-  public exportPdf() {
-    // const exportData:any[]=[];
-    // this.phieuTiemVaccines.forEach((table)=>{
-    //   exportData.push({
-    //     TenPhieuTiemVaccine: table.tenPhieuTiemVaccine,
-    //     GhiChu:table.ghiChu,
-    //   });
-    // });
-    // this.exportService.exportPdf(
-    //   {
-    //     TenPhieuTiemVaccine: "Tên PhieuTiemVaccine",
-    //     GhiChu: "Ghi Chú",
-    //   },
-    //   exportData,
-    //   'PhieuTiemVaccine'
-    // );
+  exportPdf() {
+    const exportData: any[] = [];
+    this.phieuTiemVaccines.forEach((table) => {
+      exportData.push({
+        DotTiemVaccine: table.dotTiemVaccine?.tenDotTiemVaccine,
+        MaHocSinh: table.hocSinh?.maHocSinh,
+        Ho: table.hocSinh?.ho,
+        Ten: table.hocSinh?.ten,
+        NgaySinh: table.hocSinh?.ngaySinh,
+      });
+    });
+    this.exportService.exportPdf(
+      {
+        DotTiemVaccine: 'Đợt tiêm vaccine',
+        MaHocSinh: 'Mã học sinh',
+        Ho: 'Họ',
+        Ten: 'Tên',
+        NgaySinh: 'Ngày sinh',
+      },
+      exportData,
+      'DanhSachPhieuTiemVaccine'
+    );
   }
-  // public getPhieuTiemVaccines(): void {
-  //   this.loading = true;
-  //   this.dataService.getPhieuTiemVaccines().subscribe((data) => {
-  //     this.phieuTiemVaccines = data;
-  //     this.loading = false;
-  //   });
-  // }
 
-  public getPhieuTiemVaccinesByNienHoc(): void {
+  getPhieuTiemVaccinesByNienHoc(): void {
     this.loading = true;
     if (this.selectedNienHoc) {
       this.dataService
@@ -107,21 +110,11 @@ export class PhieuTiemVaccineComponent implements OnInit {
     }
   }
 
-  public getKhoiLops(): void {
+  getKhoiLops(): void {
     this.dataService.getKhoiLops().subscribe((data) => {
       this.khoiLops = data;
     });
   }
-
-  // public getLopHocsByNienHoc():void{
-  //   if(this.selectedNienHoc && this.selectedKhoiLop){
-  //     this.dataService.getLopHocsByNienHoc(this.selectedNienHoc?.maNienHoc).subscribe((data)=>{
-  //       this.lopHocs=data;
-  //       console.log(data);
-  //       //this.getHocSinhs();
-  //     });
-  //   }
-  // }
 
   getDotTiemVaccinesByNienHoc(): void {
     if (this.selectedNienHoc) {
@@ -136,19 +129,7 @@ export class PhieuTiemVaccineComponent implements OnInit {
     }
   }
 
-  // public getLopHocsByNienHocKhoiLop():void{
-  //   // this.loading=true;
-  //   if(this.selectedNienHoc && this.selectedKhoiLop){
-  //     this.dataService.getLopHocsByNienHocKhoiLop(this.selectedNienHoc?.maNienHoc, this.selectedKhoiLop?.maKhoiLop).subscribe((data)=>{
-  //       this.lopHocs=data;
-  //       // this.loading=false;
-  //       console.log(data);
-  //       //this.getHocSinhs();
-  //     });
-  //   }
-  // }
-
-  public getHocSinhs(): void {
+  getHocSinhs(): void {
     if (this.selectedLopHoc) {
       this.dataService
         .getHocSinhsByLopHoc(this.selectedLopHoc.maLop)
@@ -167,7 +148,7 @@ export class PhieuTiemVaccineComponent implements OnInit {
       });
     }
   }
-  public getLopHocs(): void {
+  getLopHocs(): void {
     if (this.selectedNienHoc && !this.selectedKhoiLop) {
       this.dataService
         .getLopHocsByNienHoc(this.selectedNienHoc.maNienHoc)
@@ -187,6 +168,7 @@ export class PhieuTiemVaccineComponent implements OnInit {
   }
 
   public openNew(): void {
+    this.dialogHeader = 'Thêm phiếu tiêm vaccine';
     this.phieuTiemVaccine = Object.assign(
       {},
       this.dataService.newPhieuTiemVaccine
@@ -200,13 +182,12 @@ export class PhieuTiemVaccineComponent implements OnInit {
   }
 
   public editPhieuTiemVaccine(phieuTiemVaccine: PhieuTiemVaccine): void {
-    console.log('edit phieuTiemVaccine:', phieuTiemVaccine);
+    this.dialogHeader = 'Sửa phiếu tiêm vaccine';
     this.phieuTiemVaccine = phieuTiemVaccine;
     this.phieuTiemVaccineDialog = true;
   }
 
   public deletePhieuTiemVaccine(phieuTiemVaccine: PhieuTiemVaccine) {
-    console.log('delete phieu tiem vaccine', phieuTiemVaccine);
     this.confirmationService.confirm({
       message:
         'Bạn có muốn xóa phiếu tiêm của ' +
@@ -232,8 +213,7 @@ export class PhieuTiemVaccineComponent implements OnInit {
     });
   }
 
-  public hideDialog(cancel = true, success = true): void {
-    console.log('hideDialog: ');
+  hideDialog(cancel = true, success = true): void {
     this.phieuTiemVaccineDialog = false;
     if (cancel) {
       this.messageService.add({
@@ -260,9 +240,8 @@ export class PhieuTiemVaccineComponent implements OnInit {
     this.submitted = false;
   }
 
-  public savePhieuTiemVaccine() {
+  savePhieuTiemVaccine() {
     this.submitted = true;
-    console.log('savePhieuTiemVaccine: ', this.phieuTiemVaccine);
     if (this.selectedDotTiemVaccine) {
       this.phieuTiemVaccine.maDotTiemVaccine =
         this.selectedDotTiemVaccine.maDotTiemVaccine;
@@ -271,11 +250,8 @@ export class PhieuTiemVaccineComponent implements OnInit {
       if (this.phieuTiemVaccine.maPhieuTiemVaccine === 0) {
         this.selectedHocSinhs.forEach((element) => {
           this.phieuTiemVaccine.maHocSinh = element.maHocSinh;
-          console.log(this.phieuTiemVaccine);
           this.dataService.addPhieuTiemVaccine(this.phieuTiemVaccine).subscribe(
-            (data) => {
-              console.log('return data = ', data);
-            },
+            (data) => {},
             (error) => {
               console.log(error);
               this.hideDialog(false, false);
@@ -292,7 +268,6 @@ export class PhieuTiemVaccineComponent implements OnInit {
           )
           .subscribe(
             (data) => {
-              console.log('return data = ', data);
               this.getPhieuTiemVaccinesByNienHoc();
               this.hideDialog(false, true);
             },
@@ -305,20 +280,20 @@ export class PhieuTiemVaccineComponent implements OnInit {
     }
   }
 
-  public onKhoiLopChange(event: any) {
+  onKhoiLopChange(event: any) {
     const khoiLop: KhoiLop = event;
     this.selectedKhoiLop = khoiLop;
     this.getLopHocs();
     this.getHocSinhs();
   }
 
-  public onLopHocChange(event: any) {
+  onLopHocChange(event: any) {
     const lopHoc: LopHoc = event;
     this.selectedLopHoc = lopHoc;
     this.getHocSinhs();
   }
 
-  public onDotTiemVaccineChange(event: any) {
+  onDotTiemVaccineChange(event: any) {
     const dotTiemVaccine: DotTiemVaccine = event;
     this.selectedDotTiemVaccine = dotTiemVaccine;
   }

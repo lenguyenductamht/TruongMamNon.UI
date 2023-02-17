@@ -88,7 +88,7 @@
     <ng-template pTemplate="header">
       <tr>
         <th pSortableColumn="maNhanSu" style="min-width: 5rem">
-          Mã học sinh <p-sortIcon field="maNhanSu"></p-sortIcon>
+          Mã nhân sự <p-sortIcon field="maNhanSu"></p-sortIcon>
         </th>
         <th pSortableColumn="ho" style="min-width: 5rem">
           Họ <p-sortIcon field="ho"></p-sortIcon>
@@ -161,7 +161,7 @@
 <p-dialog
   [(visible)]="nhanSuDialog"
   [style]="{ width: '80%' }"
-  header="Thông tin nhân sự"
+  header="{{ dialogHeader }}"
   [modal]="true"
   styleClass="p-fluid"
 >
